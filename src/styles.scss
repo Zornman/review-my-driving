@@ -11,8 +11,29 @@ html, body {
 
 body { 
     margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-    overflow: hidden; 
+    font-family: 'Comic Sans MS', sans-serif;
+    overflow: hidden;
+    background-color: #f9f9f9; /* Light background */
+    color: #333; /* Dark gray text */ 
+}
+
+input, textarea, select, label {
+    font-family: 'Gloria Hallelujah', cursive !important; /* Form elements */
+}
+
+button {
+    background-color: #e63946; /* Muted red */
+    color: #fff; /* White text */
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #d62839; /* Slightly darker red on hover */
+        transform: translateY(-10px) rotate(10deg); /* Make it jump */
+        transition: transform 0.3s;
+    }
 }
 
 .layout {
@@ -34,6 +55,15 @@ mat-form-field {
     padding-right: 3vh;
 }
 
+mat-form-field:hover {
+    animation: wiggle 0.5s ease-in-out;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0); }
+    50% { transform: rotate(2deg); }
+}
+
 .pull-right {
     float: right;
 }
@@ -42,31 +72,20 @@ mat-form-field {
     float: left;
 }
 
-// Homepage carousel
-.carousel {
-    background-color: $secondary-white;
-    height: 30vh;
-    border: 1px solid black;
+div.mat-mdc-select-panel {
+    --mat-select-panel-background-color: white;
+    --mat-sys-surface-container: white;
+    background-color: var(--mat-select-panel-background-color, var(--mat-sys-surface-container));
 }
 
-//mat-card styling
-.mat-mdc-card-header {
-    justify-content: center;
+.mat-mdc-form-field-flex {
+    padding: 5px;
 }
 
-.mat-mdc-card-title {
-    text-align: center;
-}
-
-.mat-mdc-card-outlined {
-    background-color: $primary-gray !important;
-}
-
-.mat-mdc-card-subtitle {
-    color: black !important;
-}
-
-//mat-button styling
-.mat-mdc-button {
-    color: $primary-red !important;
+.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+    --mdc-snackbar-container-color: white;
+    --mat-sys-inverse-surface: grey;
+    color: var(--mdc-snackbar-supporting-text-color, var(--mat-sys-inverse-on-surface));
+    border-radius: var(--mdc-snackbar-container-shape, var(--mat-sys-corner-extra-small));
+    background-color: var(--mdc-snackbar-container-color, var(--mat-sys-inverse-surface));
 }

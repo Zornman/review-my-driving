@@ -1,36 +1,38 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { RandomizeInputDirective } from '../shared/directives/randomize-input.directive';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-home',
-  imports: [ FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule ],
+  imports: [ RandomizeInputDirective, FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule, MatTooltipModule ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-  reasonForContacting!: string;
+  private _snackBar = inject(MatSnackBar);
+
+  formData = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    reasonForContacting: '',
+    description: ''
+  };
 
   constructor() { }
 
-  onFocusEvent($event: any) {
-    if (this.performAction(3)) {
-      
-    }
+  submit() {
+    console.log(this.formData);
+    this.openSnackBar('Congratulations on being an asshole!', 'Close :)')
   }
 
-  // Rolls based on chance number and returns boolean
-  performAction(chance: number): boolean {
-    if (chance <= 0) {
-      return false; // No chance of success
-    }
-    if (chance >= 1 && chance % 1 === 0) {
-      return Math.random() < 1 / chance;
-    } else {
-      throw Error("Integer values only")
-    }
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action);
   }
 }
