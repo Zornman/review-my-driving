@@ -1,0 +1,21 @@
+@import './variables';
+
+.footer {
+    background-color: $primary-blue;
+    color: $secondary-white;
+    position: sticky;
+    bottom: 0;
+
+    padding: 0px 5px;
+    height: 40px;
+
+    .grid-row {
+        height: 100%;
+    }
+}
+
+.footer-branding {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

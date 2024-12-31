@@ -1,0 +1,74 @@
+// Define grid variables
+$grid-columns: 12; // Number of columns
+$gutter-width: 1rem; // Spacing between columns
+$breakpoints: (
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+);
+
+// Mixin for generating grid container
+@mixin grid-container {
+  display: grid;
+  grid-template-columns: repeat($grid-columns, 1fr);
+  gap: $gutter-width;
+}
+
+// Mixin for generating responsive grid columns
+@mixin grid-column($columns, $total-columns: $grid-columns) {
+  grid-column: span $columns;
+  @if $columns > $total-columns {
+    grid-column: span $total-columns;
+  }
+}
+
+// Mixin for responsive breakpoints
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+}
+
+// Grid container class
+.grid-container {
+  @include grid-container;
+
+  &.grid-contrainer-padding {
+    padding-left: 5vh;
+    padding-right: 5vh;
+  }
+}
+
+// Column classes for each breakpoint
+@for $i from 1 through $grid-columns {
+  .col-#{$i} {
+    @include grid-column($i);
+  }
+
+  @each $breakpoint, $size in $breakpoints {
+    .col-#{$breakpoint}-#{$i} {
+      @include respond-to($breakpoint) {
+        @include grid-column($i);
+      }
+    }
+  }
+}
+
+// Row utility class
+.grid-row {
+  display: contents;
+}
+
+// Full-width column utility
+.col-full {
+  grid-column: 1 / -1;
+}
+
+.col-center {
+  display: flex;
+  justify-content: center; // Horizontally center
+  align-items: center;    // Vertically center
+}

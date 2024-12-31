@@ -1,1 +1,72 @@
 /* You can add global styles to this file, and also import other style files */
+@import './styles/variables';
+@import './styles/grid';
+@import './styles/header';
+@import './styles/footer';
+@import './styles/inputs.scss';
+
+html, body { 
+    height: 100%; 
+}
+
+body { 
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    overflow: hidden; 
+}
+
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+}
+
+.content {
+    flex: 1; /* Fills remaining space between header and footer */
+    overflow-y: auto; /* Enables scrolling if content exceeds available space */
+    margin: 5px;
+}
+
+mat-form-field {
+    width: 100%;
+    max-width: 1000px;
+    padding-left: 3vh;
+    padding-right: 3vh;
+}
+
+.pull-right {
+    float: right;
+}
+
+.pull-left {
+    float: left;
+}
+
+// Homepage carousel
+.carousel {
+    background-color: $secondary-white;
+    height: 30vh;
+    border: 1px solid black;
+}
+
+//mat-card styling
+.mat-mdc-card-header {
+    justify-content: center;
+}
+
+.mat-mdc-card-title {
+    text-align: center;
+}
+
+.mat-mdc-card-outlined {
+    background-color: $primary-gray !important;
+}
+
+.mat-mdc-card-subtitle {
+    color: black !important;
+}
+
+//mat-button styling
+.mat-mdc-button {
+    color: $primary-red !important;
+}

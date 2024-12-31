@@ -1,0 +1,5 @@
+@import './variables';
+
+.mat-form-field:not(:disabled) {
+    max-width: 720px !important;
+}
