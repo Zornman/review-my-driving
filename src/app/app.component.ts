@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -11,4 +12,8 @@ import { FooterComponent } from './footer/footer.component';
 })
 export class AppComponent {
   title = 'review-my-driving';
+
+  constructor(private themeService: ThemeService) {
+    
+  }
 }

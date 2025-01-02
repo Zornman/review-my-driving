@@ -9,16 +9,40 @@ html, body {
     height: 100%; 
 }
 
-body { 
+body {
     margin: 0;
-    font-family: 'Comic Sans MS', sans-serif;
+    font-family: 'Butcherman', serif;
     overflow: hidden;
+}
+
+body.light-mode {
     background-color: #f9f9f9; /* Light background */
-    color: #333; /* Dark gray text */ 
+    color: #333; /* Dark gray text */
+    --mat-select-panel-background-color: #f9f9f9;
+    --mat-sys-surface-container: #f9f9f9;
+    --mdc-snackbar-container-color: #f9f9f9;
+    --mat-sys-inverse-surface: #333;
+
+    a {
+        color: #333;
+    }
+}
+
+body.dark-mode {
+    background-color: #333;
+    color: #f9f9f9;
+    --mat-select-panel-background-color: #333;
+    --mat-sys-surface-container: #333;
+    --mdc-snackbar-container-color: #f9f9f9;
+    --mat-sys-inverse-surface: #333;
+
+    a {
+        color: #f9f9f9;
+    }
 }
 
 input, textarea, select, label {
-    font-family: 'Gloria Hallelujah', cursive !important; /* Form elements */
+    font-family: 'Butcherman', serif !important; /* Form elements */
 }
 
 button {
@@ -73,8 +97,7 @@ mat-form-field:hover {
 }
 
 div.mat-mdc-select-panel {
-    --mat-select-panel-background-color: white;
-    --mat-sys-surface-container: white;
+    
     background-color: var(--mat-select-panel-background-color, var(--mat-sys-surface-container));
 }
 
@@ -83,8 +106,6 @@ div.mat-mdc-select-panel {
 }
 
 .mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
-    --mdc-snackbar-container-color: white;
-    --mat-sys-inverse-surface: grey;
     color: var(--mdc-snackbar-supporting-text-color, var(--mat-sys-inverse-on-surface));
     border-radius: var(--mdc-snackbar-container-shape, var(--mat-sys-corner-extra-small));
     background-color: var(--mdc-snackbar-container-color, var(--mat-sys-inverse-surface));

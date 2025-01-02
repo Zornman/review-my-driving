@@ -26,7 +26,7 @@ export class RandomizeInputDirective {
   @HostListener('keypress', ['$event']) onKeypress(event: KeyboardEvent) {
     if (this.performAction(5)) {
         let currentValue = this.el.nativeElement.value;
-        this.renderer.setProperty(this.el.nativeElement, "value", currentValue + this.randomCharacter(5));
+        this.renderer.setProperty(this.el.nativeElement, "value", currentValue + this.randomCharacter(1));
     }
   }
 
