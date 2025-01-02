@@ -9,14 +9,14 @@ export class RandomizeInputDirective {
 
   // Focus event
   @HostListener('focus') onFocus() {
-    if (this.performAction(5)) {
+    if (this.performAction(7)) {
         this.el.nativeElement.blur();
     }
   }
 
   // Blur event
   @HostListener('blur') onBlur() {
-    if (this.performAction(3)) {
+    if (this.performAction(5)) {
         let currentValue = this.el.nativeElement.value;
         this.renderer.setProperty(this.el.nativeElement, "value", "");
     }
@@ -24,7 +24,7 @@ export class RandomizeInputDirective {
 
   // Keypress event
   @HostListener('keypress', ['$event']) onKeypress(event: KeyboardEvent) {
-    if (this.performAction(5)) {
+    if (this.performAction(10)) {
         let currentValue = this.el.nativeElement.value;
         this.renderer.setProperty(this.el.nativeElement, "value", currentValue + this.randomCharacter(1));
     }

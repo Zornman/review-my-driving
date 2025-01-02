@@ -11,8 +11,13 @@ html, body {
 
 body {
     margin: 0;
-    font-family: 'Butcherman', serif;
-    overflow: hidden;
+    font-family: 'DynaPuff', serif;
+    overflow: auto;
+    font-size: 16px;
+
+    @media screen and (max-width: 768px) {
+        font-size: 14px; /* Scale down slightly for readability */
+    }
 }
 
 body.light-mode {
@@ -33,7 +38,7 @@ body.dark-mode {
     color: #f9f9f9;
     --mat-select-panel-background-color: #333;
     --mat-sys-surface-container: #333;
-    --mdc-snackbar-container-color: #f9f9f9;
+    --mdc-snackbar-container-color: #333;
     --mat-sys-inverse-surface: #333;
 
     a {
@@ -42,7 +47,7 @@ body.dark-mode {
 }
 
 input, textarea, select, label {
-    font-family: 'Butcherman', serif !important; /* Form elements */
+    font-family: 'DynaPuff', serif !important; /* Form elements */
 }
 
 button {

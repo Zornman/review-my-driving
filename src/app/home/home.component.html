@@ -27,6 +27,14 @@
         <div class="grid-row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
+                    <mat-label>License plate of Driver</mat-label>
+                    <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" autocomplete="new-password" randomizeInput required>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="grid-row">
+            <div class="col-12 col-center">
+                <mat-form-field appearance="outline">
                     <mat-label>Reason for Contacting us:</mat-label>
                     <mat-select [(ngModel)]="formData.reasonForContacting" name="reasonForContacting">
                         <mat-option value="Aggressive_Driving">Aggressive Driving</mat-option>
@@ -47,11 +55,11 @@
             </div>
         </div>
         <div class="grid-row">
-            <div class="col-6">
-                <span class="pull-right"><a href="/">Want your own bumper sticker?</a></span>
-            </div>
-            <div class="col-6">
+            <div class="col-12 col-center">
                 <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid" matTooltip="Are you sure?" [matTooltipPosition]="'above'">Submit</button>
+            </div>
+            <div class="col-12 col-center">
+                <span class="pull-right"><a href="/">Want your own bumper sticker?</a></span>
             </div>
         </div>
     </div>

@@ -21,6 +21,7 @@ export class HomeComponent {
     firstName: '',
     lastName: '',
     email: '',
+    licensePlate: '',
     reasonForContacting: '',
     description: ''
   };
