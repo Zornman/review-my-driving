@@ -4,7 +4,7 @@
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>First Name</mat-label>
-                    <input matInput [(ngModel)]="formData.firstName" name="firstName" autocomplete="new-password" randomizeInput required>
+                    <input matInput [(ngModel)]="formData.firstName" name="firstName" autocomplete="new-password" required>
                 </mat-form-field>
             </div>
         </div>
@@ -12,7 +12,7 @@
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Last Name</mat-label>
-                    <input matInput [(ngModel)]="formData.lastName" name="lastName" autocomplete="new-password" randomizeInput required>
+                    <input matInput [(ngModel)]="formData.lastName" name="lastName" autocomplete="new-password" required>
                 </mat-form-field>
             </div>
         </div>
@@ -20,7 +20,7 @@
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>E-Mail</mat-label>
-                    <input matInput [(ngModel)]="formData.email" name="email" autocomplete="new-password" randomizeInput required>
+                    <input matInput [(ngModel)]="formData.email" name="email" autocomplete="new-password" required>
                 </mat-form-field>
             </div>
         </div>
@@ -28,15 +28,25 @@
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>License plate of Driver</mat-label>
-                    <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" autocomplete="new-password" randomizeInput required>
+                    <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" autocomplete="new-password" required>
                 </mat-form-field>
             </div>
         </div>
         <div class="grid-row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
-                    <mat-label>Reason for Contacting us*</mat-label>
-                    <mat-select [(ngModel)]="formData.reasonForContacting" name="reasonForContacting">
+                    <mat-label>Lincense Registration State</mat-label>
+                    <mat-select [(ngModel)]="formData.state" name="state" required>
+                        <mat-option *ngFor="let state of states" [value]="state">{{ state }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="grid-row">
+            <div class="col-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>Reason for Contacting us</mat-label>
+                    <mat-select [(ngModel)]="formData.reasonForContacting" name="reasonForContacting" required>
                         <mat-option value="Aggressive_Driving">Aggressive Driving</mat-option>
                         <mat-option value="Cut_Me_Off">Cut me Off</mat-option>
                         <mat-option value="Driving_Slow">Driving Slow</mat-option>

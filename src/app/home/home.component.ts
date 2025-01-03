@@ -7,20 +7,24 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RandomizeInputDirective } from '../shared/directives/randomize-input.directive';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { US_STATES } from '../shared/classes/states';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  imports: [ RandomizeInputDirective, FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule, MatTooltipModule ],
+  imports: [ RandomizeInputDirective, CommonModule, FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule, MatTooltipModule ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
   private _snackBar = inject(MatSnackBar);
+  states = US_STATES; // Load the array of states
 
   formData = {
     firstName: '',
     lastName: '',
     email: '',
+    state: '',
     licensePlate: '',
     reasonForContacting: '',
     description: ''
@@ -30,7 +34,7 @@ export class HomeComponent {
 
   submit() {
     console.log(this.formData);
-    this.openSnackBar('Congratulations on being an asshole!', 'Close :)')
+    this.openSnackBar('Congratulations on being an asshole!', 'Close');
   }
 
   openSnackBar(message: string, action: string) {

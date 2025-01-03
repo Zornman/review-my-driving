@@ -62,8 +62,8 @@ button {
 
     &:hover {
         background-color: #d62839; /* Slightly darker red on hover */
-        transform: translateY(-10px) rotate(10deg); /* Make it jump */
-        transition: transform 0.3s;
+        // transform: translateY(-10px) rotate(10deg); /* Make it jump */
+        // transition: transform 0.3s;
     }
 }
 
@@ -99,14 +99,14 @@ mat-form-field {
     padding-right: 3vh;
 }
 
-mat-form-field:hover {
-    animation: wiggle 0.5s ease-in-out;
-}
+// mat-form-field:hover {
+//     animation: wiggle 0.5s ease-in-out;
+// }
 
-@keyframes wiggle {
-    0%, 100% { transform: rotate(0); }
-    50% { transform: rotate(2deg); }
-}
+// @keyframes wiggle {
+//     0%, 100% { transform: rotate(0); }
+//     50% { transform: rotate(2deg); }
+// }
 
 .pull-right {
     float: right;
