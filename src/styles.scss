@@ -70,14 +70,26 @@ button {
 .layout {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Full viewport height */
+    height: 100%; /* Full viewport height */
+}
+  
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Ensure it stays on top of other content */
+}
+
+.footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1000; /* Ensure it stays on top of other content */
+    text-align: center;
 }
 
 .content {
-    flex: 1; /* Fills remaining space between header and footer */
-    overflow-y: auto; /* Enables scrolling if content exceeds available space */
-    height: auto;
-    margin: 0px 5px 5px 5px;
+    flex: 1; /* Allows the content area to expand and scroll */
+    overflow-y: auto; /* Enables vertical scrolling for the content */
+    padding: 1rem; /* Optional padding for nicer layout */
 }
 
 mat-form-field {
