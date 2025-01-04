@@ -1,6 +1,19 @@
-<form autocomplete="new-password" (ngSubmit)="submit()" #form="ngForm">
+<form autocomplete="new-password" (ngSubmit)="submit(form)" #form="ngForm">
     <div class="grid-container grid-container-padding" style="padding-top: 1vh;">
         <div class="grid-row">
+            <div class="col-12 col-center">
+                <span class="align-middle">Please provide some basic information about yourself, the car in question, and the event that took place.
+                    <br />
+                    We will do our best to make sure they are reprimanded.
+                </span>
+            </div>
+        </div>
+        <div class="grid-row">
+            <!-- <div class="col-12 col-center">
+                <span class="pull-right">
+                    * = Required
+                </span>
+            </div> -->
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>First Name</mat-label>
@@ -11,19 +24,19 @@
         <div class="grid-row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
-                    <mat-label>Last Name</mat-label>
-                    <input matInput [(ngModel)]="formData.lastName" name="lastName" autocomplete="new-password" required>
+                    <mat-label>Last Initial</mat-label>
+                    <input matInput [(ngModel)]="formData.lastName" name="lastName" maxlength="1" autocomplete="new-password" required>
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <!-- <div class="grid-row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>E-Mail</mat-label>
                     <input matInput [(ngModel)]="formData.email" name="email" autocomplete="new-password" required>
                 </mat-form-field>
             </div>
-        </div>
+        </div> -->
         <div class="grid-row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">

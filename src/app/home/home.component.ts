@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
@@ -9,10 +9,11 @@ import { RandomizeInputDirective } from '../shared/directives/randomize-input.di
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { US_STATES } from '../shared/classes/states';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
-  imports: [ RandomizeInputDirective, CommonModule, FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule, MatTooltipModule ],
+  imports: [ RandomizeInputDirective, CommonModule, FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule, MatTooltipModule, HttpClientModule ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -23,21 +24,45 @@ export class HomeComponent {
   formData = {
     firstName: '',
     lastName: '',
-    email: '',
+    // email: '',
     state: '',
     licensePlate: '',
     reasonForContacting: '',
     description: ''
   };
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  submit() {
-    console.log(this.formData);
-    this.openSnackBar('Congratulations on being an asshole!', 'Close');
+  submit(form: NgForm) {
+    
+    this.http
+      .post('/.netlify/functions/sendEmail', this.formData)
+      .subscribe({
+        next: (response: any) => {
+          console.log('Form submission successful:', response);
+          this.openSnackBar('Congratulations on being an asshole!', 'Close');
+          this.resetForm(form);
+        },
+        error: (error) => {
+          console.error('Error submitting form:', error);
+          this.openSnackBar('Error submitting form, try again.', 'Close');
+        },
+      });
   }
 
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action);
+  }
+
+  resetForm(form: NgForm) {
+    form.resetForm(); // Reset the Angular form state
+    this.formData = {
+      firstName: '',
+      lastName: '',
+      state: '',
+      licensePlate: '',
+      reasonForContacting: '',
+      description: '',
+    };
   }
 }
