@@ -1,3 +1,3 @@
 [build]
-  publish = "dist/review-my-driving"
+  publish = "dist/review-my-driving/browser"
   functions = "netlify/functions"
