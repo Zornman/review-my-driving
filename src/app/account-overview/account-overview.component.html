@@ -1,0 +1,305 @@
+<span class="align-middle">Last login Time: {{ user?.metadata?.lastSignInTime }}</span>
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" (selectedTabChange)="onTabChange($event)">
+    <mat-tab label="Submissions">
+        <h3 class="align-middle">Submissions</h3>
+        <div class="account-overview-container">
+            <div class="account-card">
+                <mat-card appearance="outlined">
+                    <mat-card-header>
+                        <mat-card-title class="align-middle">{{ todaysSubmissions }}</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                        <p>Submissions for {{ todaysDate }}</p>
+                        </mat-card-content>
+                </mat-card>
+            </div>
+            <div class="account-card">
+                <mat-card appearance="outlined">
+                    <mat-card-header>
+                        <mat-card-title class="align-middle">{{ lastWeekSubmissions }}</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                        <p>Last 7 days</p>
+                        </mat-card-content>
+                </mat-card>
+            </div>
+            <div class="account-card">
+                <mat-card appearance="outlined">
+                    <mat-card-header>
+                        <mat-card-title class="align-middle">{{ lastMonthSubmissions }}</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                        <p>Last 30 days</p>
+                        </mat-card-content>
+                </mat-card>
+            </div>
+            <div class="account-card">
+                <mat-card appearance="outlined">
+                    <mat-card-header>
+                        <mat-card-title class="align-middle">{{ totalSubmissions }}</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                        <p>Total Submissions</p>
+                        </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-center">
+            
+                    <mat-table [dataSource]="submissionsDataSource" multiTemplateDataRows class="mat-elevation-z8">
+                        <!-- Define columns -->
+                        <ng-container matColumnDef="name">
+                            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{ element.firstName + ' ' + element.lastName + '.' }} </mat-cell>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="dateSubmitted">
+                            <mat-header-cell *matHeaderCellDef> Date Submitted </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{ element.dateSubmitted | date }} </mat-cell>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="reasonForContacting">
+                            <mat-header-cell *matHeaderCellDef> Reason </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{ element.reasonForContacting.replaceAll('_', ' ') }} </mat-cell>
+                        </ng-container>
+                        
+                        <!-- Expand/Collapse Column -->
+                        <ng-container matColumnDef="expand">
+                            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                            <mat-cell *matCellDef="let element">
+                            <button mat-icon-button>
+                                <mat-icon>{{ expandedElement === element ? 'expand_less' : 'expand_more' }}</mat-icon>
+                            </button>
+                            </mat-cell>
+                        </ng-container>
+        
+                        <ng-container matColumnDef="expandedDetail">
+                            <mat-cell *matCellDef="let element" [attr.colspan]="submissionsColumnsToDisplay.length" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                                <div class="expanded-detail">
+                                <p><strong>Comment:</strong> {{ element.description }}</p>
+                                </div>
+                            </mat-cell>
+                        </ng-container>
+                        
+                        <!-- Header Row -->
+                        <mat-header-row *matHeaderRowDef="submissionsColumnsToDisplay"></mat-header-row>
+                        
+                        <!-- Data Row -->
+                        <mat-row 
+                            class="submission-row"
+                            *matRowDef="let element; columns: submissionsColumnsToDisplay;" 
+                            (click)="toggleRow(element, $event)">
+                        </mat-row>
+                        
+                        <!-- Expanded Detail Row -->
+                        <mat-row *matRowDef="let element; columns: ['expandedDetail']" class="detail-row" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"></mat-row>
+
+                        <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell" colspan="4">No submissions yet, you're driving too well!</td>
+                        </tr>
+                    </mat-table>
+                        
+                </div>
+            </div>
+        </div>
+    </mat-tab>
+    <mat-tab label="Account Overview">
+        <h3 class="align-middle">Account Overview</h3>
+        <p class="align-middle">
+            This information cannot be modified at this time.
+        </p>
+        <form [formGroup]="accOverviewForm" class="align-middle" style="max-width: 90%;">
+            <mat-form-field appearance="outline">
+                <mat-label>User ID</mat-label>
+                <input matInput formControlName="userID" name="userID">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Display Name</mat-label>
+                <input matInput formControlName="name" name="name">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>E-Mail</mat-label>
+                <input matInput formControlName="email" name="email">
+            </mat-form-field>
+        </form>
+    </mat-tab>
+    <mat-tab label="Shipping Information" style="overflow-y: hidden;">
+        <h3 class="align-middle">Shipping Information</h3>
+        <form [formGroup]="shippingInfoForm" (submit)="saveShippingInfo()" class="align-middle">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12" style="padding-top: 10px;">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>E-Mail</mat-label>
+                        <input matInput type="text" formControlName="email" name="email" />
+                        <mat-error *ngIf="shippingInfoForm.get('email')?.hasError('required')">
+                          Email is required.
+                        </mat-error>
+                        <mat-error *ngIf="shippingInfoForm.get('email')?.hasError('email')">
+                          Enter a valid email address.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Phone Number</mat-label>
+                        <input matInput type="text" name="phone" formatPhone formControlName="phone" />
+                        <mat-error *ngIf="shippingInfoForm.get('phone')?.hasError('required')">
+                          Phone number is required.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-center">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>First Name</mat-label>
+                        <input matInput type="text" name="firstName" formControlName="firstName" />
+                        <mat-error *ngIf="shippingInfoForm.get('firstName')?.hasError('required')">
+                          First Name is required.
+                        </mat-error>
+                        <mat-error *ngIf="shippingInfoForm.get('firstName')?.hasError('pattern')">
+                          Enter a valid first name.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-center">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Last Name</mat-label>
+                        <input matInput type="text" name="lastName" formControlName="lastName" />
+                        <mat-error *ngIf="shippingInfoForm.get('lastName')?.hasError('required')">
+                          Last Name is required.
+                        </mat-error>
+                        <mat-error *ngIf="shippingInfoForm.get('lastName')?.hasError('pattern')">
+                          Enter a valid last name.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Address line 1</mat-label>
+                        <input matInput type="text" name="address1" formControlName="address1" autocomplete="address-line1" />
+                        <mat-error *ngIf="shippingInfoForm.get('address1')?.hasError('required')">
+                          Address is required.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Address line 2</mat-label>
+                        <input matInput type="text" name="address2" formControlName="address2" autocomplete="address-line2" />
+                      </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Country</mat-label>
+                        <mat-select formControlName="country" name="country">
+                          <mat-option *ngFor="let country of countries" [value]="country.value">{{ country.name }}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="shippingInfoForm.get('country')?.hasError('required')">
+                          Country is required.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-4 col-center">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>City</mat-label>
+                        <input matInput type="text" name="city" formControlName="city" />
+                        <mat-error *ngIf="shippingInfoForm.get('city')?.hasError('required')">
+                          City is required.
+                        </mat-error>
+                        <mat-error *ngIf="shippingInfoForm.get('city')?.hasError('pattern')">
+                          Enter a valid city.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-xs-12 col-sm-4 col-center">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>{{ (shippingInfoForm.get('country')?.value === 'US') ? 'State' : 'Region' }}</mat-label>
+                        <mat-select formControlName="region" name="region" *ngIf="shippingInfoForm.get('country')?.value === 'US'">
+                            <mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
+                        </mat-select>
+                        <input matInput formControlName="region" name="region" *ngIf="shippingInfoForm.get('country')?.value !== 'US'">
+                        <mat-error *ngIf="shippingInfoForm.get('region')?.hasError('required')">
+                          {{ (shippingInfoForm.get('country')?.value !== 'US') ? 'Region' : 'State' }} is required.
+                        </mat-error>
+                        <mat-error *ngIf="shippingInfoForm.get('region')?.hasError('pattern')">
+                          Enter a valid {{ (shippingInfoForm.get('country')?.value !== 'US') ? 'region' : 'state' }}.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-xs-12 col-sm-4 col-center">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Zip Code</mat-label>
+                        <input matInput type="text" name="zip" formControlName="zip" />
+                        <mat-error *ngIf="shippingInfoForm.get('zip')?.hasError('required')">
+                          Zip Code is required.
+                        </mat-error>
+                        <mat-error *ngIf="shippingInfoForm.get('zip')?.hasError('pattern')">
+                          Enter a valid zip code.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-center">
+                        <button mat-stroked-button color="primary" type="submit" [disabled]="!shippingInfoForm.valid">Save Shipping Info</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </mat-tab>
+    <mat-tab label="Order History">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-center">
+                    <h3 class="align-middle">Order History</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-center">
+                    <table mat-table matSort [dataSource]="ordersDataSource" multiTemplateDataRows class="mat-elevation-z8">
+                        <!-- Define columns -->
+                        <ng-container matColumnDef="orderNum">
+                            <mat-header-cell *matHeaderCellDef> Order # </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{ element.orderID }} </mat-cell>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="dateOrdered">
+                            <mat-header-cell *matHeaderCellDef> Date Ordered </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{ element.dateOrdered }} </mat-cell>
+                        </ng-container>
+                        
+                        <!-- Header Row -->
+                        <mat-header-row *matHeaderRowDef="ordersColumnsToDisplay"></mat-header-row>
+                        
+                        <!-- Data Row -->
+                        <mat-row 
+                            class="submission-row"
+                            *matRowDef="let element; columns: ordersColumnsToDisplay;" 
+                            (click)="toggleRow(element, $event)">
+                        </mat-row>
+                        
+                        <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell" colspan="4">
+                                <p>No orders yet, head to the shop and order something to get started!</p>
+                            </td>
+                        </tr>
+
+                        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of submissions"></mat-paginator>
+                    </mat-table>
+                </div>
+            </div>
+        </div>
+    </mat-tab>
+</mat-tab-group>

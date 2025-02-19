@@ -1,0 +1,53 @@
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                <a (click)="backToShop()">‹ Back</a>
+            </p>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+            <app-carousel [images]="productImages"></app-carousel>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" *ngIf="product">
+            <div class="col-xs-12">
+                <div class="product-detail">
+                    <h1>{{ product.title }}</h1>
+                    <span [innerHTML]="productDescription"></span>
+                    <p *ngIf="!user">Note: Sign up to ensure any QR codes are linked to you.</p>
+                </div>
+            </div>
+            <div class="col-xs-12 col-center">
+                <!-- Variant Selector -->
+                <mat-form-field appearance="outline" class="variant-select">
+                    <mat-label>Choose a variant</mat-label>
+                    <mat-select [(value)]="selectedVariant" required>
+                        <mat-option *ngFor="let variant of productVariants" [value]="variant.id">
+                            {{ variant.title.split('/')[0] }} - ${{ (variant.price / 100).toFixed(2) }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <!-- Quantity Selector -->
+                <mat-form-field appearance="outline" class="quantity-select">
+                    <mat-label>Quantity</mat-label>
+                    <mat-select [(value)]="quantity" required>
+                        <mat-option *ngFor="let q of quantities" [value]="q">{{ q }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <!-- Add to Cart Button -->
+                <button mat-raised-button color="primary" (click)="addToCart()" [disabled]="isAddDisabled() || disableAdd">
+                    Add to Cart
+                </button>
+
+                <img *ngIf="imageFile" [src]="imageFile" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #notFound>
+    <p>Product not found.</p>
+</ng-template>

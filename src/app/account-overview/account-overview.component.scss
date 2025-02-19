@@ -1,0 +1,25 @@
+.mat-table {
+    width: 100%;
+    table-layout: fixed; /* Ensures columns stay aligned */
+  }
+  
+.mat-header-cell, .mat-cell {
+    text-align: left;
+    padding: 8px 16px; /* Adds spacing */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+  
+.mat-tab-body-content {
+    display: flex; /* Ensures tab content takes up full width */
+    flex-direction: column;
+}
+
+.mat-column-expand {
+    max-width: 100px;
+}
+
+.submission-row:hover {
+    cursor: pointer;
+}

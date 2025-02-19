@@ -1,0 +1,113 @@
+<form [formGroup]="form" (ngSubmit)="signUpWithEmail()">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-center">
+                <span class="align-middle">Please fill out the fields with your information.</span>
+            </div>
+            <div class="col-xs-12 col-center">
+                <span class="align-middle">We are collecting only the necessary information for our services to function.</span>
+            </div>
+            <div class="col-xs-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>First Name</mat-label>
+                    <input matInput formControlName="firstName" name="firstName" required>
+                    <mat-error *ngIf="form.get('firstName')?.hasError('required')">
+                        First name is required.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput formControlName="lastName" name="lastName" required>
+                    <mat-error *ngIf="form.get('lastName')?.hasError('required')">
+                        Last name is required.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>E-Mail</mat-label>
+                    <input matInput EmailValidator formControlName="email" name="email" required autocomplete="email">
+                    <mat-error *ngIf="form.get('email')?.hasError('required')">
+                        Email is required.
+                    </mat-error>
+                    <mat-error *ngIf="form.get('email')?.hasError('email')">
+                        Please enter a valid e-mail.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>Password</mat-label>
+                    <input matInput formControlName="password" name="password" [type]="hidePassword ? 'password' : 'text'" required autocomplete="new-password">
+                    <button
+                        mat-icon-button
+                        matSuffix
+                        type="button"
+                        (click)="hidePassword = !hidePassword"
+                        aria-label="Toggle password visibility"
+                        class="button-suffix-icon"
+                    >
+                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    <mat-error *ngIf="form.get('password')?.hasError('required')">
+                        Password is required.
+                    </mat-error>
+                    <mat-error *ngIf="form.get('password')?.hasError('minlength')">
+                        Password must be at least 8 characters long.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>Confirm Password</mat-label>
+                    <input matInput formControlName="confirmPassword" name="confirmPassword" [type]="hideConfirmPassword ? 'password' : 'text'" required autocomplete="new-password">
+                    <button
+                        mat-icon-button
+                        matSuffix
+                        type="button"
+                        (click)="hideConfirmPassword = !hideConfirmPassword"
+                        aria-label="Toggle confirm password visibility"
+                        class="button-suffix-icon"
+                    >
+                        <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    <mat-error *ngIf="form.hasError('passwordsMismatch')">
+                        Passwords do not match.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <span>{{ this.errorMessage }}</span>
+            </div>
+            <div class="col-xs-12 col-center">
+                <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid">Create Account</button>
+            </div>
+            <div class="col-xs-12 col-center">
+                <span>Already have an account? <a routerLink='/login'>Login</a></span>
+            </div>
+            <div class="col-xs-12 col-center">
+                <div class="col-xs-5 sign-up-divider-left">
+                    <hr />
+                </div>
+                <div class="col-xs-2">
+                    <span class="align-middle">
+                        or
+                    </span>
+                </div>
+                <div class="col-xs-5 sign-up-divider-right">
+                    <hr />
+                </div>
+            </div>
+            <div class="col-xs-12 col-center">
+                <button mat-fab extended class="icon-button" (click)="signUpWithGoogle()">
+                    <img src="images/Google.png" alt="Google Logo" width="24" height="24" />
+                    <span>
+                        Sign in with Google
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>

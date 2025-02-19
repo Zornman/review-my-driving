@@ -1,0 +1,55 @@
+<form [formGroup]="form" (ngSubmit)="signIn()">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-center">
+                <span class="align-middle">
+                    Log in with your account info below or sign in
+                    <br />
+                    with one of our supported 3rd party providers
+                </span>
+            </div>
+            <div class="col-xs-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>E-Mail</mat-label>
+                    <input matInput formControlName="email" name="email" required autocomplete="email">
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>Password</mat-label>
+                    <input matInput formControlName="password" name="password" type="password" required autocomplete="current-password">
+                </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-center">
+                <span>{{ this.errorMessage }}</span>
+            </div>
+            <div class="col-xs-12 col-center">
+                <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid">Log in</button>
+            </div>
+            <div class="col-xs-12 col-center">
+                <span>Don't have any account? <a routerLink='/register'>Create one</a></span>
+            </div>
+            <div class="col-xs-12 col-center">
+                <div class="col-xs-5 sign-up-divider-left">
+                    <hr />
+                </div>
+                <div class="col-xs-2">
+                    <span class="align-middle">
+                        or
+                    </span>
+                </div>
+                <div class="col-xs-5 sign-up-divider-right">
+                    <hr />
+                </div>
+            </div>
+            <div class="col-xs-12 col-center">
+                <button mat-fab extended class="icon-button" (click)="signUpWithGoogle()">
+                    <img src="images/Google.png" alt="Google Logo" width="24" height="24" />
+                    <span>
+                        Sign in with Google
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>

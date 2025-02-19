@@ -1,19 +1,74 @@
 @import './variables';
 
+html {
+    --mat-badge-text-size: 10px;
+    --mat-badge-background-color: #C3B1E1;
+    --mat-badge-text-color: black;
+    --mat-badge-container-shape: 10px;
+}
+
 .header {
-    background: linear-gradient(45deg, #e63946, #d62839);
-    color: $secondary-white;
-    padding: 0px 5px;
-    height: 50px;
+    padding: 0 5px;
+    height: 40px;
 
     .grid-row {
         height: 100%;
     }
 }
 
+.dark-mode {
+    .header {
+        background: $color-header-dark;
+        color: $color-text-light;
+    }
+}
+
+.light-mode {
+    .header {
+        background: $color-header-light;
+        color: $color-text-light;
+    }
+}
+
+.mat-mdc-menu-content {
+    padding: 0 !important;
+}
+
 .header-branding {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 32px;
+    justify-content: space-between;
+    position: relative;
+
+    .header-menu {
+        flex: 0 0 auto;
+    }
+
+    .header-title {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        font-size: 32px;
+        font-weight: 500;
+        margin: 0;
+
+        a {
+            color: $color-text-light;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 590px) {
+            font-size: 16px;
+        }
+    }
+    
+    .header-actions {
+        flex: 0 0 auto;
+
+        button:first {
+            margin-right: 10px;
+        }
+    }
 }

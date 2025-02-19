@@ -1,0 +1,44 @@
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-center">
+            <span class="align-middle">
+                Take a look at what we have to offer, or don't.
+                <br />
+                (Have a great day either way)
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="product-container" *ngIf="products.length; else loading">
+                <div class="product-card" *ngFor="let product of products">
+                  <mat-card>
+                    <div class="image-container" (click)="viewProduct(product)">
+                      <img mat-card-image class="image-main" [src]="product.images[0].src" alt="{{ product.title }}" *ngIf="product.images.length" />
+                      <img mat-card-image class="image-hover" [src]="product.images[2].src" alt="{{ product.title }}" *ngIf="product.images.length" />
+                    </div>
+                    <mat-card-header>
+                      <mat-card-title class="align-middle">{{ product.title }}</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <div class="subtitle-container">
+                        <span [innerHTML]="product.description"></span>
+                      </div>
+                      <a *ngIf="showReadMore" [routerLink]="'/product/' + product.id" class="read-more-link">
+                        Read More
+                      </a>
+                    </mat-card-content>
+                    <mat-card-actions class="custom-actions">
+                      <button mat-button color="primary" class="card-full-width-button" (click)="viewProduct(product)">View Details</button>
+                    </mat-card-actions>
+                  </mat-card>
+                </div>
+            </div>
+              
+            <ng-template #loading>
+            <span class="align-middle">Loading products...</span>
+            </ng-template>
+              
+        </div>
+    </div>
+</div>

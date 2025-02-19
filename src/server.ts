@@ -15,19 +15,7 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
-
-/**
- * Serve static files from /browser
+ * ✅ Serve static files from /browser (Angular build output)
  */
 app.use(
   express.static(browserDistFolder, {
@@ -38,7 +26,7 @@ app.use(
 );
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * ✅ Handle all requests by rendering the Angular SSR app
  */
 app.use('/**', (req, res, next) => {
   angularApp
@@ -50,17 +38,16 @@ app.use('/**', (req, res, next) => {
 });
 
 /**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
+ * ✅ Start the SSR server when running locally (not Netlify)
  */
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
   app.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    console.log(`🚀 Angular SSR server listening on http://localhost:${port}`);
   });
 }
 
 /**
- * The request handler used by the Angular CLI (dev-server and during build).
+ * ✅ Request handler for Angular CLI dev-server and build
  */
 export const reqHandler = createNodeRequestHandler(app);

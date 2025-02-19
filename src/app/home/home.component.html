@@ -1,8 +1,9 @@
-<form autocomplete="new-password" (ngSubmit)="submit(form)" #form="ngForm">
+<form (ngSubmit)="submit(form)" #form="ngForm">
     <div class="grid-container grid-container-padding" style="padding-top: 1vh;">
         <div class="grid-row">
             <div class="col-12 col-center">
-                <span class="align-middle">Please provide some basic information about yourself, the car in question, and the event that took place.
+                <span class="align-middle">
+                    Please provide some basic information about yourself, the car in question, and the event that took place.
                     <br />
                     We will do our best to make sure they are reprimanded.
                 </span>
@@ -17,7 +18,7 @@
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>First Name</mat-label>
-                    <input matInput [(ngModel)]="formData.firstName" name="firstName" autocomplete="new-password" required>
+                    <input matInput [(ngModel)]="formData.firstName" name="firstName" required>
                 </mat-form-field>
             </div>
         </div>
@@ -25,7 +26,7 @@
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Last Initial</mat-label>
-                    <input matInput [(ngModel)]="formData.lastName" name="lastName" maxlength="1" autocomplete="new-password" required>
+                    <input matInput [(ngModel)]="formData.lastName" name="lastName" maxlength="1" required>
                 </mat-form-field>
             </div>
         </div>
@@ -37,20 +38,20 @@
                 </mat-form-field>
             </div>
         </div> -->
-        <div class="grid-row">
+        <div class="grid-row" *ngIf="!user_id">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>License plate of Driver</mat-label>
-                    <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" autocomplete="new-password" required>
+                    <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" required>
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="grid-row" *ngIf="!user_id">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Lincense Registration State</mat-label>
                     <mat-select [(ngModel)]="formData.state" name="state" required>
-                        <mat-option *ngFor="let state of states" [value]="state">{{ state }}</mat-option>
+                        <mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
                     </mat-select>
                 </mat-form-field>
             </div>
@@ -82,7 +83,7 @@
                 <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid" matTooltip="Are you sure?" [matTooltipPosition]="'above'">Submit</button>
             </div>
             <div class="col-12 col-center">
-                <span class="pull-right"><a href="/">Want your own bumper sticker?</a></span>
+                <span class="pull-right"><a href="/shop">Want your own bumper sticker?</a></span>
             </div>
         </div>
     </div>

@@ -1,9 +1,50 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
 @import './styles/variables';
+@import '../node_modules/bootstrap/dist/css/bootstrap-grid.min.css';
 @import './styles/grid';
 @import './styles/header';
 @import './styles/footer';
 @import './styles/inputs.scss';
+@import './styles/shop.scss';
+@import './styles/tables.scss';
+@import './styles/buttons.scss';
+
+html {
+
+    --mat-table-row-item-label-text-font: 'DynaPuff', serif;
+    --mat-table-header-headline-font: 'DynaPuff', serif;
+
+    --mdc-snackbar-container-color: #C3B1E1;
+    --mdc-snackbar-supporting-text-color: #121212;
+
+    --mat-form-field-error-text-color: #cc0404;
+
+    /* Default (Light Mode) */
+    --mdc-theme-primary: #4B0082;
+    --mdc-theme-secondary: #C3B1E1;
+    --mdc-theme-background: #FAFAFA;
+    --mdc-theme-surface: #FFFFFF;
+    --mdc-theme-on-primary: #FFFFFF;
+    --mdc-theme-on-secondary: #121212;
+    --mdc-theme-on-surface: #212121;
+
+    .row {
+        --bs-gutter-y: 10px !important;
+    }
+}
+  
+@media (prefers-color-scheme: dark) {
+    html {
+      --mdc-theme-primary: #4B0082;
+      --mdc-theme-secondary: #9F87FF;
+      --mdc-theme-background: #121212;
+      --mdc-theme-surface: #1E1E1E;
+      --mdc-theme-on-primary: #E0E0E0;
+      --mdc-theme-on-secondary: #E0E0E0;
+      --mdc-theme-on-surface: #E0E0E0;
+    }
+}
 
 html, body { 
     height: 100%;
@@ -20,51 +61,124 @@ body {
     @media screen and (max-width: 768px) {
         font-size: 14px; /* Scale down slightly for readability */
     }
+
+    button {
+        font-family: 'DynaPuff', serif;
+    }
+
+    button:not(.mdc-icon-button) {
+        background-color: $color-primary !important;
+        color: $color-text-light !important;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    
+        &:hover {
+            cursor: pointer;
+            background-color: $color-secondary;
+        }
+
+        &:disabled {
+            background-color: $color-button-disabled-bg;
+            color: $color-button-disabled-text;
+            border: 1px solid $color-button-disabled-border;
+            cursor: not-allowed;
+            opacity: 0.6; // Optional for a more subdued effect
+        }
+
+        &.button-suffix-icon {
+            background-color: transparent !important;
+        }
+    }
+
+    a {
+        color: $color-link-dark;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .card-input {
+        border-radius: 5px;
+        padding: 5px 10px;
+        margin: 5px 0px;
+
+        &.card-number {
+            margin-right: 5vh;
+
+            @media screen and (max-width: 576px) {
+                margin-right: 0px;
+            }
+        }
+
+        &.card-cvc {
+            margin-right: 5vh;
+
+            @media screen and (max-width: 576px) {
+                margin-right: 0px;
+            }
+        }
+    }
 }
 
 body.light-mode {
-    background-color: #f9f9f9; /* Light background */
-    color: #333; /* Dark gray text */
-    --mat-select-panel-background-color: #f9f9f9;
-    --mat-sys-surface-container: #f9f9f9;
-    --mdc-snackbar-container-color: #f9f9f9;
-    --mat-sys-inverse-surface: #333;
+    background-color: $color-background-light; /* Light background */
+    color: $color-text-dark; /* Dark gray text */
+    --mat-table-background-color: #F5F5F5;
+    --mat-table-header-headline-color: #212121;
+    --mat-table-row-item-label-text-color: #212121;
+    --mat-expansion-container-background-color: #F5F5F5;
+    --mat-select-panel-background-color: #F5F5F5;
+    --mat-stepper-container-color: #F5F5F5;
 
-    a {
-        color: #333;
+    @include mat.stepper-overrides((
+        header-hover-state-layer-color: #E0E0E0,
+        header-icon-background-color: #C3B1E1,
+        header-selected-state-icon-background-color: #C3B1E1
+    ));
+
+    .button-suffix-icon {
+        color: $color-text-dark !important;
+    }
+
+    .card-input {
+        border: 1px solid black;
+    }
+
+    .table-view {
+        border: 1px solid black;
+        background-color: $color-border-light;
     }
 }
 
 body.dark-mode {
-    background-color: #333;
-    color: #f9f9f9;
-    --mat-select-panel-background-color: #333;
-    --mat-sys-surface-container: #333;
-    --mdc-snackbar-container-color: #333;
-    --mat-sys-inverse-surface: #333;
+    background-color: $color-background-dark;
+    color: $color-text-light;
+    --mat-table-background-color: #1E1E1E;
+    --mat-table-header-headline-color: #E0E0E0;
+    --mat-table-row-item-label-text-color: #E0E0E0;
+    --mat-expansion-container-background-color: #1E1E1E;
+    --mat-select-panel-background-color: #1E1E1E;
+    --mat-stepper-container-color: #1E1E1E;
 
-    a {
-        color: #f9f9f9;
+    @include mat.stepper-overrides((
+        header-hover-state-layer-color: #383838,
+        header-icon-background-color: #4B0082,
+        header-selected-state-icon-background-color: #4B0082
+    ));
+
+    .card-input {
+        border: 1px solid #E0E0E0;
+    }
+
+    .table-view {
+        border: 1px solid white;
+        background-color: $color-border-dark;
     }
 }
 
 input, textarea, select, label {
     font-family: 'DynaPuff', serif !important; /* Form elements */
-}
-
-button {
-    background-color: #e63946; /* Muted red */
-    color: #fff; /* White text */
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-        background-color: #d62839; /* Slightly darker red on hover */
-        // transform: translateY(-10px) rotate(10deg); /* Make it jump */
-        // transition: transform 0.3s;
-    }
 }
 
 .layout {
@@ -89,24 +203,20 @@ button {
 .content {
     flex: 1; /* Allows the content area to expand and scroll */
     overflow-y: auto; /* Enables vertical scrolling for the content */
-    padding: 1rem; /* Optional padding for nicer layout */
 }
 
 mat-form-field {
     width: 100%;
-    max-width: 1000px;
+    // max-width: 1200px;
     padding-left: 3vh;
     padding-right: 3vh;
 }
 
-// mat-form-field:hover {
-//     animation: wiggle 0.5s ease-in-out;
-// }
-
-// @keyframes wiggle {
-//     0%, 100% { transform: rotate(0); }
-//     50% { transform: rotate(2deg); }
-// }
+.container {
+    @media screen and (max-width: 576px) {
+        width: auto !important;
+    }
+}
 
 .pull-right {
     float: right;
@@ -120,8 +230,11 @@ mat-form-field {
     text-align: center;
 }
 
+.button-padding-right {
+    margin-right: 8px;
+}
+
 div.mat-mdc-select-panel {
-    
     background-color: var(--mat-select-panel-background-color, var(--mat-sys-surface-container));
 }
 
@@ -134,3 +247,53 @@ div.mat-mdc-select-panel {
     border-radius: var(--mdc-snackbar-container-shape, var(--mat-sys-corner-extra-small));
     background-color: var(--mdc-snackbar-container-color, var(--mat-sys-inverse-surface));
 }
+
+.sign-up-divider-left {
+    width: 100%;
+    padding-left: 10%;
+    padding-right: 2%;
+}
+
+.sign-up-divider-right {
+    width: 100%;
+    padding-left: 2%;
+    padding-right: 10%;
+}
+
+.mat-mdc-dialog-actions {
+    gap: 5px;
+}
+
+.account-overview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid with min card size */
+    gap: 32px;
+    padding: 16px 32px;
+    text-align: center;
+
+    .account-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mat-mdc-card-header {
+        justify-content: center;
+        font-size: 75px;
+    }
+
+    .mat-mdc-card-outlined {
+        border-radius: 10px;
+    }
+}
+
+.mat-mdc-tab-body-content {
+    overflow: hidden !important;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+    align-items: flex-start;
+}
+

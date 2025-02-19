@@ -1,0 +1,63 @@
+mat-panel-description {
+    flex-grow: 0 !important; // Override the default flex-grow
+    margin-left: auto; // Push it to the end of the flex container
+}
+
+.mat-expansion-panel-spacing {
+    margin: 5px 0px !important;
+}
+
+.mat-mdc-table {
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+
+.col-mobile-hidden {
+    @media screen and (max-width: 576px) {
+        display: none !important;
+    }
+}
+
+.mat-column-productName {
+    flex: 3; /* Gives this column more space relative to others */
+
+    @media screen and (max-width: 576px) {
+        flex: 1;
+    }
+}
+
+.mat-column-quantity {
+    display: flex; /* Enables flexible layout for cell content */
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    max-width: 110px !important;
+}
+  
+.mat-column-actions {
+    display: flex; /* Enables flexible layout for cell content */
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    gap: 8px; /* Adds spacing between buttons */
+    max-width: 75px !important;
+}
+
+.cart-image {
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.cart-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+
+    h3 {
+      margin-left: auto;
+    }
+
+    button {
+      min-width: 120px;
+    }
+}

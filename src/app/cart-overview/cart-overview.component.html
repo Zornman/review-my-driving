@@ -1,0 +1,71 @@
+<div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <a (click)="continueShopping()">‹ Continue Shopping</a>
+      </div>
+      <div class="col-xs-12">
+        <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+          <ng-container matColumnDef="image">
+            <mat-header-cell *matHeaderCellDef class="col-mobile-hidden">  </mat-header-cell>
+            <mat-cell *matCellDef="let product" class="col-mobile-hidden">
+              <img [src]="product.product.images[0].src" alt="{{ product.productName }}" class="cart-image" />
+            </mat-cell>
+          </ng-container>
+
+          <!-- Product Name Column -->
+          <ng-container matColumnDef="productName">
+            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+            <mat-cell *matCellDef="let product"> {{product.productName}} </mat-cell>
+          </ng-container>
+        
+          <!-- Quantity Column -->
+          <ng-container matColumnDef="quantity">
+            <mat-header-cell *matHeaderCellDef> qty </mat-header-cell>
+            <mat-cell *matCellDef="let product"> 
+              <mat-select [(value)]="product.quantity" (selectionChange)="updateQuantity($event, product)">
+                <mat-option *ngFor="let q of quantities" [value]="q">{{ q }}</mat-option>
+            </mat-select>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Price Column -->
+          <ng-container matColumnDef="price">
+              <mat-header-cell *matHeaderCellDef class="col-mobile-hidden"> Price </mat-header-cell>
+              <mat-cell *matCellDef="let product" class="col-mobile-hidden"> ${{(product.price / 100).toFixed(2)}} </mat-cell>
+          </ng-container>
+
+            <!-- Total Column -->
+          <ng-container matColumnDef="totalCost">
+              <mat-header-cell *matHeaderCellDef> Total </mat-header-cell>
+              <mat-cell *matCellDef="let product"> ${{(product.totalCost / 100).toFixed(2)}} </mat-cell>
+          </ng-container>
+        
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+              <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
+              <mat-cell *matCellDef="let product"> 
+                  <mat-icon (click)="removeProduct(product)">delete</mat-icon>
+              </mat-cell>
+          </ng-container>
+          
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+          <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell">
+              <span>
+                Your shopping cart is empty, browse our <a routerLink="/shop">shop</a>
+              </span>
+            </td>
+          </tr>
+        </mat-table>
+
+        <div class="cart-footer">
+          <h3>Total: ${{ (totalCartCost / 100).toFixed(2) }}</h3>
+          <button mat-raised-button color="primary" (click)="checkout()">Checkout</button>
+        </div>
+      </div>
+    </div>
+</div>

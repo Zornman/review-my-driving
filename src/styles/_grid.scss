@@ -36,7 +36,7 @@ $breakpoints: (
 .grid-container {
   @include grid-container;
 
-  &.grid-contrainer-padding {
+  &.grid-container-padding {
     padding-left: 5vh;
     padding-right: 5vh;
   }
@@ -57,9 +57,21 @@ $breakpoints: (
   }
 }
 
+// Make all columns span full width at smaller breakpoints
+@media (max-width: map-get($breakpoints, sm)) {
+  .grid-container {
+    grid-template-columns: 1fr; // Enforce single-column layout
+  }
+
+  .grid-container > .grid-row > [class^="col-"],
+  .grid-container > .grid-row > [class*=" col-"] {
+    grid-column: 1 / -1; // Force all columns to span the full width
+  }
+}
+
 // Row utility class
 .grid-row {
-  display: contents;
+  display: contents; // Keep contents layout flexible
 }
 
 // Full-width column utility
@@ -67,8 +79,22 @@ $breakpoints: (
   grid-column: 1 / -1;
 }
 
+.max-width-col-md {
+  @media screen and (max-width: md) {
+    grid-column: 1 / -1; 
+  }
+}
+
+// Center alignment utility
 .col-center {
   display: flex;
   justify-content: center; // Horizontally center
   align-items: center;    // Vertically center
+}
+
+// Additional utilities for responsiveness and spacing
+@media (max-width: map-get($breakpoints, sm)) {
+  .grid-container {
+    grid-template-columns: 1fr; // Ensure stacking
+  }
 }
