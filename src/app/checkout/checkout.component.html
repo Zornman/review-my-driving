@@ -164,13 +164,13 @@
                     <p>
                       Shipping Fee: 
                       <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'standard'">
-                        ${{ (shipping_total_cost_standard / 100).toFixed(2) }}
+                        FREE!
                       </span>
                       <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'express'">
                         ${{ (shipping_total_cost_express / 100).toFixed(2) }}
                       </span>
                       <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'economy'">
-                        ${{ (shipping_total_cost_economy / 100).toFixed(2) }}
+                        FREE!
                       </span>
                       <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'priority'">
                         ${{ (shipping_total_cost_priority / 100).toFixed(2) }}
@@ -192,22 +192,6 @@
                       </span>
                     </p>
                   </div>
-                  <!-- <div *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'standard'">
-                    <p>Shipping Fee: ${{ (shipping_total_cost_standard / 100).toFixed(2) }}</p>
-                    <p>Delivery Window: {{ shipping_from_standard + ' to ' + shipping_to_standard + ' days' }}</p>
-                  </div>
-                  <div *ngIf="express_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'express'">
-                    <p>Shipping Fee: ${{ (shipping_total_cost_express / 100).toFixed(2) }}</p>
-                    <p>Delivery Window: {{ shipping_from_express + ' to ' + shipping_to_express + ' days' }}</p>
-                  </div>
-                  <div *ngIf="economy_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'economy'">
-                    <p>Shipping Fee: ${{ (shipping_total_cost_economy / 100).toFixed(2) }}</p>
-                    <p>Delivery Window: {{ shipping_from_economy + ' to ' + shipping_to_economy + ' days' }}</p>
-                  </div>
-                  <div *ngIf="priority_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'priority'">
-                    <p>Shipping Fee: ${{ (shipping_total_cost_priority / 100).toFixed(2) }}</p>
-                    <p>Delivery Window: {{ shipping_from_priority + ' to ' + shipping_to_priority + ' days' }}</p>
-                  </div> -->
                 </div>
               </div>
             </div>
@@ -236,9 +220,9 @@
                     <tr>
                       <td class="order-details-title"><b>Shipping:</b></td>
                       <td>
-                        <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'standard'">${{ (shipping_total_cost_standard / 100).toFixed(2) }}</p>
+                        <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'standard'">FREE</p>
                         <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'express'">${{ (shipping_total_cost_express / 100).toFixed(2) }}</p>
-                        <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'economy'">${{ (shipping_total_cost_economy / 100).toFixed(2) }}</p>
+                        <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'economy'">FREE</p>
                         <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'priority'">${{ (shipping_total_cost_priority / 100).toFixed(2) }}</p>
                       </td>
                     </tr>

@@ -592,24 +592,38 @@ export class CheckoutComponent implements OnInit {
       //console.log(this.shippingCosts);
       const asoCostList = this.shippingCosts.filter((element) => element.type === shipping_type);
       asoCostList.forEach((costList) => {
-        let firstMatch = costList.shipping_info.data.find((costLineItem) => {
+        let countryMatch = costList.shipping_info.data.find((costLineItem) => {
           const attributes = costLineItem.attributes;
-          
           if (attributes.country.code === this.shippingInfoForm.get('country')?.value && attributes.shippingType === shipping_type) {
-            return true;
-          } else if (attributes.country.code === "REST_OF_THE_WORLD" && attributes.shippingType === shipping_type) {
             return true;
           } else {
             return false;
           }
         });
 
-        if (firstMatch) {
-          let foundOption = chosenShippingOptionList.find((x) => x === firstMatch);
+        if (countryMatch) {
+          let foundOption = chosenShippingOptionList.find((x) => x === countryMatch);
           if (!foundOption)
-            chosenShippingOptionList.push(firstMatch);
+            chosenShippingOptionList.push(countryMatch);
+        } else {
+          let match = costList.shipping_info.data.find((cli) => {
+            const attributes = cli.attributes;
+            if (attributes.country.code === "REST_OF_THE_WORLD" && attributes.shippingType === shipping_type) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+
+          if (!match) return;
+
+          let foundOption = chosenShippingOptionList.find((x) => x === match);
+          if (!foundOption)
+            chosenShippingOptionList.push(match); 
         }
       });
+
+
     });
 
     if (this.cartSummary.length <= 1) {
@@ -626,7 +640,7 @@ export class CheckoutComponent implements OnInit {
           let option = chosenShippingOptionList[index];
           if (option) {
             this.setShippingRangeLabels(option.attributes);
-            
+            console.log(option.id)
             if (uniqueShippingPlans.find((x) => x === option.id)) {
               console.log('this should hit');
               this.calcShippingTotals(option.attributes, cartItem.quantity, true);
@@ -638,6 +652,8 @@ export class CheckoutComponent implements OnInit {
           }
         });
       });
+
+      console.log(uniqueShippingPlans);
     }
   }
 
@@ -711,11 +727,11 @@ export class CheckoutComponent implements OnInit {
 
   calculateAmountDue(): number {
     if (this.shippingOptionsForm.get('shippingOption')?.value === 'standard') {
-      return ((this.shipping_total_cost_standard + this.totalCartCost) / 100);
+      return ((this.totalCartCost) / 100);
     } else if (this.shippingOptionsForm.get('shippingOption')?.value === 'express') {
       return ((this.shipping_total_cost_express + this.totalCartCost) / 100);
     } else if (this.shippingOptionsForm.get('shippingOption')?.value === 'economy') {
-      return ((this.shipping_total_cost_economy + this.totalCartCost) / 100);
+      return ((this.totalCartCost) / 100);
     } else if (this.shippingOptionsForm.get('shippingOption')?.value === 'priority') {
       return ((this.shipping_total_cost_priority + this.totalCartCost) / 100);
     } else {

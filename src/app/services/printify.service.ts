@@ -2,15 +2,26 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../shared/models/product';
+import { VariablesService } from './variables.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class PrintifyService {
-    private apiUrl = 'https://api.printify.com/v1';
-    private apiToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzN2Q0YmQzMDM1ZmUxMWU5YTgwM2FiN2VlYjNjY2M5NyIsImp0aSI6IjQxYWJjMGI5ODhmOTVhNjEyMTExNzA5NGZkYjlhODAxOGRkNTIxMjhjYzI1MTc2YzhmNjBhNmM2YzEwNDkyNDM3Y2VhNGM1YTRjMWZjYzJmIiwiaWF0IjoxNzM2MjEyMTEwLjM2NjgzNiwibmJmIjoxNzM2MjEyMTEwLjM2NjgzOCwiZXhwIjoxNzY3NzQ4MTEwLjM1OTY2NCwic3ViIjoiMjEzNDM2NjIiLCJzY29wZXMiOlsic2hvcHMubWFuYWdlIiwic2hvcHMucmVhZCIsImNhdGFsb2cucmVhZCIsIm9yZGVycy5yZWFkIiwib3JkZXJzLndyaXRlIiwicHJvZHVjdHMucmVhZCIsInByb2R1Y3RzLndyaXRlIiwid2ViaG9va3MucmVhZCIsIndlYmhvb2tzLndyaXRlIiwidXBsb2Fkcy5yZWFkIiwidXBsb2Fkcy53cml0ZSIsInByaW50X3Byb3ZpZGVycy5yZWFkIiwidXNlci5pbmZvIl19.AcxgjzGsRQiW2PuzJMvZKq_66FKYx-t-TbiXck8xquhL__bQi-9npwHNZa18Vj2LQD_yyfxtkLk8datHXU0'; // Replace with your Printify API token
+    private apiUrl = '';
+    private apiToken = '';
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient, private env: VariablesService) {
+        this.env.getEnvironmentVariables().subscribe({
+            next: (variables) => {
+                this.apiUrl = variables.PRINTIFY_URL;
+                this.apiToken = variables.PRINTIFY_API_KEY;
+            },
+            error: (error: any) => {
+
+            }
+        })
+    }
 
     getShops(): Observable<any> {
         const headers = new HttpHeaders({

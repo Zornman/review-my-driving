@@ -46,8 +46,7 @@
         </div>
         <div class="container">
             <div class="row">
-                <div class="col-12 col-center">
-            
+                <div class="col-12">
                     <mat-table [dataSource]="submissionsDataSource" multiTemplateDataRows class="mat-elevation-z8">
                         <!-- Define columns -->
                         <ng-container matColumnDef="name">
@@ -101,7 +100,8 @@
                             <td class="mat-cell" colspan="4">No submissions yet, you're driving too well!</td>
                         </tr>
                     </mat-table>
-                        
+                    <div><br /></div>
+                    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of submissions"></mat-paginator>
                 </div>
             </div>
         </div>
@@ -295,9 +295,7 @@
                                 <p>No orders yet, head to the shop and order something to get started!</p>
                             </td>
                         </tr>
-
-                        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of submissions"></mat-paginator>
-                    </mat-table>
+                    </table>
                 </div>
             </div>
         </div>

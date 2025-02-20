@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 
 const PRINTIFY_API_KEY = process.env.PRINTIFY_API_KEY;
 const PRINTIFY_STORE_ID = process.env.PRINTIFY_STORE_ID;
+const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
 
 exports.handler = async (event) => {
   try {
@@ -47,7 +48,7 @@ exports.handler = async (event) => {
       }
     };
 
-    const response = await fetch(`https://api.printify.com/v1/shops/${PRINTIFY_STORE_ID}/orders.json`, {
+    const response = await fetch(`${PRINTIFY_SHOP_URL}/shops/${PRINTIFY_STORE_ID}/orders.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

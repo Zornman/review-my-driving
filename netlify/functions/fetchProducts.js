@@ -1,7 +1,8 @@
 const fetch = require('node-fetch');
 
 const shop_id = process.env.PRINTIFY_STORE_ID;
-const products_url = `https://api.printify.com/v1/shops/${shop_id}/products.json`;
+const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
+const products_url = `${PRINTIFY_SHOP_URL}/shops/${shop_id}/products.json`;
 const api_token = process.env.PRINTIFY_API_KEY;
 
 exports.handler = async (event) => {

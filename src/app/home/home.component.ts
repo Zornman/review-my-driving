@@ -29,7 +29,7 @@ export class HomeComponent {
   ngForm!: NgForm;
   user_id!: string | null;
   user_email!: string | null;
-  user_settings!: any;
+  user_settings!: any | null;
   date!: () => string;
 
   formData = {
@@ -135,8 +135,13 @@ export class HomeComponent {
   }
 
   openConfirmMessage() {
-    const style = this.user_settings.messageStyle;
-    const msg = this.user_settings.messageBody;
+    const style = this.user_settings?.messageStyle;
+    const msg = this.user_settings?.messageBody;
+
+    if (!style || !msg) {
+      this.showConfirmationDialog('Thank you for your submission!');
+      return;
+    }
 
     if (style === 'alert') {
       alert(msg);

@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 
 const api_token = process.env.PRINTIFY_API_KEY;
 const shop_id = process.env.PRINTIFY_STORE_ID;
+const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
 
 exports.handler = async (event) => {
     if (event.httpMethod !== 'POST') {
@@ -22,7 +23,7 @@ exports.handler = async (event) => {
         }
     
         // Step 1: Upload the QR Code Image
-        const uploadResponse = await fetch(`https://api.printify.com/v1/uploads/images.json`, {
+        const uploadResponse = await fetch(`${PRINTIFY_SHOP_URL}/uploads/images.json`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${api_token}`,
@@ -43,7 +44,7 @@ exports.handler = async (event) => {
         const imageId = uploadResult.id;
 
         // Step 2: Fetch the Uploaded Image by ID
-        const imageResponse = await fetch(`https://api.printify.com/v1/uploads/${imageId}.json`, {
+        const imageResponse = await fetch(`${PRINTIFY_SHOP_URL}/uploads/${imageId}.json`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${api_token}`,
@@ -59,7 +60,7 @@ exports.handler = async (event) => {
 
         // Step 3: Retrieve Original Product Details
         const productResponse = await fetch(
-          `https://api.printify.com/v1/shops/${shop_id}/products/${originalProductId}.json`,
+          `${PRINTIFY_SHOP_URL}/shops/${shop_id}/products/${originalProductId}.json`,
           {
             method: 'GET',
             headers: {
@@ -111,7 +112,7 @@ exports.handler = async (event) => {
           visible: false
         };
 
-        const createResponse = await fetch(`https://api.printify.com/v1/shops/${shop_id}/products.json`, {
+        const createResponse = await fetch(`${PRINTIFY_SHOP_URL}/shops/${shop_id}/products.json`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${api_token}`,

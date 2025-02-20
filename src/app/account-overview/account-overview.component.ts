@@ -124,7 +124,6 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
 
   initializeAccountOverview() {
     if (this.user) {
-      console.log(this.user);
       this.accOverviewForm.get('userID')?.setValue(this.user.uid);
       this.accOverviewForm.get('email')?.setValue(this.user.email);
       this.accOverviewForm.get('name')?.setValue(this.user.displayName);

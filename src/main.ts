@@ -1,19 +1,31 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import { initializeApp } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase/app';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD4_-XfMZSfXrYQJ92Z3Rx22bMSRMofL40",
-  authDomain: "review-my-driving.firebaseapp.com",
-  projectId: "review-my-driving",
-  storageBucket: "review-my-driving.firebasestorage.app",
-  messagingSenderId: "1012437740422",
-  appId: "1:1012437740422:web:36737aa05fff20e1b79a07",
-  measurementId: "G-590DHD4Z5N"
-};
+function fetchConfig(): Promise<any> {
+  return fetch('/.netlify/functions/getEnvironmentVariables')
+    .then(response => response.json())
+    .then(config => {
+      return config.FIREBASE_SERVICE_ACCOUNT;
+    })
+    .catch(error => {
+      console.error('Error loading Netlify config:', error);
+      return null;
+    });
+}
 
-initializeApp(firebaseConfig);
+fetchConfig().then(firebaseConfig => {
+  if (firebaseConfig) {
+    if (!getApps().length) {
+      initializeApp(firebaseConfig);
+    } else {
+      console.warn("Firebase app already initialized, skipping re-initialization.");
+    }
+  } else {
+    console.error("Failed to fetch config.");
+  }
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+  bootstrapApplication(AppComponent, appConfig)
+    .catch(err => console.error(err));
+});

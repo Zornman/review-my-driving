@@ -15,13 +15,15 @@ exports.handler = async (event) => {
         },
       });
 
+      const emailTo = data.emailTo ?? 'zornman45@gmail.com';
+
       // Email options
       const mailOptionsUser = {
         from: 'donotreply@reviewmydriving.co', // Sender email address 
-        to: `${data.emailTo}`, // Replace with your own email address
+        to: `${emailTo}`, // Replace with your own email address
         subject: `New Submission from ${data.firstName} ${data.lastName}`,
         html: `
-            <h2 style="color: #0077cc;">New Submission Alert</h2>
+            <h2 style="color: #4B0082;">New Submission Alert</h2>
             <p><strong>Submitter:</strong> ${data.firstName} ${data.lastName}</p>
             <p><strong>Reason for Contacting:</strong> ${data.reasonForContacting}</p>
             <p><strong>Description:</strong></p>
@@ -37,7 +39,7 @@ exports.handler = async (event) => {
         to: "zornman45+review+my+driving@gmail.com", // Replace with the second email you want to receive a copy
         subject: `Copy: New Submission from ${data.firstName} ${data.lastName}`,
         html: `
-          <h2 style="color: #0077cc;">New Submission Alert (Admin Copy)</h2>
+          <h2 style="color: #4B0082;">New Submission Alert (Admin Copy)</h2>
           <p><strong>Submitter:</strong> ${data.firstName} ${data.lastName}</p>
           <p><strong>Reason for Contacting:</strong> ${data.reasonForContacting}</p>
           <p><strong>Description:</strong></p>
