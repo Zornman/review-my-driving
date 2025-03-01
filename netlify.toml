@@ -1,7 +1,7 @@
 [build]
   publish = "dist/review-my-driving/browser"
   functions = "netlify/functions"
-  command = "ng build"
+  command = "ng build --configuration=production"
 
 [schedule]
   "updateOrderStatus" = "0 * * * *"
