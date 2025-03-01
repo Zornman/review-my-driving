@@ -1,10 +1,12 @@
-import { Handler } from '@netlify/functions';
-import Stripe from 'stripe';
+const { Handler } = require('@netlify/functions');
+const Stripe = require('stripe');
 
-// Initialize Stripe with environment variable
-const stripe = new Stripe(process.env['STRIPE_SECRET_KEY'] as string);
+// Initialize Stripe with the correct API version
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2023-10-16',
+});
 
-const handler: Handler = async (event) => {
+const handler = async (event) => {
   try {
     if (event.httpMethod !== 'POST') {
       return {
@@ -25,7 +27,7 @@ const handler: Handler = async (event) => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: 'usd',
-      automatic_payment_methods: { enabled: true }
+      automatic_payment_methods: { enabled: true },
     });
 
     return {
@@ -36,9 +38,9 @@ const handler: Handler = async (event) => {
     console.error('Stripe Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: (error as Error).message }),
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };
 
-export { handler };
+module.exports = { handler };
