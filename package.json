@@ -1,13 +1,14 @@
 {
   "name": "review-my-driving",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:review-my-driving": "node dist/review-my-driving/server/server.mjs"
+    "serve:ssr:review-my-driving": "node dist/review-my-driving/server/server.mjs",
+    "netlify-prebuild": "tsc"
   },
   "private": true,
   "dependencies": {
