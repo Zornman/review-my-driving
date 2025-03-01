@@ -5,3 +5,9 @@
 
 [schedule]
   "updateOrderStatus" = "0 * * * *"
+
+[[redirects]]
+  from = "/orderConfirmation/:id"
+  to = "/orderConfirmation/:id"
+  status = 200
+  force = true
