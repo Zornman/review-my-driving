@@ -30,7 +30,11 @@ exports.handler = async (event) => {
       $setOnInsert: { 
         userID: data.userID, 
         orderID: data.orderID,
-        dateOrdered: data.dateOrdered
+        dateOrdered: data.dateOrdered,
+        status: 'on-hold',
+        emailOrderConfirm: false,
+        emailOrderShipped: false,
+        emailOrderCanceled: false
       } 
     };
     const options = { upsert: true };

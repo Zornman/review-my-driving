@@ -230,6 +230,10 @@ mat-form-field {
     text-align: center;
 }
 
+.padding-bottom {
+    padding-bottom: 10px;
+}
+
 .button-padding-right {
     margin-right: 8px;
 }
@@ -297,3 +301,12 @@ div.mat-mdc-select-panel {
     align-items: flex-start;
 }
 
+.index-header {
+    .mat-mdc-card-header {
+        justify-content: center;
+    }
+
+    .index-large-font {
+        font-size: 75px;
+    }
+}

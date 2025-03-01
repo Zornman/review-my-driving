@@ -16,16 +16,17 @@ export class OrderConfirmationComponent implements OnInit {
   orderID!: string | null;
 
   constructor(private authService: AuthService, private route: ActivatedRoute, private dbService: MongoService) {
-    this.authService.getUser().subscribe((user) => {
-      this.user = user;
-      if (this.user) {
-        this.insertOrderHistoryRecord();
-      }
-    });
+    
   }
 
   ngOnInit() {
-    this.orderID = this.route.snapshot.paramMap.get('id');
+    this.authService.getUser().subscribe((user) => {
+      this.user = user;
+      if (this.user) {
+        this.orderID = this.route.snapshot.paramMap.get('id');
+        this.insertOrderHistoryRecord();
+      }
+    });
   }
 
   insertOrderHistoryRecord() {

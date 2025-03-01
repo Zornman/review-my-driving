@@ -2,3 +2,6 @@
   publish = "dist/review-my-driving/browser"
   functions = "netlify/functions"
   command = "ng build"
+
+[schedule]
+  "updateOrderStatus" = "0 * * * *"

@@ -11,4 +11,8 @@ export class EmailService {
     sendSubmissionEmail(formData: any): Observable<any> {
         return this.http.post('/.netlify/functions/sendEmail', formData);
     }
+
+    sendContactEmail(formData: any): Observable<any> {
+        return this.http.post('/.netlify/functions/sendContactEmail', formData);
+    }
 }

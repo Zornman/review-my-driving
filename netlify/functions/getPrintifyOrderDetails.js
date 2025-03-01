@@ -25,20 +25,20 @@ exports.handler = async (event) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch orders: ${response.statusText}`);
+      throw new Error(`Failed to fetch order: ${response.statusText}`);
     }
 
-    const orders = await response.json();
+    const order = await response.json();
 
     return {
       statusCode: 200,
-      body: JSON.stringify(orders),
+      body: JSON.stringify(order),
     };
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error('Error fetching order:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to fetch orders' }),
+      body: JSON.stringify({ error: 'Failed to fetch order' }),
     };
   }
 };

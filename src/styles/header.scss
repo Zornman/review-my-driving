@@ -8,7 +8,7 @@ html {
 }
 
 .header {
-    padding: 0 5px;
+    padding: 0 5px 5px 5px;
     height: 40px;
 
     .grid-row {
@@ -21,6 +21,10 @@ html {
         background: $color-header-dark;
         color: $color-text-light;
     }
+
+    .border-top {
+        border-top: 1px solid $color-text-light;
+    }
 }
 
 .light-mode {
@@ -28,7 +32,13 @@ html {
         background: $color-header-light;
         color: $color-text-light;
     }
+
+    .border-top {
+        border-top: 1px solid $color-text-light;
+    }
 }
+
+
 
 .mat-mdc-menu-content {
     padding: 0 !important;
@@ -40,15 +50,8 @@ html {
     justify-content: space-between;
     position: relative;
 
-    .header-menu {
-        flex: 0 0 auto;
-    }
-
     .header-title {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
+        text-align: left;
         font-size: 32px;
         font-weight: 500;
         margin: 0;
@@ -60,7 +63,11 @@ html {
         }
 
         @media screen and (max-width: 590px) {
-            font-size: 16px;
+            font-size: 24px;
+        }
+
+        @media screen and (max-width: 436px) {
+            font-size: 18px;
         }
     }
     
@@ -68,7 +75,36 @@ html {
         flex: 0 0 auto;
 
         button:first {
-            margin-right: 10px;
+            padding-right: 25px;
         }
+    }
+}
+
+.header-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding-top: 5px !important;
+
+    .header-link {
+        padding: 0px 5px;
+    }
+
+    &.desktop-view {
+
+        @media screen and (max-width: 530px) {
+            display: none !important;
+        }
+    }
+}
+
+.mobile-view {
+    @media screen and (max-width: 530px) {
+       display: block; 
+    }
+
+    @media screen and (min-width: 531px) {
+        display: none !important;
     }
 }

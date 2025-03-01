@@ -6,7 +6,10 @@
             <div class="account-card">
                 <mat-card appearance="outlined">
                     <mat-card-header>
-                        <mat-card-title class="align-middle">{{ todaysSubmissions }}</mat-card-title>
+                        <mat-card-title class="align-middle">
+                          <div *ngIf="todaysSubmissions >= 0; else loading"></div>
+                          <span>{{ todaysSubmissions }}</span>
+                        </mat-card-title>
                         </mat-card-header>
                         <mat-card-content>
                         <p>Submissions for {{ todaysDate }}</p>
@@ -16,7 +19,10 @@
             <div class="account-card">
                 <mat-card appearance="outlined">
                     <mat-card-header>
-                        <mat-card-title class="align-middle">{{ lastWeekSubmissions }}</mat-card-title>
+                        <mat-card-title class="align-middle">
+                          <div *ngIf="lastWeekSubmissions >= 0; else loading"></div>
+                          <span>{{ lastWeekSubmissions }}</span>
+                        </mat-card-title>
                         </mat-card-header>
                         <mat-card-content>
                         <p>Last 7 days</p>
@@ -26,7 +32,10 @@
             <div class="account-card">
                 <mat-card appearance="outlined">
                     <mat-card-header>
-                        <mat-card-title class="align-middle">{{ lastMonthSubmissions }}</mat-card-title>
+                        <mat-card-title class="align-middle">
+                          <div *ngIf="lastMonthSubmissions >= 0; else loading"></div>
+                          <span>{{ lastMonthSubmissions }}</span>
+                        </mat-card-title>
                         </mat-card-header>
                         <mat-card-content>
                         <p>Last 30 days</p>
@@ -36,7 +45,10 @@
             <div class="account-card">
                 <mat-card appearance="outlined">
                     <mat-card-header>
-                        <mat-card-title class="align-middle">{{ totalSubmissions }}</mat-card-title>
+                        <mat-card-title class="align-middle">
+                          <div *ngIf="totalSubmissions >= 0; else loading"></div>
+                          <span>{{ totalSubmissions }}</span>
+                        </mat-card-title>
                         </mat-card-header>
                         <mat-card-content>
                         <p>Total Submissions</p>
@@ -273,6 +285,11 @@
                             <mat-header-cell *matHeaderCellDef> Order # </mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{ element.orderID }} </mat-cell>
                         </ng-container>
+
+                        <ng-container matColumnDef="status">
+                          <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+                          <mat-cell *matCellDef="let element"> {{ element.status }} </mat-cell>
+                      </ng-container>
                         
                         <ng-container matColumnDef="dateOrdered">
                             <mat-header-cell *matHeaderCellDef> Date Ordered </mat-header-cell>
@@ -292,7 +309,7 @@
                         <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
                         <tr class="mat-row" *matNoDataRow>
                             <td class="mat-cell" colspan="4">
-                                <p>No orders yet, head to the shop and order something to get started!</p>
+                                <p>No orders yet, head to the shop and place an order to get started!</p>
                             </td>
                         </tr>
                     </table>
@@ -301,3 +318,9 @@
         </div>
     </mat-tab>
 </mat-tab-group>
+
+<ng-template #loading>
+  <div class="spinner">
+      <img src="/images/spinner.gif" alt="Loading..." height="100" width="100" />
+  </div>
+</ng-template>

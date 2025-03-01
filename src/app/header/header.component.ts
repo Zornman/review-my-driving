@@ -70,6 +70,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.cartService.clearCart();
   }
 
+  openHome() {
+    this.router.navigateByUrl('/index')
+  }
+
   openShop() {
     this.router.navigateByUrl('/shop');
   }
@@ -92,5 +96,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   loginPage() {
     this.router.navigateByUrl('/login');
+  }
+
+  aboutPage() {
+    this.router.navigateByUrl('/about');
+  }
+
+  contactPage() {
+    this.router.navigateByUrl('/contact');
   }
 }

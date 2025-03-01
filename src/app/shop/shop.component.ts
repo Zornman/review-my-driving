@@ -21,7 +21,8 @@ export class ShopComponent implements OnInit {
   constructor(private router: Router, private printifyService: PrintifyService, private dbService: MongoService) {}
 
   ngOnInit(): void {
-    let cachedProducts = localStorage.getItem('products');
+
+    let cachedProducts = localStorage?.getItem('products');
 
     if (!cachedProducts) {
       this.printifyService.getProducts().subscribe({

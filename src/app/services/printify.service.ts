@@ -20,7 +20,7 @@ export class PrintifyService {
             error: (error: any) => {
 
             }
-        })
+        });
     }
 
     getShops(): Observable<any> {

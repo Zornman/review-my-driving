@@ -2,6 +2,7 @@ exports.handler = async () => {
     return {
       statusCode: 200,
       body: JSON.stringify({
+        ADMIN_USER_ID: process.env.ADMIN_USER_ID,
         EMAIL_PASS: process.env.EMAIL_PASS,
         EMAIL_USER: process.env.EMAIL_USER,
         FIREBASE_CONFIG: process.env.FIREBASE_CONFIG,

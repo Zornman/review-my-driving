@@ -31,7 +31,7 @@ export class LoginComponent {
 
     this.authService.getUser().subscribe(user => {
       if (user) {
-        this.router.navigate(['/account']);
+        this.router.navigate(['/index']);
       }
     });
   }

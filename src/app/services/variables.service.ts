@@ -9,6 +9,6 @@ export class VariablesService {
     constructor(private http: HttpClient) {}
 
     getEnvironmentVariables(): Observable<any> {
-        return this.http.get('./netlify/getEnvironmentVariables');
+        return this.http.get('/.netlify/functions/getEnvironmentVariables');
     }
 }

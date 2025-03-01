@@ -144,7 +144,6 @@ export class ProductPageComponent {
             this.disableAdd = false;
           } else {
             this.createNewProduct();
-            this.disableAdd = false;
           }
         }
       },
@@ -182,6 +181,7 @@ export class ProductPageComponent {
             product: response.product
           });
           this._snackBar.open("Product added to cart!", "Ok", { duration: 3000 });
+          this.disableAdd = false;
         },
         error: (error) => {
           this.dbService.insertErrorLog({
@@ -196,6 +196,7 @@ export class ProductPageComponent {
             error: (error: any) => {
             }
           });
+          this.disableAdd = false;
         }
       });
     });

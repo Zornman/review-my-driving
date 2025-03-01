@@ -1,15 +1,15 @@
 <form (ngSubmit)="submit(form)" #form="ngForm">
-    <div class="grid-container grid-container-padding" style="padding-top: 1vh;">
-        <div class="grid-row">
+    <div class="container grid-container-padding" style="padding-top: 1vh;">
+        <div class="row">
             <div class="col-12 col-center">
-                <span class="align-middle">
+                <span class="align-middle padding-bottom">
                     Please provide some basic information about yourself, the car in question, and the event that took place.
                     <br />
                     We will do our best to make sure they are reprimanded.
                 </span>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <!-- <div class="col-12 col-center">
                 <span class="pull-right">
                     * = Required
@@ -22,7 +22,7 @@
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Last Initial</mat-label>
@@ -38,7 +38,7 @@
                 </mat-form-field>
             </div>
         </div> -->
-        <div class="grid-row" *ngIf="!user_id">
+        <div class="row" *ngIf="!user_id">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>License plate of Driver</mat-label>
@@ -46,7 +46,7 @@
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row" *ngIf="!user_id">
+        <div class="row" *ngIf="!user_id">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Lincense Registration State</mat-label>
@@ -56,21 +56,37 @@
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Reason for Contacting us</mat-label>
                     <mat-select [(ngModel)]="formData.reasonForContacting" name="reasonForContacting" required>
-                        <mat-option value="Aggressive_Driving">Aggressive Driving</mat-option>
-                        <mat-option value="Cut_Me_Off">Cut me Off</mat-option>
-                        <mat-option value="Driving_Slow">Driving Slow</mat-option>
-                        <mat-option value="Not_Paying_Attention">Not Paying Attention</mat-option>
-                        <mat-option value="Other">Other</mat-option>
+                        <mat-optgroup label="Bad Driving Review">
+                            <mat-option value="Aggressive_Driving">Aggressive Driving</mat-option>
+                            <mat-option value="Cut_Me_Off">Cut me Off</mat-option>
+                            <mat-option value="Driving_Slow">Driving Slow</mat-option>
+                            <mat-option value="Not_Paying_Attention">Not Paying Attention</mat-option>
+                            <mat-option value="Bad_Other">Bad Other</mat-option>
+                        </mat-optgroup>
+                        <mat-optgroup label="Good Driving Review">
+                            <mat-option value="Courteous_Driver">Courteous Driver</mat-option>
+                            <mat-option value="Used_Turn_Signals">Used Turn Signals</mat-option>
+                            <mat-option value="Good_Parking_Job">Excellent Park Job</mat-option>
+                            <mat-option value="Let_Me_Merge">Let me Merge</mat-option>
+                            <mat-option value="Good_Other">Good Other</mat-option>
+                        </mat-optgroup>
+                        <mat-optgroup label="Car Review">
+                            <mat-option value="Looks_New">Looks Brand New</mat-option>
+                            <mat-option value="Cool_Color">Cool Color/Wrap</mat-option>
+                            <mat-option value="Nice_Wheels">Nice Rims/Wheels</mat-option>
+                            <mat-option value="Unique_Eye_Catching">Unique & Eye-Catching</mat-option>
+                            <mat-option value="Other">Other</mat-option>
+                        </mat-optgroup>
                     </mat-select>
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Description of event</mat-label>
@@ -78,7 +94,7 @@
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <div class="col-12 col-center">
                 <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid" matTooltip="Are you sure?" [matTooltipPosition]="'above'">Submit</button>
             </div>

@@ -1,0 +1,87 @@
+<form [formGroup]="contactForm" (submit)="sendFeedback()">
+    <div class="container grid-container-padding" style="padding-top: 1vh;">
+        <div class="row">
+            <div class="col-12 col-center">
+                <span class="align-middle padding-bottom">
+                    Fill out the information and we will do our best to either get back to you or take your
+                    comments into consideration. Thank you for your time.
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>E-Mail</mat-label>
+                    <input matInput formControlName="email" name="email" required>
+                    <mat-error *ngIf="contactForm.get('email')?.hasError('required')">
+                        Email is required.
+                    </mat-error>
+                    <mat-error *ngIf="contactForm.get('email')?.hasError('email')">
+                        Enter a valid email address.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>First Name</mat-label>
+                    <input matInput formControlName="firstName" name="firstName" required>
+                    <mat-error *ngIf="contactForm.get('firstName')?.hasError('required')">
+                        First Name is required.
+                    </mat-error>
+                    <mat-error *ngIf="contactForm.get('firstName')?.hasError('pattern')">
+                        Enter a valid first name.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput formControlName="lastName" name="lastName" required>
+                    <mat-error *ngIf="contactForm.get('lastName')?.hasError('required')">
+                        Last Name is required.
+                    </mat-error>
+                    <mat-error *ngIf="contactForm.get('lastName')?.hasError('pattern')">
+                        Enter a valid last name.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>Reason for Contacting</mat-label>
+                    <mat-select formControlName="reasonForContacting" name="reasonForContacting" required>
+                        <mat-option value="bug">Report a Bug</mat-option>
+                        <mat-option value="feedback">Submit Feedback/Suggestion</mat-option>
+                        <mat-option value="business">Business/Partnership Inquiry</mat-option>
+                        <mat-option value="support">Help! I Need Support</mat-option>
+                        <mat-option value="other">Other</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="contactForm.get('reasonForContacting')?.hasError('required')">
+                        Reason is required.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-center">
+                <mat-form-field appearance="outline">
+                    <mat-label>Please explain</mat-label>
+                    <textarea matInput formControlName="description" name="description" required></textarea>
+                    <mat-error *ngIf="contactForm.get('description')?.hasError('required')">
+                        An explanation for contacting is required.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-center">
+                <button mat-stroked-button color="primary" type="submit" [disabled]="contactForm.invalid">Submit</button>
+            </div>
+        </div>
+    </div>
+</form>

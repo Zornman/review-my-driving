@@ -154,7 +154,7 @@ export class CheckoutComponent implements OnInit {
       city: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
       region: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]], // State/Province
       zip: ['', [Validators.required, Validators.pattern(/^\d+$/)]], // Only numbers
-      infoProcessed: [false, [Validators.requiredTrue]]
+      infoProcessed: [false]
     });
 
     this.shippingOptionsForm = this.fb.group({

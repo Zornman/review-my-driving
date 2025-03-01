@@ -11,9 +11,13 @@ import { AuthGuard } from './guards/auth.guard';
 import { GuestGuard } from './guards/guest.guard';
 import { OrderConfirmationComponent } from './order-confirmation/order-confirmation.component';
 import { AccountSettingsComponent } from './account-settings/account-settings.component';
+import { IndexComponent } from './index/index.component';
+import { AboutComponent } from './about/about.component';
+import { ContactComponent } from './contact/contact.component';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent },
+    { path: '', component: IndexComponent },
+    { path: 'index', component: IndexComponent },
     { path: 'home', component: HomeComponent },
     { path: 'shop', component: ShopComponent },
     { path: 'register', component: RegisterComponent },
@@ -25,5 +29,7 @@ export const routes: Routes = [
     { path: 'register', component: RegisterComponent },
     { path: 'account', component: AccountOverviewComponent },
     { path: 'settings', component: AccountSettingsComponent },
+    { path: 'about', component: AboutComponent },
+    { path: 'contact', component: ContactComponent },
     { path: '**', redirectTo: '/login' }, // Redirect unknown routes
 ];

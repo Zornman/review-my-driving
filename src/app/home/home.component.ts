@@ -129,9 +129,10 @@ export class HomeComponent {
     });
   }
 
-  submit(form: NgForm) {
+  async submit(form: NgForm) {
     this.ngForm = form;
-    this.insertSubmission();
+    await this.insertSubmission();
+    await this.sendEmailNotification();
   }
 
   openConfirmMessage() {
@@ -154,7 +155,7 @@ export class HomeComponent {
     }
   }
 
-  sendEmailNotification() {
+  async sendEmailNotification() {
     this.emailService.sendSubmissionEmail(this.formData).subscribe({
       next: (response: any) => {
         this.openConfirmMessage();
@@ -178,13 +179,12 @@ export class HomeComponent {
     });
   }
 
-  insertSubmission() {
+  async insertSubmission() {
     this.formData.user_id = this.user_id;
     this.formData.dateSubmitted = this.date();
     this.dbService.insertSubmission(this.formData).subscribe({
       next: (response: any) => {
-        //console.log('Data inserted successfully:', response);
-        this.sendEmailNotification();
+
       },
       error: (error) => {
         this._snackBar.open('Error submitting form, try again.', 'Close');

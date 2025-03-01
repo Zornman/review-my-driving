@@ -72,7 +72,7 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
   expandedElement: any | null;
 
   ordersDataSource = new MatTableDataSource<any>([]);
-  ordersColumnsToDisplay = ['orderNum', 'dateOrdered'];
+  ordersColumnsToDisplay = ['orderNum', 'status', 'dateOrdered'];
   
   constructor (
     private authService: AuthService, 
@@ -105,12 +105,11 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
     this.authService.getUser().subscribe((user) => {
       if (user) {
         this.user = user;
+        this._snackBar.open('Loading account information...');
         this.initializeAccountOverview();
         this.initializeSubmissions();
-        this.loadShippingInfo(this.user.uid);
+        this.loadShippingInfo();
         this.initializeOrderHistory();
-      } else {
-        this.router.navigate(['/login']);
       }
     });
   }
@@ -134,7 +133,7 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
     if (!this.shippingInfoForm.valid) return;
 
     if (!this.user) {
-      this._snackBar.open('user not found.', 'Ok', { duration: 3000 })
+      this._snackBar.open('user not found.', 'Ok', { duration: 3000 });
       return;
     }
     this._snackBar.open('Saving shipping information...');
@@ -166,11 +165,13 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
     this._snackBar.dismiss();
   }
 
-  loadShippingInfo(token: string) {
-    this.dbService.getUserShippingInfo(token).subscribe({
+  loadShippingInfo() {
+    if (!this.user) return;
+
+    this.dbService.getUserShippingInfo(this.user.uid).subscribe({
       next: (response: any) => {
         if (response.result) {
-          this.shippingInfoForm.get('userID')?.setValue(token);
+          this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
           this.shippingInfoForm.get('firstName')?.setValue(response.result.firstName);
           this.shippingInfoForm.get('lastName')?.setValue(response.result.lastName);
           this.shippingInfoForm.get('address1')?.setValue(response.result.address1);
@@ -211,8 +212,10 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
         todaysDate.setHours(0, 0, 0, 0);
         const sevenDaysAgo = new Date(now);
         sevenDaysAgo.setDate(now.getDate() - 7);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
         const thirtyDaysAgo = new Date(now);
         thirtyDaysAgo.setDate(now.getDate() - 30);
+        thirtyDaysAgo.setHours(0, 0, 0, 0);
 
         // Sort submissions by Date descending before setting table data source
         this.submissions = response.submissions.sort((a: any, b: any) => {
@@ -232,8 +235,20 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
           date.setHours(0, 0, 0, 0);
           return date.getTime() === todaysDate.getTime()
         }).length;
-        this.lastWeekSubmissions = response.submissions.filter((x: any) => this.parseDate(x.dateSubmitted) >= sevenDaysAgo && this.parseDate(x.dateSubmitted) <= now).length;
-        this.lastMonthSubmissions = response.submissions.filter((x: any) => this.parseDate(x.dateSubmitted) >= thirtyDaysAgo && this.parseDate(x.dateSubmitted) <= now).length;
+        
+        this.lastWeekSubmissions = response.submissions.filter((x: any) => {
+          const date = this.parseDate(x.dateSubmitted);
+          date.setHours(0, 0, 0, 0);
+          return date >= sevenDaysAgo && date <= now;
+        }).length;
+
+        this.lastMonthSubmissions = response.submissions.filter((x: any) => {
+          const date = this.parseDate(x.dateSubmitted);
+          date.setHours(0, 0, 0, 0);
+          return date >= thirtyDaysAgo && date <= now;
+        }).length;
+      
+        this._snackBar.open('Account Information loaded!', 'Ok', { duration: 3000 });
       },
       error: (error) => {
         //console.error('Error getting data:', error);
