@@ -37,9 +37,6 @@
             "scripts": [],
             "server": "src/main.server.ts",
             "outputMode": "server",
-            "prerender": {
-              "routesFile": "products.txt"
-            },
             "ssr": {
               "entry": "src/server.ts"
             }

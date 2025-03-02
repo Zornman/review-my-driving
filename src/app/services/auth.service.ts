@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword } from 'firebase/auth';
@@ -25,7 +26,7 @@ export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null);
   user$: Observable<User | null> = this.userSubject.asObservable(); // Expose as observable
 
-  constructor(private router: Router) {
+  constructor(@Inject(PLATFORM_ID) private platformId: any, private router: Router) {
     // Ensure Firebase Auth state is set correctly before emitting
     onAuthStateChanged(this.auth, (user) => {
       //console.log('AuthService: User state updated:', user);
@@ -39,7 +40,9 @@ export class AuthService {
       .then((result) => {
         //console.log('User signed in:', result.user);
         this.userSubject.next(result.user); // 🔥 Update state immediately after login
-        localStorage.setItem('userToken', result.user.uid);
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('userToken', result.user.uid);
+        }
       })
       .catch((error) => {
         console.error('Error during sign-in:', error);
@@ -50,7 +53,9 @@ export class AuthService {
     return signOut(this.auth)
       .then(() => {
         this.userSubject.next(null); // 🔥 Ensure state updates immediately after logout
-        localStorage.removeItem('userToken');
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.removeItem('userToken');
+        }
         this.router.navigateByUrl('/login');
       })
       .catch((error) => {
@@ -65,7 +70,9 @@ export class AuthService {
         const user = userCredential.user;
         return updateProfile(user, { displayName }).then(() => {
           this.userSubject.next(user); // 🔥 Update user state
-          localStorage.setItem('userToken', user.uid);
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('userToken', user.uid);
+          }
         });
       })
       .catch((error) => {
@@ -79,7 +86,9 @@ export class AuthService {
       .then((userCredential) => {
         const user = userCredential.user;
         this.userSubject.next(user); // 🔥 Update state immediately after login
-        localStorage.setItem('userToken', user.uid);
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('userToken', user.uid);
+        }
       })
       .catch((error) => {
         console.error('Email/Password login failed:', error);

@@ -1,4 +1,5 @@
-import { Injectable } from "@angular/core";
+import { Injectable, PLATFORM_ID, Inject } from "@angular/core";
+import { isPlatformBrowser } from '@angular/common';
 import { WindowRefService } from "./window.service";
 
 @Injectable({
@@ -10,7 +11,7 @@ export class ThemeService {
     private themeKey = 'user-theme'; // LocalStorage key
     private isDarkMode!: boolean;
 
-    constructor(private windowRef: WindowRefService) {
+    constructor(@Inject(PLATFORM_ID) private platformId: any, private windowRef: WindowRefService) {
         this.setInitialTheme();
     }
 
@@ -23,7 +24,10 @@ export class ThemeService {
     setInitialTheme(): void {
         const win = this.windowRef.nativeWindow;
         if (win) {
-            const savedTheme = localStorage.getItem(this.themeKey);
+            let savedTheme = null;
+            if (isPlatformBrowser(this.platformId)) {
+                savedTheme = localStorage.getItem(this.themeKey);
+            }
             
             if (savedTheme) {
                 // Load user preference from localStorage
@@ -40,7 +44,9 @@ export class ThemeService {
     /** ✅ Toggle dark/light mode and persist preference */
     toggleTheme(isDarkMode: boolean): void {
         this.isDarkMode = isDarkMode;
-        localStorage.setItem(this.themeKey, isDarkMode ? this.darkThemeClass : this.lightThemeClass);
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem(this.themeKey, isDarkMode ? this.darkThemeClass : this.lightThemeClass);
+        }
         this.applyTheme(isDarkMode ? this.darkThemeClass : this.lightThemeClass);
     }
 

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Product } from '../shared/models/product';
@@ -18,11 +19,14 @@ export class ShopComponent implements OnInit {
   products: Product[] = [];
   showReadMore: boolean = true;
 
-  constructor(private router: Router, private printifyService: PrintifyService, private dbService: MongoService) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: any, private router: Router, private printifyService: PrintifyService, private dbService: MongoService) {}
 
   ngOnInit(): void {
 
-    let cachedProducts = localStorage?.getItem('products');
+    let cachedProducts = null;
+    if (isPlatformBrowser(this.platformId)) {
+      cachedProducts = localStorage?.getItem('products');
+    }
 
     if (!cachedProducts) {
       this.printifyService.getProducts().subscribe({
@@ -32,7 +36,9 @@ export class ShopComponent implements OnInit {
           });
   
           this.products = this.products.filter(x => x.visible);
-          localStorage.setItem('products', JSON.stringify(this.products));
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('products', JSON.stringify(this.products));
+          }
         },
         error: (error) => {
           this.dbService.insertErrorLog({
