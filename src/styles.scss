@@ -1,14 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
-@import './styles/variables';
-@import '../node_modules/bootstrap/dist/css/bootstrap-grid.min.css';
-@import './styles/grid';
-@import './styles/header';
-@import './styles/footer';
-@import './styles/inputs.scss';
-@import './styles/shop.scss';
-@import './styles/tables.scss';
-@import './styles/buttons.scss';
+@use './styles/variables' as *;
+@use '../node_modules/bootstrap/dist/css/bootstrap-grid.min.css';
+@use './styles/grid';
+@use './styles/header';
+@use './styles/footer';
+@use './styles/inputs.scss';
+@use './styles/shop.scss';
+@use './styles/tables.scss';
+@use './styles/buttons.scss';
 
 html {
 

@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // Define grid variables
 $grid-columns: 12; // Number of columns
 $gutter-width: 1rem; // Spacing between columns
@@ -25,8 +27,8 @@ $breakpoints: (
 
 // Mixin for responsive breakpoints
 @mixin respond-to($breakpoint) {
-  @if map-has-key($breakpoints, $breakpoint) {
-    @media (min-width: map-get($breakpoints, $breakpoint)) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: map.get($breakpoints, $breakpoint)) {
       @content;
     }
   }
@@ -58,7 +60,7 @@ $breakpoints: (
 }
 
 // Make all columns span full width at smaller breakpoints
-@media (max-width: map-get($breakpoints, sm)) {
+@media (max-width: map.get($breakpoints, sm)) {
   .grid-container {
     grid-template-columns: 1fr; // Enforce single-column layout
   }
@@ -93,7 +95,7 @@ $breakpoints: (
 }
 
 // Additional utilities for responsiveness and spacing
-@media (max-width: map-get($breakpoints, sm)) {
+@media (max-width: map.get($breakpoints, sm)) {
   .grid-container {
     grid-template-columns: 1fr; // Ensure stacking
   }
