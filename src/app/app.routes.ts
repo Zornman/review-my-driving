@@ -26,10 +26,9 @@ export const routes: Routes = [
     { path: 'checkout', component: CheckoutComponent },
     { path: 'orderConfirmation/:id', component: OrderConfirmationComponent },
     { path: 'login', component: LoginComponent },
-    { path: 'register', component: RegisterComponent },
     { path: 'account', component: AccountOverviewComponent },
     { path: 'settings', component: AccountSettingsComponent },
     { path: 'about', component: AboutComponent },
     { path: 'contact', component: ContactComponent },
-    { path: '**', redirectTo: '/login' }, // Redirect unknown routes
+    { path: '**', redirectTo: '/index' }
 ];

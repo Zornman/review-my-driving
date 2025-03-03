@@ -7,7 +7,7 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'orderConfirmation/:id',
-    renderMode: RenderMode.Client // Disable prerendering for orderConfirmation
+    renderMode: RenderMode.Client
   },
   {
     path: '**',

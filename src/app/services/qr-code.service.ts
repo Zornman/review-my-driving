@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import QRCode, { QRCodeToDataURLOptions } from 'qrcode';
+import { QRCodeToDataURLOptions } from 'qrcode';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -8,12 +8,18 @@ import { AuthService } from './auth.service';
 export class QRCodeService {
     baseURL: string = 'https://www.reviewmydriving.co/';
     userID!: string;
+    QRCode!: any;
 
     constructor(private authService: AuthService) {
+        this.loadQRCodeModule();
         this.authService.getUser().subscribe((user) => {
             if (user)
                 this.userID = user.uid;
         });
+    }
+
+    private async loadQRCodeModule() {
+        this.QRCode = (await import('qrcode')).default;
     }
 
     async generateQRCode(): Promise<string> {
@@ -25,7 +31,7 @@ export class QRCodeService {
                 errorCorrectionLevel: 'H', // High error correction level
               };
 
-            return await QRCode.toDataURL(url, options); // Returns a Base64 data URL
+            return await this.QRCode.toDataURL(url, options); // Returns a Base64 data URL
         } catch (err) {
             console.error('Error generating QR code:', err);
             throw err;
