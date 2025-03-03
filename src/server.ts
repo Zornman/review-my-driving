@@ -1,9 +1,12 @@
 import express from 'express';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CommonEngine } from '@angular/ssr/node'
+import { render } from '@netlify/angular-runtime/common-engine'
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
+const commonEngine = new CommonEngine();
 
 const app = express();
 
@@ -20,12 +23,12 @@ app.use('*', (req, res) => {
 });
 
 // ✅ Start the server locally (for testing)
-const port = process.env['PORT'] || 3000;
+const port = process.env['PORT'] || 5500;
 app.listen(port, () => {
     console.log(`🚀 Angular server running at http://localhost:${port}`);
 });
 
 // ✅ Netlify Function Handler (if needed)
-export async function netlifyHandler(request: Request): Promise<Response> {
-    return new Response('Not found', { status: 404 });
+export async function netlifyCommonEngineHandler(request: Request, context: any): Promise<Response> {
+  return await render(commonEngine);
 }
