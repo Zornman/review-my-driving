@@ -19,8 +19,14 @@ app.use(express.static(browserDistFolder, {
 }));
 
 // ✅ Redirect all requests to `index.html` (SPA fallback)
-app.use('*', (req, res) => {
-    res.sendFile(resolve(browserDistFolder, 'index.html'));
+app.use('*', async (req, res) => {
+  try {
+      const html = await render(commonEngine);
+      res.status(200).send(html);
+  } catch (error) {
+      console.error('SSR Error:', error);
+      res.status(500).send('<h1>Internal Server Error</h1>');
+  }
 });
 
 // ✅ Function to check if port is in use
