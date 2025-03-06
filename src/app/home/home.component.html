@@ -1,14 +1,15 @@
-<form autocomplete="new-password" (ngSubmit)="submit(form)" #form="ngForm">
-    <div class="grid-container grid-container-padding" style="padding-top: 1vh;">
-        <div class="grid-row">
+<form (ngSubmit)="submit(form)" #form="ngForm">
+    <div class="container grid-container-padding" style="padding-top: 1vh;">
+        <div class="row">
             <div class="col-12 col-center">
-                <span class="align-middle">Please provide some basic information about yourself, the car in question, and the event that took place.
+                <span class="align-middle padding-bottom">
+                    Please provide some basic information about yourself, the car in question, and the event that took place.
                     <br />
                     We will do our best to make sure they are reprimanded.
                 </span>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <!-- <div class="col-12 col-center">
                 <span class="pull-right">
                     * = Required
@@ -17,15 +18,15 @@
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>First Name</mat-label>
-                    <input matInput [(ngModel)]="formData.firstName" name="firstName" autocomplete="new-password" required>
+                    <input matInput [(ngModel)]="formData.firstName" name="firstName" required>
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Last Initial</mat-label>
-                    <input matInput [(ngModel)]="formData.lastName" name="lastName" maxlength="1" autocomplete="new-password" required>
+                    <input matInput [(ngModel)]="formData.lastName" name="lastName" maxlength="1" required>
                 </mat-form-field>
             </div>
         </div>
@@ -37,39 +38,55 @@
                 </mat-form-field>
             </div>
         </div> -->
-        <div class="grid-row">
+        <div class="row" *ngIf="!user_id">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>License plate of Driver</mat-label>
-                    <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" autocomplete="new-password" required>
+                    <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" required>
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row" *ngIf="!user_id">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Lincense Registration State</mat-label>
                     <mat-select [(ngModel)]="formData.state" name="state" required>
-                        <mat-option *ngFor="let state of states" [value]="state">{{ state }}</mat-option>
+                        <mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
                     </mat-select>
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Reason for Contacting us</mat-label>
                     <mat-select [(ngModel)]="formData.reasonForContacting" name="reasonForContacting" required>
-                        <mat-option value="Aggressive_Driving">Aggressive Driving</mat-option>
-                        <mat-option value="Cut_Me_Off">Cut me Off</mat-option>
-                        <mat-option value="Driving_Slow">Driving Slow</mat-option>
-                        <mat-option value="Not_Paying_Attention">Not Paying Attention</mat-option>
-                        <mat-option value="Other">Other</mat-option>
+                        <mat-optgroup label="Bad Driving Review">
+                            <mat-option value="Aggressive_Driving">Aggressive Driving</mat-option>
+                            <mat-option value="Cut_Me_Off">Cut me Off</mat-option>
+                            <mat-option value="Driving_Slow">Driving Slow</mat-option>
+                            <mat-option value="Not_Paying_Attention">Not Paying Attention</mat-option>
+                            <mat-option value="Bad_Other">Bad Other</mat-option>
+                        </mat-optgroup>
+                        <mat-optgroup label="Good Driving Review">
+                            <mat-option value="Courteous_Driver">Courteous Driver</mat-option>
+                            <mat-option value="Used_Turn_Signals">Used Turn Signals</mat-option>
+                            <mat-option value="Good_Parking_Job">Excellent Park Job</mat-option>
+                            <mat-option value="Let_Me_Merge">Let me Merge</mat-option>
+                            <mat-option value="Good_Other">Good Other</mat-option>
+                        </mat-optgroup>
+                        <mat-optgroup label="Car Review">
+                            <mat-option value="Looks_New">Looks Brand New</mat-option>
+                            <mat-option value="Cool_Color">Cool Color/Wrap</mat-option>
+                            <mat-option value="Nice_Wheels">Nice Rims/Wheels</mat-option>
+                            <mat-option value="Unique_Eye_Catching">Unique & Eye-Catching</mat-option>
+                            <mat-option value="Other">Other</mat-option>
+                        </mat-optgroup>
                     </mat-select>
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>Description of event</mat-label>
@@ -77,12 +94,12 @@
                 </mat-form-field>
             </div>
         </div>
-        <div class="grid-row">
+        <div class="row">
             <div class="col-12 col-center">
                 <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid" matTooltip="Are you sure?" [matTooltipPosition]="'above'">Submit</button>
             </div>
             <div class="col-12 col-center">
-                <span class="pull-right"><a href="/">Want your own bumper sticker?</a></span>
+                <span class="pull-right"><a href="/shop">Want your own bumper sticker?</a></span>
             </div>
         </div>
     </div>

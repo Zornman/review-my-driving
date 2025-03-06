@@ -1,0 +1,40 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-center">
+            <h3 class="align-middle">
+                Account Settings
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <mat-accordion multi>
+                <mat-expansion-panel expanded="true">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title> Form Settings </mat-panel-title>
+                  </mat-expansion-panel-header>
+                    <div class="form-settings">
+                        <form [formGroup]="messageForm">
+                            <label id="radio-group-label">Preferred Message Style:</label>
+                            <br />
+                            <mat-radio-group formControlName="type" name="type" aria-label="Select an option" aria-labelledby="radio-group-label">
+                                <mat-radio-button value="popup">Popup</mat-radio-button>
+                                <mat-radio-button value="snackbar">Snackbar</mat-radio-button>
+                                <mat-radio-button value="alert">Alert</mat-radio-button>
+                            </mat-radio-group>
+                            <br />
+                            <mat-form-field appearance="outline" class="full-width">
+                                <mat-label>Confirmation Message</mat-label>
+                                <input matInput type="text" formControlName="message" name="message" />
+                            </mat-form-field>
+                        </form>
+                    </div>
+                  <mat-action-row>
+                    <button mat-raised-button color="primary" class="button-padding-right" (click)="saveSettings()">Save</button>
+                    <button mat-raised-button color="accent" (click)="previewMessage()">Preview</button>
+                  </mat-action-row>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+    </div>
+</div>

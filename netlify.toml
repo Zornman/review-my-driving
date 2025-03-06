@@ -1,3 +1,19 @@
 [build]
   publish = "dist/review-my-driving/browser"
   functions = "netlify/functions"
+  command = "ng build --configuration=production"
+
+[schedule]
+  "updateOrderStatus" = "0 * * * *"
+
+[[redirects]]
+  from = "/product/:id"
+  to = "/product/:id"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/orderConfirmation/:id"
+  to = "/orderConfirmation/:id"
+  status = 200
+  force = true

@@ -1,0 +1,279 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <p>
+          <a href="/cart">‹ Back</a>
+      </p>
+    </div>
+    <div class="col-12">
+      <mat-stepper [orientation]="(stepperOrientation | async)!" linear="true" #stepper (selectionChange)="onStepChange($event)">
+        <mat-step [stepControl]="shippingInfoForm">
+          <ng-template matStepLabel>Shipping Information</ng-template>
+          <form [formGroup]="shippingInfoForm" (submit)="saveUserShippingInfo()">
+            <div class="container">
+              <div class="row">
+                <div class="col-12" style="padding-top: 10px;">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>E-Mail</mat-label>
+                    <input matInput type="text" formControlName="email" name="email" />
+                    <mat-error *ngIf="shippingInfoForm.get('email')?.hasError('required')">
+                      Email is required.
+                    </mat-error>
+                    <mat-error *ngIf="shippingInfoForm.get('email')?.hasError('email')">
+                      Enter a valid email address.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Phone Number</mat-label>
+                    <input matInput type="text" name="phone" formatPhone formControlName="phone" />
+                    <mat-error *ngIf="shippingInfoForm.get('phone')?.hasError('required')">
+                      Phone number is required.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-center">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>First Name</mat-label>
+                    <input matInput type="text" name="firstName" formControlName="firstName" />
+                    <mat-error *ngIf="shippingInfoForm.get('firstName')?.hasError('required')">
+                      First Name is required.
+                    </mat-error>
+                    <mat-error *ngIf="shippingInfoForm.get('firstName')?.hasError('pattern')">
+                      Enter a valid first name.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-center">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput type="text" name="lastName" formControlName="lastName" />
+                    <mat-error *ngIf="shippingInfoForm.get('lastName')?.hasError('required')">
+                      Last Name is required.
+                    </mat-error>
+                    <mat-error *ngIf="shippingInfoForm.get('lastName')?.hasError('pattern')">
+                      Enter a valid last name.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Address line 1</mat-label>
+                    <input matInput type="text" name="address1" formControlName="address1" autocomplete="address-line1" />
+                    <mat-error *ngIf="shippingInfoForm.get('address1')?.hasError('required')">
+                      Address is required.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Address line 2</mat-label>
+                    <input matInput type="text" name="address2" formControlName="address2" autocomplete="address-line2" />
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Country</mat-label>
+                    <mat-select formControlName="country" name="country">
+                      <mat-option *ngFor="let country of countries" [value]="country.value">{{ country.name }}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="shippingInfoForm.get('country')?.hasError('required')">
+                      Country is required.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-sm-4 col-center">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>City</mat-label>
+                    <input matInput type="text" name="city" formControlName="city" />
+                    <mat-error *ngIf="shippingInfoForm.get('city')?.hasError('required')">
+                      City is required.
+                    </mat-error>
+                    <mat-error *ngIf="shippingInfoForm.get('city')?.hasError('pattern')">
+                      Enter a valid city.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-xs-12 col-sm-4 col-center">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ (shippingInfoForm.get('country')?.value === 'US') ? 'State' : 'Region' }}</mat-label>
+                    <mat-select formControlName="region" name="region" *ngIf="shippingInfoForm.get('country')?.value === 'US'">
+                        <mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
+                    </mat-select>
+                    <input matInput formControlName="region" name="region" *ngIf="shippingInfoForm.get('country')?.value !== 'US'">
+                    <mat-error *ngIf="shippingInfoForm.get('region')?.hasError('required')">
+                      {{ (shippingInfoForm.get('country')?.value !== 'US') ? 'Region' : 'State' }} is required.
+                    </mat-error>
+                    <mat-error *ngIf="shippingInfoForm.get('region')?.hasError('pattern')">
+                      Enter a valid {{ (shippingInfoForm.get('country')?.value !== 'US') ? 'region' : 'state' }}.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-xs-12 col-sm-4 col-center">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Zip Code</mat-label>
+                    <input matInput type="text" name="zip" formControlName="zip" />
+                    <mat-error *ngIf="shippingInfoForm.get('zip')?.hasError('required')">
+                      Zip Code is required.
+                    </mat-error>
+                    <mat-error *ngIf="shippingInfoForm.get('zip')?.hasError('pattern')">
+                      Enter a valid zip code.
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12 col-center" *ngIf="!this.shippingInfoLoaded">
+                  <button mat-stroked-button color="primary" type="submit" [disabled]="!shippingInfoForm.valid">Save</button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div *ngIf="this.shippingInfoLoaded">
+            <button mat-stroked-button type="button" color="primary" (click)="getShippingRates()">Next - Choose Shipping</button>
+          </div>
+        </mat-step>
+        <mat-step [stepControl]="shippingOptionsForm">
+          <ng-template matStepLabel>Shipping Options</ng-template>
+          <form [formGroup]="shippingOptionsForm">
+            <div class="container">
+              <div class="row">
+                <div class="col-xs-12 col-sm-8 col-md-6 table-view">
+                  <h3>Available Shipping Options:</h3>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-sm-4 col-md-3 table-view">
+                  <mat-radio-group formControlName="shippingOption" name="shippingOption" class="radio-group">
+                    <mat-radio-button *ngFor="let option of allShippingOptions" [value]="option">
+                      {{ option | titlecase }} <!-- Display the option with proper casing -->
+                    </mat-radio-button>
+                  </mat-radio-group>
+                </div>
+                <div class="col-xs-12 col-sm-4 col-md-3 table-view">
+                  <div>
+                    <p>
+                      Shipping Fee: 
+                      <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'standard'">
+                        FREE!
+                      </span>
+                      <span *ngIf="express_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'express'">
+                        ${{ (shipping_total_cost_express / 100).toFixed(2) }}
+                      </span>
+                      <span *ngIf="economy_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'economy'">
+                        FREE!
+                      </span>
+                      <span *ngIf="priority_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'priority'">
+                        ${{ (shipping_total_cost_priority / 100).toFixed(2) }}
+                      </span>
+                    </p>
+                    <p>
+                      Delivery Window:
+                      <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'standard'">
+                        {{ shipping_from_standard + ' to ' + shipping_to_standard + ' days' }}
+                      </span>
+                      <span *ngIf="express_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'express'">
+                        {{ shipping_from_express + ' to ' + shipping_to_express + ' days' }}
+                      </span>
+                      <span *ngIf="economy_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'economy'">
+                        {{ shipping_from_economy + ' to ' + shipping_to_economy + ' days' }}
+                      </span>
+                      <span *ngIf="priority_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'priority'">
+                        {{ shipping_from_priority + ' to ' + shipping_to_priority + ' days' }}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="padding-top: 15px;">
+              <button mat-button matStepperPrevious class="button-padding-right">Back</button>
+              <button mat-button matStepperNext (click)="confirmShippingOption()" [disabled]="!shippingOptionsForm.valid">Next - Payment</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Order Summary</ng-template>
+          <div class="container">
+            <div class="row">
+              <div class="col-xs-12 col-sm-6 table-view">
+                <h3>Order Details</h3>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td class="order-details-title"><b>Total Items:</b></td>
+                      <td><p class="order-details-data">{{ totalCartQuantity }}</p></td>
+                    </tr>
+                    <tr>
+                      <td class="order-details-title"><b>Order Total:</b></td>
+                      <td><p class="order-details-data">${{ (totalCartCost / 100).toFixed(2) }}</p></td>
+                    </tr>
+                    <tr>
+                      <td class="order-details-title"><b>Shipping:</b></td>
+                      <td>
+                        <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'standard'">FREE</p>
+                        <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'express'">${{ (shipping_total_cost_express / 100).toFixed(2) }}</p>
+                        <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'economy'">FREE</p>
+                        <p class="order-details-data" *ngIf="shippingOptionsForm.get('shippingOption')?.value === 'priority'">${{ (shipping_total_cost_priority / 100).toFixed(2) }}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="order-details-title"><b>Amount Due:</b></td>
+                      <td><p class="order-details-data">${{ calculateAmountDue().toFixed(2) }}</p></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-xs-12 col-sm-6 table-view">
+                <h3>Shipping Details</h3>
+                <p>{{ shippingInfoForm.get('email')?.value }}</p>
+                <p>{{ shippingInfoForm.get('phone')?.value }}</p>
+                <p>{{ shippingInfoForm.get('firstName')?.value + ' ' + shippingInfoForm.get('lastName')?.value }}</p>
+                <p>{{ shippingInfoForm.get('address1')?.value }}</p>
+                <p *ngIf="shippingInfoForm.get('address2')?.value">{{ shippingInfoForm.get('address2')?.value }}</p>
+                <p>{{ shippingInfoForm.get('city')?.value + ', ' + shippingInfoForm.get('region')?.value + ' ' + shippingInfoForm.get('zip')?.value }}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-12">
+                <div class="stripe-payment-container">
+                  <h3>Credit Card Info</h3>
+                  <form (submit)="handlePayment()">
+                    <!-- <div id="card-element"></div> -->
+                    <div class="container">
+                      <div class="row">
+                        <div class="col-12">
+                          <div id="card-number-element" class="card-input card-number"></div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                          <div id="card-expiry-element" class="card-input"></div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                          <div id="card-cvc-element" class="card-input card-cvc"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="padding-top: 15px"></div>
+                    <button mat-button matStepperPrevious class="button-padding-right">Back</button>
+                    <button mat-raised-button color="primary" type="submit" [disabled]="!stripeElementsValid || paymentProcessing">Pay Now ${{ calculateAmountDue().toFixed(2) }}</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </div>
+  </div>
+</div>

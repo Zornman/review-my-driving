@@ -1,0 +1,16 @@
+.icon-button {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Center icon and text vertically */
+    justify-content: center; /* Optional: Center the content horizontally */
+
+    img {
+        margin-right: 8px; /* Add space between the icon and text */
+        display: inline-flex; /* Ensure proper alignment */
+        align-items: center; /* Center icon content vertically */
+    }
+
+    span {
+        display: inline-flex; /* Ensure span content is properly aligned */
+        align-items: center; /* Vertically align the text */
+    }
+}

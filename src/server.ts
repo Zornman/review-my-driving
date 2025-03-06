@@ -1,66 +1,63 @@
-import {
-  AngularNodeAppEngine,
-  createNodeRequestHandler,
-  isMainModule,
-  writeResponseToNodeResponse,
-} from '@angular/ssr/node';
 import express from 'express';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CommonEngine } from '@angular/ssr/node';
+import { render } from '@netlify/angular-runtime/common-engine';
+import net from 'net';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
+const commonEngine = new CommonEngine();
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
-
-/**
- * Serve static files from /browser
- */
-app.use(
-  express.static(browserDistFolder, {
+// ✅ Serve static files from Angular's build output
+app.use(express.static(browserDistFolder, {
     maxAge: '1y',
     index: false,
     redirect: false,
-  }),
-);
+}));
 
-/**
- * Handle all other requests by rendering the Angular application.
- */
-app.use('/**', (req, res, next) => {
-  angularApp
-    .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
-    .catch(next);
+// ✅ Redirect all requests to `index.html` (SPA fallback)
+app.use('*', (req, res) => {
+    res.sendFile(resolve(browserDistFolder, 'index.html'));
 });
 
-/**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
-if (isMainModule(import.meta.url)) {
-  const port = process.env['PORT'] || 4000;
-  app.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
-  });
+// ✅ Function to check if port is in use
+function checkPortInUse(port: number): Promise<boolean> {
+    return new Promise((resolve) => {
+        const server = net.createServer();
+        server.once('error', (err: any) => {
+            if (err.code === 'EADDRINUSE') {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
+        server.once('listening', () => {
+            server.close();
+            resolve(false);
+        });
+        server.listen(port);
+    });
 }
 
-/**
- * The request handler used by the Angular CLI (dev-server and during build).
- */
-export const reqHandler = createNodeRequestHandler(app);
+// ✅ Start server only if port is free
+const port = process.env['PORT'] || 5500;
+
+(async () => {
+    const isPortInUse = await checkPortInUse(Number(port));
+
+    if (!isPortInUse) {
+        app.listen(port, () => {
+            console.log(`🚀 Angular server running at http://localhost:${port}`);
+        });
+    } else {
+        console.log(`⚠️ Server is already running on port ${port}. Skipping restart.`);
+    }
+})();
+
+// ✅ Netlify Function Handler (if needed)
+export async function netlifyCommonEngineHandler(request: Request, context: any): Promise<Response> {
+    return await render(commonEngine);
+}

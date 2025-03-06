@@ -1,0 +1,163 @@
+.product-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid with min card size */
+    gap: 16px;
+    padding: 16px;
+}
+  
+.product-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-detail {
+    max-width: 100%;
+
+    @media screen and (max-width: 576px) {
+        max-width: 500px;
+        
+        span {
+            max-width: 500px !important;
+            word-wrap: break-word; /* For older browsers */
+            word-break: break-word; /* Standard property */
+            overflow-wrap: break-word; /* Modern and widely supported */
+        }   
+    }
+}
+  
+mat-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.custom-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-full-width-button {
+    width: 100%;
+}
+  
+.image-container {
+    position: relative;
+    width: 100%; /* Adjust width as needed */
+    height: 275px; /* Adjust height as needed */
+    overflow: hidden;
+
+    img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.5s ease; /* Smooth transition effect */
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.image-container .image-hover {
+    opacity: 0; /* Hide the hover image by default */
+}
+  
+.image-container:hover .image-hover {
+    opacity: 1; /* Show the hover image on hover */
+}
+  
+.image-container:hover .image-main {
+    opacity: 0; /* Hide the main image on hover */
+}
+
+/* Carousel Container */
+.carousel {
+    position: relative;
+    overflow: hidden;
+    width: fit-content; /* Set to desired width */
+    max-width: 500px; /* Limit max width */
+    margin: auto;
+    height: fit-content;
+    max-height: 500px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+
+    @media screen and (max-width: 590px) {
+        margin: 0;
+    }
+}
+  
+/* Track for Images */
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out; /* Smooth transition */
+    transform: translateX(0); /* Default position */
+}
+  
+/* Carousel Images */
+.carousel-image {
+    flex: 0 0 100%; /* Each image takes full width */
+    max-width: 100%;
+    height: auto;
+    object-fit: cover; /* Maintain aspect ratio */
+}
+  
+/* Carousel Buttons */
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    font-size: 18px;
+}
+  
+/* Previous Button */
+.carousel-button.prev {
+    left: 10px;
+}
+  
+/* Next Button */
+.carousel-button.next {
+    right: 10px;
+}
+  
+/* Button Hover Effects */
+.carousel-button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.subtitle-container {
+    max-height: 150px; /* Adjust the height limit */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 5; /* Limit to 5 lines */
+    -webkit-box-orient: vertical;
+}
+  
+.read-more-link {
+    display: block;
+    margin-top: 8px;
+    color: #3f51b5; /* Match your theme color */
+    text-decoration: none;
+    font-weight: bold;
+}
+  
+.read-more-link:hover {
+    text-decoration: underline;
+}

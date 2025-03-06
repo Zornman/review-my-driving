@@ -13,7 +13,6 @@ import { ThemeService } from './services/theme.service';
 export class AppComponent {
   title = 'review-my-driving';
 
-  constructor(private themeService: ThemeService) {
-    
+  constructor() {
   }
 }
