@@ -1,13 +1,24 @@
 import express from 'express';
-import { render } from '@netlify/angular-runtime/common-engine';
-import net from 'net';
+import { CommonEngine } from '@angular/ssr/node';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
+
+const isNetlify = process.env['NETLIFY_DEV'] === 'true';
+if (isNetlify) {
+    console.log('🚀 Running on Netlify. server.ts is disabled.');
+    process.exit(0); // Prevents server.ts from running on Netlify
+}
 
 const app = express();
+const commonEngine = new CommonEngine();
 
-// ✅ Serve Angular SSR in Netlify Edge Functions
-app.use('*', async (req, res) => {
+// ✅ Serve Angular SSR in Local Dev (ONLY when running locally)
+app.get('*', async (req, res) => {
     try {
-        const html = await render({});
+        const html = await commonEngine.render({
+            documentFilePath: resolve(__dirname, '../browser/index.html'),
+            url: req.url,
+        });
         res.status(200).send(html);
     } catch (error) {
         console.error('❌ SSR Error:', error);
@@ -15,42 +26,8 @@ app.use('*', async (req, res) => {
     }
 });
 
-// ✅ Function to check if port is in use (for local dev)
-function checkPortInUse(port: number): Promise<boolean> {
-    return new Promise((resolve) => {
-        const server = net.createServer();
-        server.once('error', (err: any) => {
-            if (err.code === 'EADDRINUSE') {
-                resolve(true);
-            } else {
-                resolve(false);
-            }
-        });
-        server.once('listening', () => {
-            server.close();
-            resolve(false);
-        });
-        server.listen(port);
-    });
-}
-
-// ✅ Start Express server **ONLY in local development**
+// ✅ Start Express Server Locally
 const port = process.env['PORT'] || 5500;
-if (process.env['NETLIFY_DEV'] === 'true') {
-    (async () => {
-        const isPortInUse = await checkPortInUse(Number(port));
-
-        if (!isPortInUse) {
-            app.listen(port, () => {
-                console.log(`🚀 Angular SSR server running at http://localhost:${port}`);
-            });
-        } else {
-            console.log(`⚠️ Server is already running on port ${port}. Skipping restart.`);
-        }
-    })();
-}
-
-// ✅ Netlify Edge Function Handler
-export async function netlifyCommonEngineHandler(request: Request, context: any): Promise<Response> {
-    return await render({});
-}
+app.listen(port, () => {
+    console.log(`🚀 Local Angular SSR server running at http://localhost:${port}`);
+});
