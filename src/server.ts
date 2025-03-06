@@ -1,15 +1,13 @@
 import express from 'express';
 import { render } from '@netlify/angular-runtime/common-engine';
 import net from 'net';
-import { CommonEngine } from '@angular/ssr/node';
 
-const commonEngine = new CommonEngine();
 const app = express();
 
 // ✅ Serve Angular SSR in Netlify Edge Functions
 app.use('*', async (req, res) => {
     try {
-        const html = await render(commonEngine);
+        const html = await render({});
         res.status(200).send(html);
     } catch (error) {
         console.error('❌ SSR Error:', error);
@@ -54,5 +52,5 @@ if (process.env['NETLIFY_DEV'] === 'true') {
 
 // ✅ Netlify Edge Function Handler
 export async function netlifyCommonEngineHandler(request: Request, context: any): Promise<Response> {
-    return await render(commonEngine);
+    return await render({});
 }
