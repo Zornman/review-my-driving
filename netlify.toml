@@ -6,6 +6,10 @@
 [schedule]
   "updateOrderStatus" = "0 * * * *"
 
+[[edge_functions]]
+  function = "angular-ssr"
+  path = "/*"
+
 [[redirects]]
   from = "/product/:id"
   to = "/product/:id"
