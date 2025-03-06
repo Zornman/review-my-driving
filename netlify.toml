@@ -1,7 +1,6 @@
 [build]
   publish = "dist/review-my-driving/browser"
   functions = "netlify/functions"
-  edge_functions = "netlify/edge-functions"
   command = "ng build --configuration=production"
 
 [schedule]
