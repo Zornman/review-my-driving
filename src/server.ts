@@ -45,7 +45,8 @@ function checkPortInUse(port: number): Promise<boolean> {
 // ✅ Start server only if port is free
 const port = process.env['PORT'] || 5500;
 
-(async () => {
+if (process.env['NETLIFY_DEV'] === 'true') {
+  (async () => {
     const isPortInUse = await checkPortInUse(Number(port));
 
     if (!isPortInUse) {
@@ -56,6 +57,7 @@ const port = process.env['PORT'] || 5500;
         console.log(`⚠️ Server is already running on port ${port}. Skipping restart.`);
     }
 })();
+}
 
 // ✅ Netlify Function Handler (if needed)
 export async function netlifyCommonEngineHandler(request: Request, context: any): Promise<Response> {
