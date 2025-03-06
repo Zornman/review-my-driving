@@ -56,12 +56,12 @@ exports.handler = async function(event, context) {
                 );
               }
       
-              if (printifyOrder.status === 'in-production' && !order.emailOrderConfirm) {
+              if (printifyOrder.status === 'in-production' && !order.emailOrderCreated) {
                   await sendEmail(printifyOrder);
       
                   await ordersCollection.updateOne(
                     { orderID: printifyOrder.id },
-                    { $set: { emailOrderConfirm: true } }
+                    { $set: { emailOrderCreated: true } }
                   );
                 }
       
@@ -158,7 +158,7 @@ async function sendEmail(printifyOrder) {
 
 function getEmailSubject(order) {
     if (order.status === 'in-production') {
-        return `Order Confirmation #${order.id}`;
+        return `Order In Production #${order.id}`;
     } else if (order.status === 'fulfilled') {
         return `Your Order has Shipped! #${order.id}`;
     } else if (order.status === 'canceled') {
@@ -172,7 +172,7 @@ function getEmailContents(order) {
     if (order.status === 'in-production') {
         let html = `
             <h1 style="text-align: center;">Review My Driving</h1>
-            <h2 style="color: #4B0082;">Your order has been confirmed!</h2>
+            <h2 style="color: #4B0082;">Your order is being custom crafted!</h2>
             <p><strong>Order Number:  </strong> ${ order.id }</p>
             <p><strong>Order Total:  </strong> $${ calculateOrderTotal(order) }</p>
         `;

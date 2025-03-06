@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CartService } from '../services/shopping_cart.service';
 import { CartItem } from '../shared/models/cartItem';
@@ -44,7 +44,7 @@ export class CartOverviewComponent implements OnInit, OnDestroy {
   quantities: number[] = Array.from({ length: 10 }, (_, i) => i + 1); // [1, 2, 3, ..., 10]
   cartItemArray!: Array<any>;
 
-  constructor(private cartService: CartService, private router: Router, private dialog: MatDialog, private stripeService: StripeService) {
+  constructor(private cartService: CartService, private router: Router, private dialog: MatDialog, private stripeService: StripeService, private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -113,9 +113,9 @@ export class CartOverviewComponent implements OnInit, OnDestroy {
 
         this.cartSummary.push(cartItem);
       }
-
-      this.calculateCartTotal();
     });
+
+    this.calculateCartTotal();
   }
 
   clearCart() {
@@ -140,13 +140,13 @@ export class CartOverviewComponent implements OnInit, OnDestroy {
   removeProduct(product: CartSummary) {
     this.showConfirmationDialog().afterClosed().subscribe((result: any) => {
       if (result) {
-        let index = this.cartSummary.findIndex((item) => item === product);
+        const index = this.cartSummary.findIndex((item) => item === product);
 
-        this.cartService.removeFromCart(product.productId, product.variantId);
-    
-        this.cartSummary = this.cartSummary.splice(index, 1);
-        this.dataSource = new MatTableDataSource(this.cartSummary);
-        this.calculateCartTotal();
+        if (index > -1) {
+          this.cartService.removeFromCart(product.productId, product.variantId);
+          this.loadCart();
+          this.cdr.detectChanges();
+        }
       } else {
         console.log('User canceled action ❌');
       }

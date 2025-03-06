@@ -32,9 +32,10 @@ exports.handler = async (event) => {
         orderID: data.orderID,
         dateOrdered: data.dateOrdered,
         status: 'on-hold',
-        emailOrderConfirm: false,
-        emailOrderShipped: false,
-        emailOrderCanceled: false
+        emailOrderConfirm: data.emailOrderConfirm,
+        emailOrderShipped: data.emailOrderShipped,
+        emailOrderCanceled: data.emailOrderCanceled,
+        emailOrderCreated: data.emailOrderCreated
       } 
     };
     const options = { upsert: true };

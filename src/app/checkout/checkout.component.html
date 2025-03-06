@@ -166,13 +166,13 @@
                       <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'standard'">
                         FREE!
                       </span>
-                      <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'express'">
+                      <span *ngIf="express_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'express'">
                         ${{ (shipping_total_cost_express / 100).toFixed(2) }}
                       </span>
-                      <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'economy'">
+                      <span *ngIf="economy_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'economy'">
                         FREE!
                       </span>
-                      <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'priority'">
+                      <span *ngIf="priority_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'priority'">
                         ${{ (shipping_total_cost_priority / 100).toFixed(2) }}
                       </span>
                     </p>
@@ -181,13 +181,13 @@
                       <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'standard'">
                         {{ shipping_from_standard + ' to ' + shipping_to_standard + ' days' }}
                       </span>
-                      <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'express'">
+                      <span *ngIf="express_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'express'">
                         {{ shipping_from_express + ' to ' + shipping_to_express + ' days' }}
                       </span>
-                      <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'economy'">
+                      <span *ngIf="economy_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'economy'">
                         {{ shipping_from_economy + ' to ' + shipping_to_economy + ' days' }}
                       </span>
-                      <span *ngIf="standard_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'priority'">
+                      <span *ngIf="priority_shipping_enabled && shippingOptionsForm.get('shippingOption')?.value === 'priority'">
                         {{ shipping_from_priority + ' to ' + shipping_to_priority + ' days' }}
                       </span>
                     </p>

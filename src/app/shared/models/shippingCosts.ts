@@ -77,9 +77,11 @@ export class DataItem {
 
 export class DataData {
   data: DataItem[];
+  error: string | null;
 
-  constructor(data: DataItem[]) {
+  constructor(data: DataItem[], error: string) {
     this.data = data;
+    this.error = error;
   }
 }
   

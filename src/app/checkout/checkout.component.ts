@@ -34,6 +34,7 @@ import {BreakpointObserver} from '@angular/cdk/layout';
 import { ThemeService } from '../services/theme.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '../shared/modals/message-dialog/message-dialog.component';
+import { VariablesService } from '../services/variables.service';
 
 @Component({
   selector: 'app-checkout',
@@ -137,6 +138,7 @@ export class CheckoutComponent implements OnInit {
     private paymentService: StripeService,
     private printifyService: PrintifyService,
     private themeService: ThemeService,
+    private variablesService: VariablesService,
     private fb: FormBuilder,
     private dialog: MatDialog
   ) 
@@ -190,9 +192,13 @@ export class CheckoutComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      const key = 'pk_test_51Qmnk12KeQqbDqTp84aakGQdasoxAei93E0X8RQ0WcJvnhSmGISShHFzOyUJ3IbxYGIvK2kEDPPiNgiwdADPiBwS00kE1aqBwL';
+      // Await the value from the observable
+      const response: any = await firstValueFrom(this.variablesService.getEnvironmentVariables());
+
+      const key = response.STRIPE_PUBLISHABLE_KEY;
+
       if (key) {
-        await loadStripe(key).then((value) => this.stripe = value);
+        this.stripe = await loadStripe(key);
       }
 
       if (!this.stripe) {
@@ -425,8 +431,6 @@ export class CheckoutComponent implements OnInit {
       return;
     }
 
-    console.log(this.shippingInfoForm.value);
-
     if (!this.shippingInfoForm.valid) return;
 
     this._snackBar.open('Saving shipping information...');
@@ -540,6 +544,8 @@ export class CheckoutComponent implements OnInit {
 
     // Iterate through shippingCosts for any that have no data, remove
     this.shippingCosts.forEach((element) => {
+      if (element.shipping_info.error) return;
+
       if (element.shipping_info.data.length <= 0) {
         filteredOptions = filteredOptions.filter((item) => item !== element.type);
       }
@@ -575,7 +581,7 @@ export class CheckoutComponent implements OnInit {
       let allShippingCosts = responses as ShippingData[];
       this.shippingCosts = allShippingCosts;
 
-      // console.log('All shipping costs received:', this.shippingCosts);
+      //console.log('All shipping costs received:', this.shippingCosts);
     } catch (error) {
       this._snackBar.open('Error getting Shipping Info, please try again.', 'Ok', { duration: 3000 });
       console.error('Error getting Shipping Info:', error);
@@ -592,6 +598,8 @@ export class CheckoutComponent implements OnInit {
       //console.log(this.shippingCosts);
       const asoCostList = this.shippingCosts.filter((element) => element.type === shipping_type);
       asoCostList.forEach((costList) => {
+        if (costList.shipping_info.error) return;
+
         let countryMatch = costList.shipping_info.data.find((costLineItem) => {
           const attributes = costLineItem.attributes;
           if (attributes.country.code === this.shippingInfoForm.get('country')?.value && attributes.shippingType === shipping_type) {
@@ -626,6 +634,7 @@ export class CheckoutComponent implements OnInit {
 
     });
 
+    console.log(chosenShippingOptionList);
     if (this.cartSummary.length <= 1) {
       chosenShippingOptionList.forEach((dataItem) => {
         let cartItem = this.cartSummary.find((x) => x.uid === this.cartSummary[0].uid);
@@ -637,15 +646,14 @@ export class CheckoutComponent implements OnInit {
     } else {
       this.cartSummary.forEach((cartItem, index) => {
         this.allShippingOptions.forEach((shippingOption) => {
-          let option = chosenShippingOptionList[index];
+          let option = chosenShippingOptionList.find((x) => x.attributes.shippingType === shippingOption);
+          
           if (option) {
             this.setShippingRangeLabels(option.attributes);
-            console.log(option.id)
+
             if (uniqueShippingPlans.find((x) => x === option.id)) {
-              console.log('this should hit');
               this.calcShippingTotals(option.attributes, cartItem.quantity, true);
-            }
-            else
+            } else
               this.calcShippingTotals(option.attributes, cartItem.quantity, false);
 
             uniqueShippingPlans.push(option.id);
@@ -658,6 +666,7 @@ export class CheckoutComponent implements OnInit {
   }
 
   setShippingRangeLabels(attributes: Attributes) {
+    console.log(attributes.shippingType);
     switch (attributes.shippingType.toLowerCase()) {
       case 'standard':
         this.shipping_from_standard = attributes.handlingTime.from;
@@ -688,18 +697,22 @@ export class CheckoutComponent implements OnInit {
       case 'standard':
         this.shipping_total_cost_standard += this.calcShippingForLabels(firstItemCost, additionalItemCost, quantity, skipFirstItem);
         this.standard_shipping_enabled = true;
+        console.log('standard shipping cost set');
       break;
       case 'priority':
         this.shipping_total_cost_priority += this.calcShippingForLabels(firstItemCost, additionalItemCost, quantity, skipFirstItem);
         this.priority_shipping_enabled = true;
+        console.log('priority shipping cost set');
       break;
       case 'economy':
         this.shipping_total_cost_economy += this.calcShippingForLabels(firstItemCost, additionalItemCost, quantity, skipFirstItem);
         this.economy_shipping_enabled = true;
+        console.log('economy shipping cost set');
       break;
       case 'express':
         this.shipping_total_cost_express += this.calcShippingForLabels(firstItemCost, additionalItemCost, quantity, skipFirstItem);
         this.express_shipping_enabled = true;
+        console.log('express shipping cost set');
       break;
       default:
         //console.log('Error in calcShippingTotals()');
