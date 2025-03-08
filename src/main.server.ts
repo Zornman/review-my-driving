@@ -13,3 +13,5 @@ const document = readFileSync(indexHtmlPath, 'utf8');
 export function render(url: string): Promise<string> {
   return renderApplication(() => bootstrapApplication(AppComponent, appConfig), { document, url });
 }
+
+export default render;
