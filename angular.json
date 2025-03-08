@@ -17,9 +17,8 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/review-my-driving",
+            "outputPath": "dist/review-my-driving/browser",
             "index": "src/index.html",
-            "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -28,18 +27,14 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/assets"
               }
             ],
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -68,7 +63,7 @@
         "server": {
           "builder": "@angular-devkit/build-angular:server",
           "options": {
-            "outputPath": "dist/review-my-driving-server",
+            "outputPath": "dist/review-my-driving/server",
             "main": "src/main.server.ts",
             "tsConfig": "tsconfig.server.json"
           },
@@ -87,13 +82,34 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "review-my-driving:build:production"
             },
             "development": {
-              "buildTarget": "review-my-driving:build:development"
             }
           },
           "defaultConfiguration": "development"
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "options": {},
+          "configurations": {
+            "production": {},
+            "development": {}
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "browserTarget": "review-my-driving:build:production",
+            "serverTarget": "review-my-driving:server:production",
+            "routes": [
+              "/"
+            ]
+          },
+          "configurations": {
+            "production": {},
+            "development": {}
+          }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
@@ -110,7 +126,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/assets"
               }
             ],
             "styles": [
