@@ -1,7 +1,13 @@
-import { bootstrapApplication } from '@angular/platform-browser';
-import { AppComponent } from './app/app.component';
-import { config } from './app/app.config.server';
+import { CommonEngine } from '@angular/ssr/node';
+import { join } from 'path';
 
-const bootstrap = () => bootstrapApplication(AppComponent, config);
+const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
+const indexHtml = join(distFolder, 'index.html');
+const commonEngine = new CommonEngine();
 
-export default bootstrap;
+export default async function render({ url }: { url: string }): Promise<string> {
+    return commonEngine.render({
+        documentFilePath: indexHtml,
+        url
+    });
+}
