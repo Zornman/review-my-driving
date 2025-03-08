@@ -80,20 +80,31 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "review-my-driving:build"
+          },
           "configurations": {
             "production": {
+              "browserTarget": "review-my-driving:build:production"
             },
             "development": {
+              "browserTarget": "review-my-driving:build:development"
             }
           },
           "defaultConfiguration": "development"
         },
         "serve-ssr": {
           "builder": "@nguniversal/builders:ssr-dev-server",
-          "options": {},
+          "options": {
+            "serverTarget": "review-my-driving:server"
+          },
           "configurations": {
-            "production": {},
-            "development": {}
+            "production": {
+              "serverTarget": "review-my-driving:server:production"
+            },
+            "development": {
+              "serverTarget": "review-my-driving:server:development"
+            }
           },
           "defaultConfiguration": "development"
         },
