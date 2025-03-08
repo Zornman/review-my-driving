@@ -9,6 +9,12 @@ const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
 // Serve static files (JS, CSS, images)
 app.use(express.static(distFolder, { maxAge: '1y' }));
 
+// ✅ Ensure MIME types are correctly set for JavaScript files
+app.get('*.js', (req, res, next) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  next();
+});
+
 // Handle all routes using Angular SSR
 app.get('*', async (req, res) => {
   try {
