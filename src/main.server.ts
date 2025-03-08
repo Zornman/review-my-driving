@@ -1,14 +1,12 @@
-import { CommonEngine } from '@angular/ssr/node';
-import { join } from 'path';
+import { ngExpressEngine } from '@nguniversal/express-engine';
+import { provideServerRendering } from '@angular/platform-server';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { appConfig } from './app/app.config';
 
-const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
-const indexHtml = join(distFolder, 'index.html');
-const commonEngine = new CommonEngine();
-
-export default async function render(params: { url?: string } = {}): Promise<string> {
-    const { url = '/' } = params; // ✅ Ensure URL is always defined
-    return commonEngine.render({
-        documentFilePath: indexHtml,
-        url
+export default async function bootstrap() {
+    return bootstrapApplication(AppComponent, {
+        ...appConfig,
+        providers: [provideServerRendering()]
     });
 }
