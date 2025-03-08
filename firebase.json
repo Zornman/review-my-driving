@@ -27,6 +27,15 @@
     ],
     "headers": [
       {
+        "source": "**/*.js",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/javascript"
+          }
+        ]
+      },
+      {
         "source": "**",
         "headers": [
           { "key": "Access-Control-Allow-Origin", "value": "*" },
