@@ -6,7 +6,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 // Load the HTML template (needed for the second argument)
-const indexHtmlPath = join(process.cwd(), 'dist/review-my-driving/browser/index.html');
+const indexHtmlPath = join(process.cwd(), 'dist/review-my-driving/browser/index.csr.html');
 const document = readFileSync(indexHtmlPath, 'utf8');
 
 // Correctly export `render()` as a named function (not default)
