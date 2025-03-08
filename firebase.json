@@ -17,6 +17,7 @@
     }
   ],
   "hosting": {
+    "site": "review-my-driving",
     "public": "dist/browser",
     "ignore": [
       "firebase.json",
