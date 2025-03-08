@@ -2,7 +2,7 @@ import 'zone.js/node';
 import express from 'express';
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { render } from './main.server'; // ✅ Now correctly imports the SSR function
+import { render } from './main.server'; // ✅ Import named export, not "default"
 
 const app = express();
 const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
@@ -16,7 +16,7 @@ app.use(express.static(distFolder, { maxAge: '1y' }));
 // ✅ Handle all routes using Angular SSR
 app.get('*', async (req, res) => {
   try {
-    const html = await render();
+    const html = await render(); // ✅ Uses the fixed `render()` function
     res.send(html);
   } catch (error) {
     console.error('❌ SSR Error:', error);
