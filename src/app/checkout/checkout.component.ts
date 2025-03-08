@@ -34,7 +34,7 @@ import {BreakpointObserver} from '@angular/cdk/layout';
 import { ThemeService } from '../services/theme.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '../shared/modals/message-dialog/message-dialog.component';
-import { VariablesService } from '../services/variables.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-checkout',
@@ -138,7 +138,6 @@ export class CheckoutComponent implements OnInit {
     private paymentService: StripeService,
     private printifyService: PrintifyService,
     private themeService: ThemeService,
-    private variablesService: VariablesService,
     private fb: FormBuilder,
     private dialog: MatDialog
   ) 
@@ -192,14 +191,7 @@ export class CheckoutComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      // Await the value from the observable
-      const response: any = await firstValueFrom(this.variablesService.getEnvironmentVariables());
-
-      const key = response.STRIPE_PUBLISHABLE_KEY;
-
-      if (key) {
-        this.stripe = await loadStripe(key);
-      }
+      this.stripe = await loadStripe(environment.stripePublishableKey);
 
       if (!this.stripe) {
         console.log('Stripe failed to load.');

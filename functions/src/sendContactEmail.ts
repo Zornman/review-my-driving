@@ -1,7 +1,8 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v2';
 import nodemailer from 'nodemailer';
 
-export const sendContactEmail = functions.https.onRequest(async (req, res) => {
+export const sendContactEmail = functions
+.https.onRequest({ secrets: ['EMAIL_USER', 'EMAIL_PASS'] }, async (req, res) => {
   if (req.method === 'POST') {
     try {
       // Parse the form data from the request body
@@ -11,8 +12,8 @@ export const sendContactEmail = functions.https.onRequest(async (req, res) => {
       const transporter = nodemailer.createTransport({
         service: 'gmail', // Use Gmail or another email service
         auth: {
-          user: functions.config().email.user, // Your email address
-          pass: functions.config().email.pass, // Your email password (use an app password for Gmail)
+          user: process.env.EMAIL_USER, // Your email address
+          pass: process.env.EMAIL_PASS, // Your email password (use an app password for Gmail)
         },
       });
 

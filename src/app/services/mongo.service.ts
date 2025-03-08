@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class MongoService {
-    constructor(private http: HttpClient) {}
+
+    constructor(private http: HttpClient) {
+
+    }
 
     getUserSubmissions(token: string) {
         const params = new HttpParams().set('userID', (token) ? token : '');
-        return this.http.get('/.netlify/functions/getSubmissionsByUser', { params });
+        return this.http.get(environment.apiBaseUrl + '/getSubmissionsByUser', { params });
     }
 
     /**
@@ -21,17 +25,17 @@ export class MongoService {
     getUserShippingInfo(token: string): Observable<any> {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
         const params = new HttpParams().set('userId', (token) ? token : '');
-        return this.http.get('/.netlify/functions/getUserShipping', { headers, params });
+        return this.http.get(environment.apiBaseUrl + '/getUserShipping', { headers, params });
     }
 
     getUserOrderHistory(token: string) {
         const params = new HttpParams().set('userID', (token) ? token : '');
-        return this.http.get('/.netlify/functions/getUserOrderHistory', { params });
+        return this.http.get(environment.apiBaseUrl + '/getUserOrderHistory', { params });
     }
 
     getUserSettings(token: string) {
         const params = new HttpParams().set('userId', (token) ? token : '');
-        return this.http.get('/.netlify/functions/getUserSettings', { params });
+        return this.http.get(environment.apiBaseUrl + '/getUserSettings', { params });
     }
 
     /**
@@ -40,11 +44,11 @@ export class MongoService {
      * @returns 
      */
     insertUserShippingInfo(shippingInfo: any): Observable<any> {
-        return this.http.post('/.netlify/functions/insertUserShipping', shippingInfo);
+        return this.http.post(environment.apiBaseUrl + '/insertUserShipping', shippingInfo);
     }
 
     insertUserSettings(data: any): Observable<any> {
-        return this.http.post('/.netlify/functions/insertUserSettings', data);
+        return this.http.post(environment.apiBaseUrl + '/insertUserSettings', data);
     }
 
     /**
@@ -53,14 +57,14 @@ export class MongoService {
      * @returns 
      */
     insertUserOrderHistoryRecord(data: any): Observable<any> {
-        return this.http.post('/.netlify/functions/insertUserOrder', data);
+        return this.http.post(environment.apiBaseUrl + '/insertUserOrder', data);
     }
 
     insertSubmission(formData: any): Observable<any> {
-        return this.http.post('/.netlify/functions/insertSubmission', formData);
+        return this.http.post(environment.apiBaseUrl + '/insertSubmission', formData);
     }
 
     insertErrorLog(data: any): Observable<any> {
-        return this.http.post('/.netlify/functions/logError', data);
+        return this.http.post(environment.apiBaseUrl + '/logError', data);
     }
 }

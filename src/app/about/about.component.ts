@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { BackgroundService } from '../services/background.service';
 import { AuthService } from '../services/auth.service';
 import { User } from 'firebase/auth';
-import { VariablesService } from '../services/variables.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-about',
@@ -20,17 +20,14 @@ export class AboutComponent {
   user!: User | null;
   isAdmin: boolean = false;
 
-  constructor(private authService: AuthService, private bgService: BackgroundService, private env: VariablesService) {
+  constructor(private authService: AuthService, private bgService: BackgroundService) {
     this.authService.getUser().subscribe((user) => {
       if (!user) return;
 
       this.user = user;
 
-      this.env.getEnvironmentVariables().subscribe({
-        next: (variables) => {
-          if (this.user?.uid === variables.ADMIN_USER_ID) this.isAdmin = true;
-        }
-      });
+      if (this.user?.uid === environment.adminUserId) 
+        this.isAdmin = true;
     });
   }
 

@@ -1,14 +1,7 @@
-import * as functions from "firebase-functions";
+import * as functions from "firebase-functions/v2";
 import {MongoClient} from "mongodb";
 import fetch from "node-fetch";
 import nodemailer from "nodemailer";
-
-const shopId = functions.config().printify.store_id;
-const printifyShopUrl = functions.config().printify.url;
-const ordersUrl = printifyShopUrl+ "/shops/" + shopId + "/orders.json";
-const apiToken = functions.config().printify.api_token;
-
-const uri = functions.config().mongo.uri;
 
 // const statusArray = [
 //   "pending",
@@ -22,8 +15,15 @@ const uri = functions.config().mongo.uri;
 //   "had-issues"
 // ];
 
-export const updateOrderStatus = functions.https.onRequest(async (req, res) => {
+export const updateOrderStatus = functions
+.https.onRequest({secrets: ["PRINTIFY_STORE_ID", "PRINTIFY_URL", "PRINTIFY_API_KEY", "MONGO_URI", "EMAIL_USER", "EMAIL_PASS"]}, async (req, res) => {
   try {
+   const shopId = process.env.PRINTIFY_STORE_ID;
+   const printifyShopUrl = process.env.PRINTIFY_URL;
+   const ordersUrl = printifyShopUrl+ "/shops/" + shopId + "/orders.json";
+   const apiToken = process.env.PRINTIFY_API_KEY;
+   const uri = process.env.MONGO_URI as string;
+
     const printifyResponse = await fetch(ordersUrl, {
       headers: {"Authorization": "Bearer" + apiToken},
     });
@@ -97,8 +97,8 @@ async function sendEmail(printifyOrder: any) {
   const transporter = nodemailer.createTransport({
     service: "gmail", // Use Gmail or another email service
     auth: {
-      user: functions.config().email.user,
-      pass: functions.config().email.pass,
+      user: process.env.EMAIL_USER, // Your email address
+      pass: process.env.EMAIL_PASS, // Your email password (use an app password for Gmail)
    },
  });
 

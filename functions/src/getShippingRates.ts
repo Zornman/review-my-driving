@@ -1,9 +1,10 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v2';
 import fetch from 'node-fetch';
 
-const api_token = functions.config().printify.api_token;
+export const getShippingRates = functions
+.https.onRequest({ secrets: ["PRINTIFY_API_KEY"] }, async (req, res) => {
+  const api_token = process.env.PRINTIFY_API_KEY;
 
-export const getShippingRates = functions.https.onRequest(async (req, res) => {
   // Check if the product ID is provided as a query parameter
   const blueprint_id = req.query.blueprint_id as string;
   const print_provider_id = req.query.print_provider_id as string;

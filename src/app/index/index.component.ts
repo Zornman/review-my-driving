@@ -90,19 +90,19 @@ export class IndexComponent {
         }).length;
       },
       error: (error) => {
-        //console.error('Error getting data:', error);
-        this.dbService.insertErrorLog({
-          fileName: 'account-overview.component.ts',
-          method: 'initializeSubmissions()',
-          timestamp: new Date().toString(),
-          error: error
-        }).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
+        console.error('Error getting data:', error);
+        // this.dbService.insertErrorLog({
+        //   fileName: 'account-overview.component.ts',
+        //   method: 'initializeSubmissions()',
+        //   timestamp: new Date().toString(),
+        //   error: error.message
+        // }).subscribe({
+        //   next: (response: any) => {
+        //       console.log(response);
+        //   },
+        //   error: (error: any) => {
+        //   }
+        // });
       }
     });
   }

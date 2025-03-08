@@ -1,11 +1,12 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v2';
 import fetch from 'node-fetch';
 
-const api_token = functions.config().printify.api_token;
-const shop_id = functions.config().printify.store_id;
-const PRINTIFY_SHOP_URL = functions.config().printify.url;
+export const getPrintifyOrderDetails = functions
+.https.onRequest({ secrets: ["PRINTIFY_API_KEY", "PRINTIFY_STORE_ID", "PRINTIFY_URL"] }, async (req, res) => {
+  const api_token = process.env.PRINTIFY_API_KEY;
+  const shop_id = process.env.PRINTIFY_STORE_ID;
+  const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
 
-export const getPrintifyOrderDetails = functions.https.onRequest(async (req, res) => {
   // Check if the product ID is provided as a query parameter
   const orderId = req.query.id as string;
 

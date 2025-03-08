@@ -41,6 +41,6 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Local Netlify folder
-.netlify
-.env
+# Ignore environment files (Production)
+src/environments/environment.prod.ts
+src/assets/data_storage/serviceAccount.json

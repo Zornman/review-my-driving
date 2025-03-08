@@ -1,13 +1,12 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v2';
 import { MongoClient } from 'mongodb';
 
-const uri = functions.config().mongo.uri;
-
-// Create a client
-const client = new MongoClient(uri);
-
-export const getUserOrderHistory = functions.https.onRequest(async (req, res) => {
+export const getUserOrderHistory = functions
+.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
+  const uri = process.env.MONGO_URI as string;
   const userID = req.query.userID as string;
+
+  const client = new MongoClient(uri);
 
   if (!userID) {
     res.status(400).json({ error: 'Missing userID' });

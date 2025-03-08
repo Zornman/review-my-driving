@@ -1,13 +1,14 @@
 import fetch from 'node-fetch';
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v2';
 
-const shop_id = functions.config().printify.store_id;
-const PRINTIFY_SHOP_URL = functions.config().printify.url;
-const products_url = `${PRINTIFY_SHOP_URL}/shops/${shop_id}/products.json`;
-const api_token = functions.config().printify.api_token;
-
-export const fetchProducts = functions.https.onRequest(async (req, res) => {
+export const fetchProducts = functions
+.https.onRequest({ secrets: ["PRINTIFY_STORE_ID", "PRINTIFY_URL", "PRINTIFY_API_KEY"]}, async (req, res) => {
   try {
+    const shop_id = process.env.PRINTIFY_STORE_ID;
+    const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
+    const products_url = `${PRINTIFY_SHOP_URL}/shops/${shop_id}/products.json`;
+    const api_token = process.env.PRINTIFY_API_KEY;
+
     const response = await fetch(products_url, {
       headers: {
         Authorization: `Bearer ${api_token}`,

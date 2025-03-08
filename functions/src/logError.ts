@@ -1,16 +1,17 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v2';
 import { MongoClient } from 'mongodb';
 
-const uri = functions.config().mongo.uri;
-
-// Create a client
-const client = new MongoClient(uri);
-
-export const logError = functions.https.onRequest(async (req, res) => {
+export const logError = functions
+.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method Not Allowed' });
     return;
   }
+
+  const uri = process.env.MONGO_URI as string;
+
+  // Create a client
+  const client = new MongoClient(uri);
 
   try {
     const data = JSON.parse(req.body); // Parse incoming data
@@ -21,7 +22,7 @@ export const logError = functions.https.onRequest(async (req, res) => {
     // Select the database and collection
     const database = client.db('review_my_driving'); // Replace 'myDatabase' with your database name
     const collection = database.collection('error_log'); // Replace 'myCollection' with your collection name
-
+    console.log(data);
     // Insert the data
     const result = await collection.insertOne(data);
 

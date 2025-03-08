@@ -1,18 +1,19 @@
-import * as functions from "firebase-functions";
+import * as functions from "firebase-functions/v2";
 import { MongoClient } from "mongodb";
 import nodemailer from "nodemailer";
 import fetch from "node-fetch";
 
-const shop_id = functions.config().printify.store_id;
-const PRINTIFY_SHOP_URL = functions.config().printify.url;
-const order_url = PRINTIFY_SHOP_URL + "/shops/" + shop_id + "/orders/";
-const api_token = functions.config().printify.api_token;
-
-const uri = functions.config().mongo.uri;
-
-export const sendOrderConfirmationEmail = functions.https.onRequest(async (req, res) => {
+export const sendOrderConfirmationEmail = functions
+.https.onRequest({ secrets: ["PRINTIFY_STORE_ID", "PRINTIFY_URL", "PRINTIFY_API_KEY", "MONGO_URI"] }, async (req, res) => {
   if (req.method === "POST") {
     try {
+      const shop_id = process.env.PRINTIFY_STORE_ID;
+      const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
+      const order_url = PRINTIFY_SHOP_URL + "/shops/" + shop_id + "/orders/";
+      const api_token = process.env.PRINTIFY_API_KEY;
+      
+      const uri = process.env.MONGO_URI as string;
+
       // Parse the form data from the request body
       const data = JSON.parse(req.body);
 
@@ -38,8 +39,8 @@ export const sendOrderConfirmationEmail = functions.https.onRequest(async (req, 
       const transporter = nodemailer.createTransport({
         service: "gmail", // Use Gmail or another email service
         auth: {
-          user: functions.config().email.user, // Your email address
-          pass: functions.config().email.pass, // Your email password (use an app password for Gmail)
+          user: process.env.EMAIL_USER, // Your email address
+          pass: process.env.EMAIL_PASS, // Your email password (use an app password for Gmail)
         },
       });
 

@@ -1,14 +1,14 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v2';
 import { MongoClient } from 'mongodb';
 
-const uri = functions.config().mongo.uri;
-const client = new MongoClient(uri);
-
-export const insertUserShipping = functions.https.onRequest(async (req, res) => {
+export const insertUserShipping = functions
+.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method Not Allowed' });
     return;
   }
+  const uri = process.env.MONGO_URI as string;
+  const client = new MongoClient(uri);
 
   try {
     const data = JSON.parse(req.body); // Parse incoming data

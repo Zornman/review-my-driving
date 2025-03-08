@@ -1,9 +1,5 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v2';
 import fetch from 'node-fetch';
-
-const PRINTIFY_API_KEY = functions.config().printify.api_token;
-const PRINTIFY_STORE_ID = functions.config().printify.store_id;
-const PRINTIFY_SHOP_URL = functions.config().printify.url;
 
 interface CustomerInfo {
   first_name: string;
@@ -34,13 +30,16 @@ interface PrintifyOrder {
   address_to: CustomerInfo;
 }
 
-exports.handler = functions.https.onRequest(async (req, res) => {
+export const createPrintifyOrder = functions.https.onRequest({secrets: ["PRINTIFY_API_KEY", "PRINTIFY_STORE_ID", "PRINTIFY_URL"]}, async (req, res) => {
   try {
     if (req.method !== 'POST') {
       res.status(405).send({ error: 'Method Not Allowed' });
       return;
     }
 
+    const PRINTIFY_API_KEY = process.env.PRINTIFY_API_KEY;
+    const PRINTIFY_STORE_ID = process.env.PRINTIFY_STORE_ID;
+    const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
     const { stripeTransactionId, customerInfo, products, shippingMethod } = req.body;
 
     if (!stripeTransactionId || !customerInfo || !products || !shippingMethod) {
