@@ -10,7 +10,7 @@ const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
 app.use(express.static(distFolder, { maxAge: '1y' }));
 
 // ✅ Ensure MIME types are correctly set for JavaScript files
-app.get('*.js', (req, res, next) => {
+app.get('*', (req, res, next) => {
   res.setHeader('Content-Type', 'application/javascript');
   next();
 });
