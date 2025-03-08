@@ -19,6 +19,7 @@
   "hosting": {
     "site": "review-my-driving",
     "public": "dist/browser",
+    "port": 8080,
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -42,6 +43,11 @@
           }
         ]
       }
-    ]
+    ],
+    "run": {
+      "serviceId": "review-my-driving",
+      "region": "us-central1",
+      "serviceAccount": "firebase-app-hosting-compute@review-my-driving.iam.gserviceaccount.com"
+    }
   }
 }
