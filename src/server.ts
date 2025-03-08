@@ -1,3 +1,4 @@
+import 'zone.js/node';
 import express from 'express';
 import { join } from 'path';
 import { existsSync } from 'fs';
@@ -11,15 +12,15 @@ const indexHtml = existsSync(join(distFolder, 'index.original.html'))
   ? 'index.original.html'
   : 'index.html';
 
-// ✅ Serve static files (images, CSS, JS)
+// ✅ Serve static files (JS, CSS, images)
 app.use(express.static(distFolder, { maxAge: '1y' }));
 
-// ✅ SSR Rendering for all routes
+// ✅ Handle all routes using Angular SSR
 app.get('*', async (req, res) => {
     try {
         const html = await commonEngine.render({
-            url: req.url,
-            document: join(distFolder, indexHtml),
+            documentFilePath: join(distFolder, indexHtml),
+            url: req.url
         });
         res.send(html);
     } catch (error) {
@@ -28,7 +29,7 @@ app.get('*', async (req, res) => {
     }
 });
 
-// ✅ Ensure the server always listens on PORT 8080
+// ✅ Ensure the server listens on Cloud Run's required port (8080)
 const PORT = process.env['PORT'] || 8080;
 app.listen(PORT, () => {
     console.log(`🚀 Angular SSR running on http://localhost:${PORT}`);
