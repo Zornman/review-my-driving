@@ -2,12 +2,14 @@
   "name": "review-my-driving",
   "version": "1.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:review-my-driving": "node dist/review-my-driving/server/server.mjs"
+  "ng": "ng",
+  "start": "ng serve",
+  "build": "ng build",
+  "watch": "ng build --watch --configuration development",
+  "test": "ng test",
+  "build:ssr": "ng run review-my-driving:server",
+  "serve:ssr": "node dist/review-my-driving/server/main.js",
+  "serve:ssr:review-my-driving": "node dist/review-my-driving/server/server.mjs"
   },
   "private": true,
   "dependencies": {
