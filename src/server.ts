@@ -18,9 +18,10 @@ app.use(express.static(distFolder, { maxAge: '1y' }));
 // ✅ Handle all routes using Angular SSR
 app.get('*', async (req, res) => {
     try {
+        const url = req.url || '/'; // ✅ Ensure URL is always defined
         const html = await commonEngine.render({
             documentFilePath: join(distFolder, indexHtml),
-            url: req.url
+            url
         });
         res.send(html);
     } catch (error) {
