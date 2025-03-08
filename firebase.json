@@ -18,7 +18,7 @@
   ],
   "hosting": {
     "site": "review-my-driving",
-    "public": "dist/browser",
+    "public": "dist/review-my-driving",
     "port": 8080,
     "ignore": [
       "firebase.json",
