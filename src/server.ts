@@ -16,7 +16,7 @@ app.use(express.static(distFolder, { maxAge: '1y' }));
 // ✅ Handle all routes using Angular SSR
 app.get('*', async (req, res) => {
   try {
-    const html = await render(); // ✅ Uses the fixed `render()` function
+    const html = await render(req.originalUrl); // Pass the request URL to the render function
     res.send(html);
   } catch (error) {
     console.error('❌ SSR Error:', error);
