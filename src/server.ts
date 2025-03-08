@@ -26,7 +26,7 @@ function checkPortInUse(port: number): Promise<boolean> {
 
 // ✅ Start Express server **ONLY in local development**
 (async () => {
-    const port = 8080;
+    const port = 8080; //port 8080
     const isPortInUse = await checkPortInUse(Number(port));
 
     if (!isPortInUse) {
