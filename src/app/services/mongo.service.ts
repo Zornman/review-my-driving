@@ -13,8 +13,9 @@ export class MongoService {
     }
 
     getUserSubmissions(token: string) {
+        const url = this.getFunctionUrl("getSubmissionsByUser");
         const params = new HttpParams().set('userID', (token) ? token : '');
-        return this.http.get(environment.apiBaseUrl + '/getSubmissionsByUser', { params });
+        return this.http.get(url, { params });
     }
 
     /**
@@ -23,19 +24,22 @@ export class MongoService {
      * @returns ShippingInfo object
      */
     getUserShippingInfo(token: string): Observable<any> {
+        const url = this.getFunctionUrl("getUserShipping");
         const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
         const params = new HttpParams().set('userId', (token) ? token : '');
-        return this.http.get(environment.apiBaseUrl + '/getUserShipping', { headers, params });
+        return this.http.get(url, { headers, params });
     }
 
     getUserOrderHistory(token: string) {
+        const url = this.getFunctionUrl("getUserOrderHistory");
         const params = new HttpParams().set('userID', (token) ? token : '');
-        return this.http.get(environment.apiBaseUrl + '/getUserOrderHistory', { params });
+        return this.http.get(url, { params });
     }
 
     getUserSettings(token: string) {
+        const url = this.getFunctionUrl("getUserSettings");
         const params = new HttpParams().set('userId', (token) ? token : '');
-        return this.http.get(environment.apiBaseUrl + '/getUserSettings', { params });
+        return this.http.get(url, { params });
     }
 
     /**
@@ -44,11 +48,13 @@ export class MongoService {
      * @returns 
      */
     insertUserShippingInfo(shippingInfo: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/insertUserShipping', shippingInfo);
+        const url = this.getFunctionUrl("insertUserShipping");
+        return this.http.post(url, shippingInfo);
     }
 
     insertUserSettings(data: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/insertUserSettings', data);
+        const url = this.getFunctionUrl("insertUserSettings");
+        return this.http.post(url, data);
     }
 
     /**
@@ -57,14 +63,24 @@ export class MongoService {
      * @returns 
      */
     insertUserOrderHistoryRecord(data: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/insertUserOrder', data);
+        const url = this.getFunctionUrl("insertUserOrder");
+        return this.http.post(url, data);
     }
 
     insertSubmission(formData: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/insertSubmission', formData);
+        const url = this.getFunctionUrl("insertSubmission");
+        return this.http.post(url, formData);
     }
 
     insertErrorLog(data: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/logError', data);
+        const url = this.getFunctionUrl("logError");
+        return this.http.post(url, data);
+    }
+
+    getFunctionUrl(functionName: string): string {
+        if (environment.production) {
+            functionName = functionName.toLocaleLowerCase();
+        }
+        return environment.apiBaseUrl.replace("{function}", functionName);
     }
 }

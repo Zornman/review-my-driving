@@ -10,10 +10,19 @@ export class StripeService {
     constructor(private http: HttpClient) {}
 
     fetchClientSecret(amt: number): Observable<any> {
-        return this.http.post<{ clientSecret: string }>(environment.apiBaseUrl + '/server', { amount: amt })
+        const url = this.getFunctionUrl("server");
+        return this.http.post<{ clientSecret: string }>(url, { amount: amt })
     }
 
     createStripeCheckout(data: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/createStripeCheckout', { items: data });
+        const url = this.getFunctionUrl("createStripeCheckout");
+        return this.http.post(url, { items: data });
+    }
+
+    getFunctionUrl(functionName: string): string {
+        if (environment.production) {
+            functionName = functionName.toLocaleLowerCase();
+        }
+        return environment.apiBaseUrl.replace("{function}", functionName);
     }
 }

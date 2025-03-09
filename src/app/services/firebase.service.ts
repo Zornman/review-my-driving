@@ -10,6 +10,15 @@ export class FirebaseService {
     constructor(private http: HttpClient) {}
 
     getUserByUID(userID: string): Observable<any> {
-        return this.http.get(environment.apiBaseUrl + '/getUserByUID?uid=' + userID);
+        const url = this.getFunctionUrl("getUserByUID");
+        const params = new HttpParams().set('uid', userID);
+        return this.http.get(url, { params });
+    }
+
+    getFunctionUrl(functionName: string): string {
+        if (environment.production) {
+            functionName = functionName.toLocaleLowerCase();
+        }
+        return environment.apiBaseUrl.replace("{function}", functionName);
     }
 }
