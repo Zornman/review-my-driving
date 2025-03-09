@@ -19,7 +19,7 @@ export const sendOrderConfirmationEmail = functions
         const uri = process.env.MONGO_URI as string;
   
         // Parse the form data from the request body
-        const data = JSON.parse(req.body);
+        const data = req.body;
   
         const printifyResponse = await fetch(order_url + data.orderID + ".json", {
           headers: { "Authorization": `Bearer ${api_token}` }

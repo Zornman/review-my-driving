@@ -33,6 +33,7 @@
 export { createCustomProduct } from "./createCustomProduct";
 export { createPrintifyOrder } from "./createPrintifyOrder";
 export { createStripeCheckout } from "./createStripeCheckout";
+export { createStripePaymentIntent } from "./createStripePaymentIntent";
 export { fetchProducts } from "./fetchProducts";
 export { getPrintifyOrderDetails } from "./getPrintifyOrderDetails";
 export { getProduct } from "./getProduct";
