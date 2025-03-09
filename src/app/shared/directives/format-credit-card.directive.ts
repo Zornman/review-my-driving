@@ -23,8 +23,8 @@ export class FormatCreditCardDirective implements OnInit {
   }
 
   private formatCreditCard(value: string): string {
-    let cleanValue = value.replace(/\D/g, ''); // Remove non-numeric chars
-    let cardType = this.detectCardType(cleanValue);
+    const cleanValue = value.replace(/\D/g, ''); // Remove non-numeric chars
+    const cardType = this.detectCardType(cleanValue);
 
     switch (cardType) {
       case 'amex': // American Express: 15 digits, format XXXX XXXXXX XXXXX
