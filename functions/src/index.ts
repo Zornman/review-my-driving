@@ -48,6 +48,7 @@ export { insertUserOrder } from "./insertUserOrder";
 export { insertUserSettings } from "./insertUserSettings";
 export { insertUserShipping } from "./insertUserShipping";
 export { logError } from "./logError";
+export { stripePaymentIntent } from "./stripePaymentIntent";
 export { sendContactEmail } from "./sendContactEmail";
 export { sendEmail } from "./sendEmail";
 export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail";

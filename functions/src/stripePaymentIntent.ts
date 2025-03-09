@@ -1,16 +1,17 @@
 import * as functions from "firebase-functions/v2";
 import Stripe from "stripe";
 import cors from 'cors';
+import { environment } from "../../src/environments/environment";
 
 const corsHandler = cors({ origin: true });
 
 // ✅ Load secret using `runWith({ secrets: [...] })`
-export const createStripeCheckout = functions
+export const stripePaymentIntent = functions
   .https.onRequest({ secrets: ["STRIPE_SECRET_KEY"] }, async (req, res) => {
     corsHandler(req, res, async () => {
       try {
         // ✅ Retrieve the secret from Firebase Secrets
-        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+        const stripeSecretKey = environment.stripeSecretKey;
         if (!stripeSecretKey) {
           throw new Error("Stripe secret key is missing");
         }
