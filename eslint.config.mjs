@@ -23,6 +23,7 @@ export default [
       "no-undef": "off",
       "no-empty": "off",
       "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-expressions": "off"
     },
   },
   {

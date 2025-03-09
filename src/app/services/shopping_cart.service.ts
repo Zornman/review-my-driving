@@ -11,7 +11,7 @@ export class CartService {
   private cartSubject = new BehaviorSubject<CartItem[]>(this.getCart());
   cart$ = this.cartSubject.asObservable();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
     // Emit the initial cart state
     this.cartSubject.next(this.getCart());
   }

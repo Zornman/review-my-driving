@@ -570,7 +570,7 @@ export class CheckoutComponent implements OnInit {
     try {
       // Await all API calls (runs in parallel)
       const responses = await Promise.all(requests);
-      let allShippingCosts = responses as ShippingData[];
+      const allShippingCosts = responses as ShippingData[];
       this.shippingCosts = allShippingCosts;
 
       //console.log('All shipping costs received:', this.shippingCosts);
@@ -583,7 +583,7 @@ export class CheckoutComponent implements OnInit {
   calculateShippingTotals() {
     this._snackBar.open('Calculating shipping totals...');
     const uniqueShippingPlans = new Array<string>();
-    let chosenShippingOptionList = Array<DataItem>();
+    const chosenShippingOptionList = Array<DataItem>();
 
     this.allShippingOptions.forEach((shipping_type) => {
       // Filter shipping costs by shipping_type
@@ -592,7 +592,7 @@ export class CheckoutComponent implements OnInit {
       asoCostList.forEach((costList) => {
         if (costList.shipping_info.error) return;
 
-        let countryMatch = costList.shipping_info.data.find((costLineItem) => {
+        const countryMatch = costList.shipping_info.data.find((costLineItem) => {
           const attributes = costLineItem.attributes;
           if (attributes.country.code === this.shippingInfoForm.get('country')?.value && attributes.shippingType === shipping_type) {
             return true;
@@ -602,11 +602,11 @@ export class CheckoutComponent implements OnInit {
         });
 
         if (countryMatch) {
-          let foundOption = chosenShippingOptionList.find((x) => x === countryMatch);
+          const foundOption = chosenShippingOptionList.find((x) => x === countryMatch);
           if (!foundOption)
             chosenShippingOptionList.push(countryMatch);
         } else {
-          let match = costList.shipping_info.data.find((cli) => {
+          const match = costList.shipping_info.data.find((cli) => {
             const attributes = cli.attributes;
             if (attributes.country.code === "REST_OF_THE_WORLD" && attributes.shippingType === shipping_type) {
               return true;
@@ -617,7 +617,7 @@ export class CheckoutComponent implements OnInit {
 
           if (!match) return;
 
-          let foundOption = chosenShippingOptionList.find((x) => x === match);
+          const foundOption = chosenShippingOptionList.find((x) => x === match);
           if (!foundOption)
             chosenShippingOptionList.push(match); 
         }
@@ -629,7 +629,7 @@ export class CheckoutComponent implements OnInit {
     console.log(chosenShippingOptionList);
     if (this.cartSummary.length <= 1) {
       chosenShippingOptionList.forEach((dataItem) => {
-        let cartItem = this.cartSummary.find((x) => x.uid === this.cartSummary[0].uid);
+        const cartItem = this.cartSummary.find((x) => x.uid === this.cartSummary[0].uid);
         //console.log(cartItem);
         this.setShippingRangeLabels(dataItem.attributes);
         if (cartItem)
@@ -638,7 +638,7 @@ export class CheckoutComponent implements OnInit {
     } else {
       this.cartSummary.forEach((cartItem, index) => {
         this.allShippingOptions.forEach((shippingOption) => {
-          let option = chosenShippingOptionList.find((x) => x.attributes.shippingType === shippingOption);
+          const option = chosenShippingOptionList.find((x) => x.attributes.shippingType === shippingOption);
           
           if (option) {
             this.setShippingRangeLabels(option.attributes);
@@ -682,8 +682,8 @@ export class CheckoutComponent implements OnInit {
   }
 
   calcShippingTotals(attributes: Attributes, quantity: number, skipFirstItem: boolean) {
-    let firstItemCost = attributes.shippingCost.firstItem;
-    let additionalItemCost = attributes.shippingCost.additionalItems;
+    const firstItemCost = attributes.shippingCost.firstItem;
+    const additionalItemCost = attributes.shippingCost.additionalItems;
 
     switch (attributes.shippingType.toLowerCase()) {
       case 'standard':

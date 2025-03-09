@@ -14,7 +14,7 @@ export class CarouselComponent implements AfterViewInit {
   private currentIndex: number = 0;
   private track!: HTMLElement;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
 
   ngOnInit(): void {
     // Ensure any DOM-dependent logic only happens in the browser
