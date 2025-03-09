@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../shared/models/product';
 import { environment } from '../../environments/environment';
@@ -13,22 +13,36 @@ export class PrintifyService {
     }
 
     getProducts(): Observable<Product[]> {
-        return this.http.get<Product[]>(environment.apiBaseUrl + '/fetchProducts');
+        const url = this.getFunctionUrl("fetchProducts");
+        return this.http.get<Product[]>(url);
     }
 
     getProduct(productId: string): Observable<Product> {
-        return this.http.get<Product>(environment.apiBaseUrl + '/getProduct?id=' + productId);
+        const url = this.getFunctionUrl("getProduct");
+        const params = new HttpParams().set('id', productId);
+        return this.http.get<Product>(url, { params });
     }
 
     getPrintifyOrder(orderId: string): Observable<any> {
-        return this.http.get(environment.apiBaseUrl + '/getPrintifyOrderDetails?id=' + orderId);
+        const url = this.getFunctionUrl("getPrintifyOrderDetails");
+        const params = new HttpParams().set('id', orderId);
+        return this.http.get(url, { params });
     }
 
     createCustomPrintifyProduct(data: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/createCustomProduct', data);
+        const url = this.getFunctionUrl("createCustomProduct");
+        return this.http.post(url, data);
     }
 
     createPrintifyOrder(orderData: any): Observable<any> {
-        return this.http.post<{ success: boolean; orderId: string }>(environment.apiBaseUrl + '/createPrintifyOrder', orderData);
+        const url = this.getFunctionUrl("createPrintifyOrder");
+        return this.http.post<{ success: boolean; orderId: string }>(url, orderData);
+    }
+
+    getFunctionUrl(functionName: string): string {
+        if (environment.production) {
+            functionName = functionName.toLocaleLowerCase();
+        }
+        return environment.apiBaseUrl.replace("{function}", functionName);
     }
 }

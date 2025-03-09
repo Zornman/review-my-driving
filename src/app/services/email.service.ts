@@ -10,14 +10,24 @@ export class EmailService {
     constructor(private http: HttpClient) {}
 
     sendSubmissionEmail(formData: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/sendEmail', formData);
+        const url = this.getFunctionUrl("sendEmail");
+        return this.http.post(url, formData);
     }
 
     sendContactEmail(formData: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/sendContactEmail', formData);
+        const url = this.getFunctionUrl("sendContactEmail");
+        return this.http.post(url, formData);
     }
 
     sendOrderConfirmationEmail(formData: any): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/sendOrderConfirmationEmail', formData);
+        const url = this.getFunctionUrl("sendOrderConfirmationEmail");
+        return this.http.post(url, formData);
+    }
+
+    getFunctionUrl(functionName: string): string {
+        if (environment.production) {
+            functionName = functionName.toLocaleLowerCase();
+        }
+        return environment.apiBaseUrl.replace("{function}", functionName);
     }
 }

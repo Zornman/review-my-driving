@@ -10,6 +10,14 @@ export class BackgroundService {
     constructor(private http: HttpClient) {}
 
     updateOrderDetails(): Observable<any> {
-        return this.http.post(environment.apiBaseUrl + '/updateOrderStatus', {});
+        const url = this.getFunctionUrl("updateOrderStatus");
+        return this.http.post(url, {});
+    }
+
+    getFunctionUrl(functionName: string): string {
+        if (environment.production) {
+            functionName = functionName.toLocaleLowerCase();
+        }
+        return environment.apiBaseUrl.replace("{function}", functionName);
     }
 }
