@@ -147,12 +147,12 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         this._snackBar.open('Error saving shipping information. Please try again.', 'Ok', { duration: 3000 });
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'account-overview.component.ts',
           method: 'saveShippingInfo()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -187,12 +187,12 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         this._snackBar.open('Error loading shipping information. Please try again.', 'Ok', { duration: 3000 });
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'account-overview.component.ts',
           method: 'loadShippingInfo()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -252,12 +252,12 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         //console.error('Error getting data:', error);
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'account-overview.component.ts',
           method: 'initializeSubmissions()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -278,12 +278,12 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         //console.error('Error getting order history: ', error);
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'account-overview.component.ts',
           method: 'initializeOrderHistory()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },

@@ -41,9 +41,9 @@ export const createPrintifyOrder = functions.https.onRequest({secrets: ["PRINTIF
         return;
       }
   
-      const PRINTIFY_API_KEY = process.env.PRINTIFY_API_KEY;
-      const PRINTIFY_STORE_ID = process.env.PRINTIFY_STORE_ID;
-      const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
+      const PRINTIFY_API_KEY = process.env['PRINTIFY_API_KEY'];
+      const PRINTIFY_STORE_ID = process.env['PRINTIFY_STORE_ID'];
+      const PRINTIFY_SHOP_URL = process.env['PRINTIFY_URL'];
       const { stripeTransactionId, customerInfo, products, shippingMethod } = req.body;
   
       if (!stripeTransactionId || !customerInfo || !products || !shippingMethod) {

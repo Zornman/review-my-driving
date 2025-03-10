@@ -10,14 +10,14 @@ export const sendContactEmail = functions
     if (req.method === 'POST') {
       try {
         // Parse the form data from the request body
-        const data = JSON.parse(req.body);
+        const data = req.body;
   
         // Set up Nodemailer transporter
         const transporter = nodemailer.createTransport({
           service: 'gmail', // Use Gmail or another email service
           auth: {
-            user: process.env.EMAIL_USER, // Your email address
-            pass: process.env.EMAIL_PASS, // Your email password (use an app password for Gmail)
+            user: process.env['EMAIL_USER'], // Your email address
+            pass: process.env['EMAIL_PASS'], // Your email password (use an app password for Gmail)
           },
         });
   

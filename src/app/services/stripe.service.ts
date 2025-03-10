@@ -10,7 +10,7 @@ export class StripeService {
     constructor(private http: HttpClient) {}
 
     fetchClientSecret(amt: number): Observable<any> {
-        const url = this.getFunctionUrl("server");
+        const url = this.getFunctionUrl("createStripePaymentIntent");
         return this.http.post<{ clientSecret: string }>(url, { amount: amt })
     }
 

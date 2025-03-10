@@ -10,12 +10,12 @@ export const getProduct = functions.https.onRequest(
   },
   async (req, res) => {
     corsHandler(req, res, async () => {
-      const api_token = process.env.PRINTIFY_API_KEY;
-      const shop_id = process.env.PRINTIFY_STORE_ID;
-      const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
+      const api_token = process.env['PRINTIFY_API_KEY'];
+      const shop_id = process.env['PRINTIFY_STORE_ID'];
+      const PRINTIFY_SHOP_URL = process.env['PRINTIFY_URL'];
 
       // Check if the product ID is provided as a query parameter
-      const productId = req.query.id as string;
+      const productId = req.query['id'] as string;
 
       if (!productId) {
         res.status(400).json({ error: 'Product ID is required' });

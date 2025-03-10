@@ -10,7 +10,7 @@ export const createStripeCheckout = functions
     corsHandler(req, res, async () => {
       try {
         // ✅ Retrieve the secret from Firebase Secrets
-        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+        const stripeSecretKey = process.env['STRIPE_SECRET_KEY'];
         if (!stripeSecretKey) {
           throw new Error("Stripe secret key is missing");
         }

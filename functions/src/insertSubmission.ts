@@ -12,7 +12,7 @@ export const insertSubmission = functions
       return;
     }
   
-    const uri = process.env.MONGO_URI as string;
+    const uri = process.env['MONGO_URI'] as string;
   
     // Create a client
     const client = new MongoClient(uri);

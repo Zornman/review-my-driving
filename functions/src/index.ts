@@ -1,34 +1,11 @@
-// import * as functions from "firebase-functions";
-// import { createCustomProduct } from "./createCustomProduct";
-// import { createPrintifyOrder } from "./createPrintifyOrder";
-// import { createStripeCheckout } from "./createStripeCheckout";
-// import { fetchProducts } from "./fetchProducts";
-// import { getPrintifyOrderDetails } from "./getPrintifyOrderDetails";
-// import { getPrintifyOrder } from "./getPrintifyOrder";
-// import { getProduct } from "./getProduct";
-// import { getShippingOptions } from "./getShippingOptions";
-// import { getShippingRates } from "./getShippingRates";
-// import { getSubmissionsByUser } from "./getSubmissionsByUser";
-// import { getUserByUID } from "./getUserByUID";
-// import { getUserOrderHistory } from "./getUserOrderHistory";
-// import { getUserSettings } from "./getUserSettings";
-// import { getUserShipping } from "./getUserShipping";
-// import { insertSubmission } from "./insertSubmission";
-// import { insertUserOrder } from "./insertUserOrder";
-// import { insertUserSettings } from "./insertUserSettings";
-// import { insertUserShipping } from "./insertUserShipping";
-// import { logError } from "./logError";
-// import { sendContactEmail } from "./sendContactEmail";
-// import { sendEmail } from "./sendEmail";
-// import { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail";
-// import { updateOrderStatus } from "./updateOrderStatus";
-
-
-// import {onRequest} from "firebase-functions/v2/https";
-// import * as logger from "firebase-functions/logger";
-
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * import {onCall} from "firebase-functions/v2/https";
+ * import {onDocumentWritten} from "firebase-functions/v2/firestore";
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
 
 export { createCustomProduct } from "./createCustomProduct";
 export { createPrintifyOrder } from "./createPrintifyOrder";
@@ -36,6 +13,8 @@ export { createStripeCheckout } from "./createStripeCheckout";
 export { createStripePaymentIntent } from "./createStripePaymentIntent";
 export { fetchProducts } from "./fetchProducts";
 export { getPrintifyOrderDetails } from "./getPrintifyOrderDetails";
+// export { getPrintifyOrders } from "./getPrintifyOrders";
+
 export { getProduct } from "./getProduct";
 export { getShippingOptions } from "./getShippingOptions";
 export { getShippingRates } from "./getShippingRates";
@@ -44,13 +23,24 @@ export { getUserByUID } from "./getUserByUID";
 export { getUserOrderHistory } from "./getUserOrderHistory";
 export { getUserSettings } from "./getUserSettings";
 export { getUserShipping } from "./getUserShipping";
+
 export { insertSubmission } from "./insertSubmission";
 export { insertUserOrder } from "./insertUserOrder";
 export { insertUserSettings } from "./insertUserSettings";
 export { insertUserShipping } from "./insertUserShipping";
+
 export { logError } from "./logError";
-export { stripePaymentIntent } from "./stripePaymentIntent";
 export { sendContactEmail } from "./sendContactEmail";
 export { sendEmail } from "./sendEmail";
 export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail";
+
 export { updateOrderStatus } from "./updateOrderStatus";
+
+
+// Start writing functions
+// https://firebase.google.com/docs/functions/typescript
+
+// export const helloWorld = onRequest((request, response) => {
+//   logger.info("Hello logs!", {structuredData: true});
+//   response.send("Hello from Firebase!");
+// });

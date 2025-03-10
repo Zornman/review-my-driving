@@ -6,12 +6,14 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "lib",
+    "rootDir": "./src", // Explicitly define rootDir
     "sourceMap": true,
     "strict": true,
-    "target": "es2017"
+    "target": "es2017",
+    "skipLibCheck": true, // Helps avoid ESLint errors with Firebase
+    "forceConsistentCasingInFileNames": true
   },
   "compileOnSave": true,
-  "include": [
-    "src"
-  ]
+  "include": ["src", "functions/src"], // Ensure it includes functions
+  "exclude": ["node_modules", "dist", "lib"]
 }

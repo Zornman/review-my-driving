@@ -7,11 +7,11 @@ const corsHandler = cors({ origin: true });
 export const getShippingOptions = functions
 .https.onRequest({ secrets: ["PRINTIFY_API_KEY"] }, async (req, res) => {
   corsHandler(req, res, async () => { 
-    const api_token = process.env.PRINTIFY_API_KEY;
+    const api_token = process.env['PRINTIFY_API_KEY'];
 
     // Check if the product ID is provided as a query parameter
-    const blueprint_id = req.query.blueprint_id as string;
-    const print_provider_id = req.query.print_provider_id as string;
+    const blueprint_id = req.query['blueprint_id'] as string;
+    const print_provider_id = req.query['print_provider_id'] as string;
 
     if (!blueprint_id) {
       res.status(400).json({ error: 'Blueprint ID is required' });

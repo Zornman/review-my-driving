@@ -61,19 +61,18 @@ export class ContactComponent {
     if (!this.contactForm.valid) return;
 
     this.contactForm.get('dateSubmitted')?.setValue(this.date());
-
-    this.emailService.sendContactEmail(this.contactForm.value).subscribe({
+    this.emailService.sendContactEmail(JSON.stringify(this.contactForm.value)).subscribe({
       next: (data: any) => {
         this.contactForm.reset();
         this.showConfirmationDialog('Thank you for contacting us, we will do our best to get back to you within 24 hours via email. Have a wonderful day!')
       },
       error: (error: any) => {
-        this.errorService.insertErrorLog({
+        this.errorService.insertErrorLog(JSON.stringify({
           fileName: 'contact.component.ts',
           method: 'sendFeedback()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },

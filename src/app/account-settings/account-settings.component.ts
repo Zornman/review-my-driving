@@ -75,12 +75,12 @@ export class AccountSettingsComponent {
         this.messageForm.get('message')?.setValue(settings.result.messageBody);
       },
       error: (error: any) => {
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'home.component.ts',
           method: 'getUserSettings()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -111,12 +111,12 @@ export class AccountSettingsComponent {
       },
       error: (error: any) => {
         this._snackBar.open('Error submitting form, try again.', 'Close');
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'account-settings.component.ts',
           method: 'saveSettings()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },

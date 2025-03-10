@@ -12,7 +12,7 @@ export const logError = functions
       return;
     }
   
-    const uri = process.env.MONGO_URI as string;
+    const uri = process.env['MONGO_URI'] as string;
   
     // Create a client
     const client = new MongoClient(uri);
@@ -26,7 +26,6 @@ export const logError = functions
       // Select the database and collection
       const database = client.db('review_my_driving'); // Replace 'myDatabase' with your database name
       const collection = database.collection('error_log'); // Replace 'myCollection' with your collection name
-      console.log(data);
       // Insert the data
       const result = await collection.insertOne(data);
   

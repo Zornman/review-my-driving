@@ -18,9 +18,9 @@ export const createCustomProduct =  functions
     }
     
     try {
-      const api_token = process.env.PRINTIFY_API_KEY;
-      const shop_id = process.env.PRINTIFY_STORE_ID;
-      const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
+      const api_token = process.env['PRINTIFY_API_KEY'];
+      const shop_id = process.env['PRINTIFY_STORE_ID'];
+      const PRINTIFY_SHOP_URL = process.env['PRINTIFY_URL'];
         const { base64QRCode, originalProductId, userID } = req.body as RequestBody;
     
         if (!base64QRCode || !originalProductId || !userID) {
