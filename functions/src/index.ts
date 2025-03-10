@@ -7,34 +7,34 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-export { createCustomProduct } from "./createCustomProduct";
-export { createPrintifyOrder } from "./createPrintifyOrder";
-export { createStripeCheckout } from "./createStripeCheckout";
-export { createStripePaymentIntent } from "./createStripePaymentIntent";
-export { fetchProducts } from "./fetchProducts";
-export { getPrintifyOrderDetails } from "./getPrintifyOrderDetails";
+export { createCustomProduct } from "./createCustomProduct.js";
+export { createPrintifyOrder } from "./createPrintifyOrder.js";
+export { createStripeCheckout } from "./createStripeCheckout.js";
+export { createStripePaymentIntent } from "./createStripePaymentIntent.js";
+export { fetchProducts } from "./fetchProducts.js";
+export { getPrintifyOrderDetails } from "./getPrintifyOrderDetails.js";
 // export { getPrintifyOrders } from "./getPrintifyOrders";
 
-export { getProduct } from "./getProduct";
-export { getShippingOptions } from "./getShippingOptions";
-export { getShippingRates } from "./getShippingRates";
-export { getSubmissionsByUser } from "./getSubmissionsByUser";
-export { getUserByUID } from "./getUserByUID";
-export { getUserOrderHistory } from "./getUserOrderHistory";
-export { getUserSettings } from "./getUserSettings";
-export { getUserShipping } from "./getUserShipping";
+export { getProduct } from "./getProduct.js";
+export { getShippingOptions } from "./getShippingOptions.js";
+export { getShippingRates } from "./getShippingRates.js";
+export { getSubmissionsByUser } from "./getSubmissionsByUser.js";
+export { getUserByUID } from "./getUserByUID.js";
+export { getUserOrderHistory } from "./getUserOrderHistory.js";
+export { getUserSettings } from "./getUserSettings.js";
+export { getUserShipping } from "./getUserShipping.js";
 
-export { insertSubmission } from "./insertSubmission";
-export { insertUserOrder } from "./insertUserOrder";
-export { insertUserSettings } from "./insertUserSettings";
-export { insertUserShipping } from "./insertUserShipping";
+export { insertSubmission } from "./insertSubmission.js";
+export { insertUserOrder } from "./insertUserOrder.js";
+export { insertUserSettings } from "./insertUserSettings.js";
+export { insertUserShipping } from "./insertUserShipping.js";
 
-export { logError } from "./logError";
-export { sendContactEmail } from "./sendContactEmail";
-export { sendEmail } from "./sendEmail";
-export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail";
+export { logError } from "./logError.js";
+export { sendContactEmail } from "./sendContactEmail.js";
+export { sendEmail } from "./sendEmail.js";
+export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 
-export { updateOrderStatus } from "./updateOrderStatus";
+export { updateOrderStatus } from "./updateOrderStatus.js";
 
 
 // Start writing functions

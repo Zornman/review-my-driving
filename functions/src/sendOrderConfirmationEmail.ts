@@ -24,7 +24,7 @@ export const sendOrderConfirmationEmail = functions
         const printifyResponse = await fetch(order_url + data.orderID + ".json", {
           headers: { "Authorization": `Bearer ${api_token}` }
         });
-        const printifyOrder = await printifyResponse.json();
+        const printifyOrder = await printifyResponse.json() as any;
   
         const client = await MongoClient.connect(uri);
         const db = client.db("review_my_driving");

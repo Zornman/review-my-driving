@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import cors from 'cors';
-import { environment } from "./environments/environment";
+import { environment } from "./environments/environment.js";
 
 const corsHandler = cors({ origin: true });
 

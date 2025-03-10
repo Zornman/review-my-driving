@@ -45,7 +45,7 @@ export const createCustomProduct =  functions
           throw new Error(`Image upload failed: ${errorText}`);
         }
     
-        const uploadResult = await uploadResponse.json();
+        const uploadResult = await uploadResponse.json() as any;
         const imageId = uploadResult.id;
 
         // Step 2: Fetch the Uploaded Image by ID
@@ -79,7 +79,7 @@ export const createCustomProduct =  functions
           throw new Error(`Failed to fetch original product: ${errorText}`);
         }
 
-        const originalProduct = await productResponse.json();
+        const originalProduct = await productResponse.json() as any;
 
         const updatePrintAreaList = (originalPrintAreas: any[], uploadedImage: any, userID: string) => {
           // Clone the original array to avoid mutating the original object

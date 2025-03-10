@@ -85,7 +85,7 @@ export const createPrintifyOrder = functions.https.onRequest({secrets: ["PRINTIF
         body: JSON.stringify(printifyOrder),
       });
   
-      const orderData = await response.json();
+      const orderData = await response.json() as any;
   
       if (!response.ok) {
         res.status(response.status).send(orderData);
