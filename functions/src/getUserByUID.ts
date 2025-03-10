@@ -1,5 +1,7 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
+import { cert, initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import cors from 'cors';
 import { environment } from "./environments/environment.js";
 
@@ -10,17 +12,17 @@ export const getUserByUID = functions.https.onRequest({ secrets: ["FB_CLIENT_EMA
   corsHandler(req, res, async () => {
     try {
       // ✅ Retrieve secrets from Firebase Secrets
-      const privateKey = environment.firebase.privateKey;
+      const privateKey = environment.firebase.privateKey.trim();
       const clientEmail = process.env['FB_CLIENT_EMAIL'];
   
       if (!privateKey || !clientEmail) {
         throw new Error("Missing Firebase Admin credentials.");
       }
-      console.log("Private Key:", privateKey);
+      
       // ✅ Initialize Firebase Admin SDK (Only Once)
-      if (!admin.apps.length) {
-        admin.initializeApp({
-          credential: admin.credential.cert({
+      if (!admin.apps?.length) {
+        initializeApp({
+          credential: cert({
             privateKey: privateKey,
             clientEmail: clientEmail,
             projectId: "review-my-driving",
@@ -36,7 +38,7 @@ export const getUserByUID = functions.https.onRequest({ secrets: ["FB_CLIENT_EMA
       }
   
       // ✅ Fetch user from Firebase Authentication
-      const userRecord = await admin.auth().getUser(uid);
+      const userRecord = await getAuth().getUser(uid);
       res.status(200).json(userRecord); // ✅ Ensure response is returned
     } catch (error: any) {
       console.error("Error fetching user:", error);
