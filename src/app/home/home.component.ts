@@ -16,6 +16,7 @@ import { EmailService } from '../services/email.service';
 import { FirebaseService } from '../services/firebase.service';
 import { MessageDialogComponent } from '../shared/modals/message-dialog/message-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -89,12 +90,12 @@ export class HomeComponent {
         //console.log(this.formData);
       },
       error: (error) => {
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'home.component.ts',
           method: 'getUserEmail()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -113,12 +114,12 @@ export class HomeComponent {
         this.user_settings = settings.result;
       },
       error: (error: any) => {
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'home.component.ts',
           method: 'getUserSettings()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -156,19 +157,19 @@ export class HomeComponent {
   }
 
   async sendEmailNotification() {
-    this.emailService.sendSubmissionEmail(this.formData).subscribe({
+    this.emailService.sendSubmissionEmail(JSON.stringify(this.formData)).subscribe({
       next: (response: any) => {
         this.openConfirmMessage();
         this.resetForm();
       },
       error: (error) => {
         this._snackBar.open('Error submitting form, try again.', 'Close');
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'home.component.ts',
           method: 'sendEmailNotification()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -182,18 +183,18 @@ export class HomeComponent {
   async insertSubmission() {
     this.formData.user_id = this.user_id;
     this.formData.dateSubmitted = this.date();
-    this.dbService.insertSubmission(this.formData).subscribe({
+    this.dbService.insertSubmission(JSON.stringify(this.formData)).subscribe({
       next: (response: any) => {
 
       },
       error: (error) => {
         this._snackBar.open('Error submitting form, try again.', 'Close');
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'home.component.ts',
           method: 'insertSubmission()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },

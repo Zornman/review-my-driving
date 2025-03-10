@@ -7,8 +7,8 @@ const corsHandler = cors({ origin: true });
 export const getUserOrderHistory = functions
 .https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
   corsHandler(req, res, async () => {
-    const uri = process.env.MONGO_URI as string;
-    const userID = req.query.userID as string;
+    const uri = process.env['MONGO_URI'] as string;
+    const userID = req.query['userID'] as string;
   
     const client = new MongoClient(uri);
   

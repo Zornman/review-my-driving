@@ -12,13 +12,13 @@ export const getUserShipping = functions
       return;
     }
   
-    const uri = process.env.MONGO_URI as string;
+    const uri = process.env['MONGO_URI'] as string;
   
     // Create a client
     const client = new MongoClient(uri);
   
     try {
-      const userId = req.query.userId as string;
+      const userId = req.query['userId'] as string;
   
       if (!userId) {
         res.status(400).json({ message: 'Missing userId parameter' });

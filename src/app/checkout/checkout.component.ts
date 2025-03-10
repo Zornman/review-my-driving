@@ -202,7 +202,7 @@ export class CheckoutComponent implements OnInit {
 
       const style = {
         base: {
-          fontFamily: '"DynaPuff", cursive',
+          fontFamily: '"DynaPuff", sans-serif',
           fontSize: '20px', // Larger font size
           color: (this.themeService.getIsDarkMode()) ? '#E0E0E0' : '#121212', // Default text color
           backgroundColor: 'transparent',
@@ -337,12 +337,12 @@ export class CheckoutComponent implements OnInit {
       },
       error: (error) => {
         this._snackBar.open('Failed to place order. Please contact support.', 'Ok');
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'checkout.component.ts',
           method: 'handlePayment() - printifyService.createPrintifyOrder',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -401,12 +401,12 @@ export class CheckoutComponent implements OnInit {
       },
       error: (error) => {
         this._snackBar.open('Error loading shipping information. Please try again.', 'Ok', { duration: 3000 });
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'checkout.component.ts',
           method: 'loadUserShippingInfo()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -437,12 +437,12 @@ export class CheckoutComponent implements OnInit {
       },
       error: (error) => {
         this._snackBar.open('Error saving shipping information. Please try again.', 'Ok', { duration: 3000 });
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'checkout.component.ts',
           method: 'saveUserShippingInfo()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },

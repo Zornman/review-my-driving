@@ -43,3 +43,4 @@ Thumbs.db
 # Ignore environment files (Production)
 src/environments/environment.prod.ts
 src/assets/data_storage/serviceAccount.json
+functions/src/environments/environment.prod.ts

@@ -7,12 +7,12 @@ const corsHandler = cors({ origin: true });
 export const getPrintifyOrderDetails = functions
 .https.onRequest({ secrets: ["PRINTIFY_API_KEY", "PRINTIFY_STORE_ID", "PRINTIFY_URL"] }, async (req, res) => {
   corsHandler(req, res, async () => {
-    const api_token = process.env.PRINTIFY_API_KEY;
-    const shop_id = process.env.PRINTIFY_STORE_ID;
-    const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
+    const api_token = process.env['PRINTIFY_API_KEY'];
+    const shop_id = process.env['PRINTIFY_STORE_ID'];
+    const PRINTIFY_SHOP_URL = process.env['PRINTIFY_URL'];
 
     // Check if the product ID is provided as a query parameter
-    const orderId = req.query.id as string;
+    const orderId = req.query['id'] as string;
 
     if (!orderId) {
       res.status(400).json({ error: 'order ID is required' });

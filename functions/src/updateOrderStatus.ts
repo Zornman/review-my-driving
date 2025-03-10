@@ -22,11 +22,11 @@ export const updateOrderStatus = functions
 .https.onRequest({secrets: ["PRINTIFY_STORE_ID", "PRINTIFY_URL", "PRINTIFY_API_KEY", "MONGO_URI", "EMAIL_USER", "EMAIL_PASS"]}, async (req, res) => {
    corsHandler(req, res, async () => {
       try {
-         const shopId = process.env.PRINTIFY_STORE_ID;
-         const printifyShopUrl = process.env.PRINTIFY_URL;
+         const shopId = process.env['PRINTIFY_STORE_ID'];
+         const printifyShopUrl = process.env['PRINTIFY_URL'];
          const ordersUrl = printifyShopUrl+ "/shops/" + shopId + "/orders.json";
-         const apiToken = process.env.PRINTIFY_API_KEY;
-         const uri = process.env.MONGO_URI as string;
+         const apiToken = process.env['PRINTIFY_API_KEY'];
+         const uri = process.env['MONGO_URI'] as string;
       
           const printifyResponse = await fetch(ordersUrl, {
             headers: {"Authorization": "Bearer" + apiToken},
@@ -47,14 +47,14 @@ export const updateOrderStatus = functions
                   const order = await ordersCollection.findOne({orderID: printifyOrder.id});
       
                   if (order) {
-                      if (order.status !== printifyOrder.status) {
+                      if (order['status'] !== printifyOrder.status) {
                           await ordersCollection.updateOne(
                           {orderID: printifyOrder.id},
                           {$set: {status: printifyOrder.status}}
                           );
                       }
       
-                      if (printifyOrder.status === "in-production" && !order.emailOrderCreated) {
+                      if (printifyOrder.status === "in-production" && !order['emailOrderCreated']) {
                           await sendEmail(printifyOrder);
       
                           await ordersCollection.updateOne(
@@ -63,7 +63,7 @@ export const updateOrderStatus = functions
                           );
                       }
       
-                      if (printifyOrder.status === "fulfilled" && !order.emailOrderShipped) {
+                      if (printifyOrder.status === "fulfilled" && !order['emailOrderShipped']) {
                           await sendEmail(printifyOrder);
       
                           await ordersCollection.updateOne(
@@ -72,7 +72,7 @@ export const updateOrderStatus = functions
                           );
                       }
       
-                      if (printifyOrder.status === "canceled" && !order.emailOrderCanceled) {
+                      if (printifyOrder.status === "canceled" && !order['emailOrderCanceled']) {
                           await sendEmail(printifyOrder);
       
                           await ordersCollection.updateOne(
@@ -101,8 +101,8 @@ export const updateOrderStatus = functions
         const transporter = nodemailer.createTransport({
           service: "gmail", // Use Gmail or another email service
           auth: {
-            user: process.env.EMAIL_USER, // Your email address
-            pass: process.env.EMAIL_PASS, // Your email password (use an app password for Gmail)
+            user: process.env['EMAIL_USER'], // Your email address
+            pass: process.env['EMAIL_PASS'], // Your email password (use an app password for Gmail)
          },
        });
       

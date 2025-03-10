@@ -41,12 +41,12 @@ export class ShopComponent implements OnInit {
           }
         },
         error: (error) => {
-          this.dbService.insertErrorLog({
+          this.dbService.insertErrorLog(JSON.stringify({
             fileName: 'shop.component.ts',
             method: 'ngOnInit()',
             timestamp: new Date().toString(),
             error: error
-          }).subscribe({
+          })).subscribe({
             next: (response: any) => {
                 console.log(response);
             },

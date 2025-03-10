@@ -6,11 +6,15 @@ import tsParser from "@typescript-eslint/parser";
 /** @type {import('eslint').Linter.Config} */
 export default [
   {
-    files: ["**/*.{js,mjs,cjs,ts}"],
+    files: ["functions/src/**/*.{js,ts}"], // Ensure it targets the right folder
+    ignores: ["node_modules/", "dist/", "lib/"], // Ignore unnecessary folders
     languageOptions: {
       parser: tsParser,
       sourceType: "module",
       globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: "latest"
+      }
     },
     plugins: {
       "@typescript-eslint": tseslint,
@@ -27,7 +31,7 @@ export default [
     },
   },
   {
-    files: ["**/*.js"],
+    files: ["functions/**/*.js"],
     languageOptions: {
       sourceType: "script",
     },

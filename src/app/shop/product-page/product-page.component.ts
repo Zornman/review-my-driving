@@ -80,12 +80,12 @@ export class ProductPageComponent {
           },
           error: (error) => {
             this._snackBar.open('Error loading product details, please try again.', 'Ok', { duration: 3000 });
-            this.dbService.insertErrorLog({
+            this.dbService.insertErrorLog(JSON.stringify({
               fileName: 'product-page.component.ts',
               method: 'ngOnInit()',
               timestamp: new Date().toString(),
               error: error
-            }).subscribe({
+            })).subscribe({
               next: (response: any) => {
                   console.log(response);
               },
@@ -148,12 +148,12 @@ export class ProductPageComponent {
         }
       },
       error: (error) => {
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'product-page.component.ts',
           method: 'checkForExistingProduct()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
@@ -184,12 +184,12 @@ export class ProductPageComponent {
           this.disableAdd = false;
         },
         error: (error) => {
-          this.dbService.insertErrorLog({
+          this.dbService.insertErrorLog(JSON.stringify({
             fileName: 'product-page.component.ts',
             method: 'createNewProduct()',
             timestamp: new Date().toString(),
             error: error
-          }).subscribe({
+          })).subscribe({
             next: (response: any) => {
                 console.log(response);
             },

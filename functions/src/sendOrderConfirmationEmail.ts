@@ -11,12 +11,12 @@ export const sendOrderConfirmationEmail = functions
   corsHandler(req, res, async () => {
     if (req.method === "POST") {
       try {
-        const shop_id = process.env.PRINTIFY_STORE_ID;
-        const PRINTIFY_SHOP_URL = process.env.PRINTIFY_URL;
+        const shop_id = process.env['PRINTIFY_STORE_ID'];
+        const PRINTIFY_SHOP_URL = process.env['PRINTIFY_URL'];
         const order_url = PRINTIFY_SHOP_URL + "/shops/" + shop_id + "/orders/";
-        const api_token = process.env.PRINTIFY_API_KEY;
+        const api_token = process.env['PRINTIFY_API_KEY'];
         
-        const uri = process.env.MONGO_URI as string;
+        const uri = process.env['MONGO_URI'] as string;
   
         // Parse the form data from the request body
         const data = req.body;
@@ -34,7 +34,7 @@ export const sendOrderConfirmationEmail = functions
   
         if (!order) return;
   
-        if (order.emailOrderConfirm) {
+        if (order['emailOrderConfirm']) {
           res.status(200).json({ message: "Email already sent for this order" });
           return;
         }
@@ -43,8 +43,8 @@ export const sendOrderConfirmationEmail = functions
         const transporter = nodemailer.createTransport({
           service: "gmail", // Use Gmail or another email service
           auth: {
-            user: process.env.EMAIL_USER, // Your email address
-            pass: process.env.EMAIL_PASS, // Your email password (use an app password for Gmail)
+            user: process.env['EMAIL_USER'], // Your email address
+            pass: process.env['EMAIL_PASS'], // Your email password (use an app password for Gmail)
           },
         });
   

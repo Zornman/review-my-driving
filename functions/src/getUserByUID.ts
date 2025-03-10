@@ -1,21 +1,22 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import cors from 'cors';
+import { environment } from "./environments/environment";
 
 const corsHandler = cors({ origin: true });
 
 // ✅ Load secrets with the new names
-export const getUserByUID = functions.https.onRequest({ secrets: ["FB_PRIVATE_KEY", "FB_CLIENT_EMAIL"] }, async (req, res) => {
+export const getUserByUID = functions.https.onRequest({ secrets: ["FB_CLIENT_EMAIL"] }, async (req, res) => {
   corsHandler(req, res, async () => {
     try {
       // ✅ Retrieve secrets from Firebase Secrets
-      const privateKey = process.env.FB_PRIVATE_KEY?.replace(/\\n/g, '\n'); // Fix formatting
-      const clientEmail = process.env.FB_CLIENT_EMAIL;
+      const privateKey = JSON.stringify(environment.firebase.privateKey);
+      const clientEmail = process.env['FB_CLIENT_EMAIL'];
   
       if (!privateKey || !clientEmail) {
         throw new Error("Missing Firebase Admin credentials.");
       }
-  
+      console.log("Private Key:", privateKey);
       // ✅ Initialize Firebase Admin SDK (Only Once)
       if (!admin.apps.length) {
         admin.initializeApp({
@@ -28,7 +29,7 @@ export const getUserByUID = functions.https.onRequest({ secrets: ["FB_PRIVATE_KE
       }
   
       // ✅ Get UID from query params (?uid=...)
-      const uid = req.query.uid as string;
+      const uid = req.query['uid'] as string;
       if (!uid) {
         res.status(400).json({ error: "UID parameter is required" });
         return;

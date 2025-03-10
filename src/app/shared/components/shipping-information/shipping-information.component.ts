@@ -71,12 +71,12 @@ export class ShippingInformationComponent {
           }
         },
         error: (error) => {
-          this.dbService.insertErrorLog({
+          this.dbService.insertErrorLog(JSON.stringify({
             fileName: 'shipping-information.component.ts',
             method: 'load()',
             timestamp: new Date().toString(),
             error: error
-          }).subscribe({
+          })).subscribe({
             next: (response: any) => {
                 console.log(response);
             },
@@ -94,12 +94,12 @@ export class ShippingInformationComponent {
 
       },
       error: (error) => {
-        this.dbService.insertErrorLog({
+        this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'shipping-information.component.ts',
           method: 'save()',
           timestamp: new Date().toString(),
           error: error
-        }).subscribe({
+        })).subscribe({
           next: (response: any) => {
               console.log(response);
           },
