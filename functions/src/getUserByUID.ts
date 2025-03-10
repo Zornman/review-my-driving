@@ -1,6 +1,5 @@
 import * as functions from "firebase-functions/v2";
-import * as admin from "firebase-admin";
-import { cert, initializeApp } from "firebase-admin/app";
+import { cert, initializeApp, getApps } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import cors from 'cors';
 import { environment } from "./environments/environment.js";
@@ -18,9 +17,9 @@ export const getUserByUID = functions.https.onRequest({ secrets: ["FB_CLIENT_EMA
       if (!privateKey || !clientEmail) {
         throw new Error("Missing Firebase Admin credentials.");
       }
-      
+
       // ✅ Initialize Firebase Admin SDK (Only Once)
-      if (!admin.apps?.length) {
+      if (!getApps().length) {
         initializeApp({
           credential: cert({
             privateKey: privateKey,
