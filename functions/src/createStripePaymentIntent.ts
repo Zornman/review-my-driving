@@ -15,7 +15,7 @@ export const createStripePaymentIntent = functions.https.onRequest({ secrets: ["
 
         const stripe = new Stripe(stripeSecretKey, { apiVersion: "2025-02-24.acacia" });
 
-        const { amount } = JSON.parse(req.body || '{}');
+        const { amount } = req.body;
 
         if (!amount) {
           res.status(400).json({ error: 'Amount is required' });

@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 export class StripeService {
     constructor(private http: HttpClient) {}
 
-    fetchClientSecret(amt: number): Observable<any> {
+    fetchClientSecret(amt: string): Observable<any> {
         const url = this.getFunctionUrl("createStripePaymentIntent");
         return this.http.post<{ clientSecret: string }>(url, { amount: amt })
     }
