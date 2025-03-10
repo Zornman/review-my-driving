@@ -18,7 +18,7 @@ export const logError = functions
     const client = new MongoClient(uri);
   
     try {
-      const data = req.body; // Parse incoming data
+      const data = JSON.parse(req.body); // Parse incoming data
   
       // Connect to MongoDB
       await client.connect();
