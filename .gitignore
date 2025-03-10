@@ -44,3 +44,4 @@ Thumbs.db
 src/environments/environment.prod.ts
 src/assets/data_storage/serviceAccount.json
 functions/src/environments/environment.prod.ts
+dist/out-tsc/functions/src/environments/environment.prod.js
