@@ -250,8 +250,7 @@ export class CheckoutComponent implements OnInit {
 
   async fetchClientSecret() {
     //console.log('fetching client secret');
-    
-    this.paymentService.fetchClientSecret(this.calculateAmountDue() * 100).subscribe(response => {
+    this.paymentService.fetchClientSecret(JSON.stringify(this.calculateAmountDue() * 100)).subscribe(response => {
       this.clientSecret = response.clientSecret;
     });
   }

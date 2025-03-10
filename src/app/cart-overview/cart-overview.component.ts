@@ -59,20 +59,6 @@ export class CartOverviewComponent implements OnInit, OnDestroy {
     this.router.navigate(['/checkout'], { state: { cartSummary: this.cartSummary } });
   }
 
-  createCheckoutSession() {
-    
-    this.cartItemArray = [];
-
-    this.cartSummary.forEach((item) => this.cartItemArray.push({productName: item.productName, quantity: item.quantity, price: item.price}));
-
-    this.stripeService.createStripeCheckout(this.cartItemArray).subscribe(async (res) => {
-      const stripe = await loadStripe('pk_test_51Qmnk12KeQqbDqTp84aakGQdasoxAei93E0X8RQ0WcJvnhSmGISShHFzOyUJ3IbxYGIvK2kEDPPiNgiwdADPiBwS00kE1aqBwL');
-      if (res.sessionId && stripe) {
-        stripe.redirectToCheckout({ sessionId: res.sessionId });
-      }
-    });
-  }
-
   loadCart() {
     // Subscribe to cart changes
     this.cartSubscription = this.cartService.cart$.subscribe((cart) => {
