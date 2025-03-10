@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
 import cors from 'cors';
-import { environment } from "../../src/environments/environment";
+import { environment } from "./environments/environment";
 const corsHandler = cors({ origin: true });
 // ✅ Load secrets with the new names
 export const getUserByUID = functions.https.onRequest({ secrets: ["FB_CLIENT_EMAIL"] }, async (req, res) => {

@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions/v2";
 import Stripe from "stripe";
 import cors from 'cors';
-import { environment } from "../../src/environments/environment";
+import { environment } from "./environments/environment";
 const corsHandler = cors({ origin: true });
 export const createStripePaymentIntent = functions.https.onRequest({ secrets: ["STRIPE_SECRET_KEY"] }, async (req, res) => {
     corsHandler(req, res, async () => {
