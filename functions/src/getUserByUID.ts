@@ -10,7 +10,7 @@ export const getUserByUID = functions.https.onRequest({ secrets: ["FB_CLIENT_EMA
   corsHandler(req, res, async () => {
     try {
       // ✅ Retrieve secrets from Firebase Secrets
-      const privateKey = JSON.stringify(environment.firebase.privateKey);
+      const privateKey = environment.firebase.privateKey;
       const clientEmail = process.env['FB_CLIENT_EMAIL'];
   
       if (!privateKey || !clientEmail) {
