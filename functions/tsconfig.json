@@ -9,7 +9,7 @@
     "rootDir": "./src", // Explicitly define rootDir
     "sourceMap": true,
     "strict": true,
-    "target": "es2017",
+    "target": "ES2022",
     "skipLibCheck": true, // Helps avoid ESLint errors with Firebase
     "forceConsistentCasingInFileNames": true
   },

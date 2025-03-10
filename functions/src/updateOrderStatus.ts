@@ -31,7 +31,7 @@ export const updateOrderStatus = functions
           const printifyResponse = await fetch(ordersUrl, {
             headers: {"Authorization": "Bearer" + apiToken},
           });
-          const printifyOrders = await printifyResponse.json();
+          const printifyOrders = await printifyResponse.json() as any;
       
           const client = await MongoClient.connect(uri);
           const db = client.db("review_my_driving");
@@ -41,7 +41,7 @@ export const updateOrderStatus = functions
               const pageResponse = await fetch(ordersUrl + "/?page=" + i, {
                   headers: {"Authorization": "Bearer" + apiToken}
               });
-              const printifyOrdersPage = await pageResponse.json();
+              const printifyOrdersPage = await pageResponse.json() as any;
       
               for (const printifyOrder of printifyOrdersPage.data) {
                   const order = await ordersCollection.findOne({orderID: printifyOrder.id});
