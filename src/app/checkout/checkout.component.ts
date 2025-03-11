@@ -343,7 +343,6 @@ export class CheckoutComponent implements OnInit {
           error: error
         })).subscribe({
           next: (response: any) => {
-              console.log(response);
           },
           error: (error: any) => {
           }
@@ -407,7 +406,6 @@ export class CheckoutComponent implements OnInit {
           error: error
         })).subscribe({
           next: (response: any) => {
-              console.log(response);
           },
           error: (error: any) => {
           }
@@ -443,7 +441,6 @@ export class CheckoutComponent implements OnInit {
           error: error
         })).subscribe({
           next: (response: any) => {
-              console.log(response);
           },
           error: (error: any) => {
           }
@@ -625,7 +622,6 @@ export class CheckoutComponent implements OnInit {
 
     });
 
-    console.log(chosenShippingOptionList);
     if (this.cartSummary.length <= 1) {
       chosenShippingOptionList.forEach((dataItem) => {
         const cartItem = this.cartSummary.find((x) => x.uid === this.cartSummary[0].uid);
@@ -651,13 +647,10 @@ export class CheckoutComponent implements OnInit {
           }
         });
       });
-
-      console.log(uniqueShippingPlans);
     }
   }
 
   setShippingRangeLabels(attributes: Attributes) {
-    console.log(attributes.shippingType);
     switch (attributes.shippingType.toLowerCase()) {
       case 'standard':
         this.shipping_from_standard = attributes.handlingTime.from;
@@ -688,22 +681,18 @@ export class CheckoutComponent implements OnInit {
       case 'standard':
         this.shipping_total_cost_standard += this.calcShippingForLabels(firstItemCost, additionalItemCost, quantity, skipFirstItem);
         this.standard_shipping_enabled = true;
-        console.log('standard shipping cost set');
       break;
       case 'priority':
         this.shipping_total_cost_priority += this.calcShippingForLabels(firstItemCost, additionalItemCost, quantity, skipFirstItem);
         this.priority_shipping_enabled = true;
-        console.log('priority shipping cost set');
       break;
       case 'economy':
         this.shipping_total_cost_economy += this.calcShippingForLabels(firstItemCost, additionalItemCost, quantity, skipFirstItem);
         this.economy_shipping_enabled = true;
-        console.log('economy shipping cost set');
       break;
       case 'express':
         this.shipping_total_cost_express += this.calcShippingForLabels(firstItemCost, additionalItemCost, quantity, skipFirstItem);
         this.express_shipping_enabled = true;
-        console.log('express shipping cost set');
       break;
       default:
         //console.log('Error in calcShippingTotals()');
