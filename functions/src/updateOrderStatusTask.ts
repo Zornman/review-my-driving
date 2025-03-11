@@ -1,19 +1,28 @@
 import * as functions from "firebase-functions/v2";
 import { MongoClient } from "mongodb";
 import fetch from "node-fetch";
-import { Response } from "express";
 import nodemailer from "nodemailer";
 
 // ✅ Load secrets dynamically
-export async function updateOrderStatusTask(req?: functions.https.Request, res?: Response) {
+export async function updateOrderStatusTask(secrets?: {
+  PRINTIFY_STORE_ID: string;
+  PRINTIFY_URL: string;
+  PRINTIFY_API_KEY: string;
+  MONGO_URI: string;
+  EMAIL_USER: string;
+  EMAIL_PASS: string;
+}) {
   try {
     console.log("Running updateOrderStatus...");
 
     // ✅ Use process.env when available, fallback to Firebase Secrets
-    const shopId = process.env['PRINTIFY_STORE_ID'] || functions.params.defineSecret("PRINTIFY_STORE_ID").value();
-    const printifyShopUrl = process.env['PRINTIFY_URL'] || functions.params.defineSecret("PRINTIFY_URL").value();
-    const apiToken = process.env['PRINTIFY_API_KEY'] || functions.params.defineSecret("PRINTIFY_API_KEY").value();
-    const uri = process.env['MONGO_URI'] || functions.params.defineSecret("MONGO_URI").value();
+    const shopId = (secrets) ? secrets.PRINTIFY_STORE_ID : functions.params.defineSecret("PRINTIFY_STORE_ID").value();
+    const printifyShopUrl = (secrets) ? secrets.PRINTIFY_URL : functions.params.defineSecret("PRINTIFY_URL").value();
+    const apiToken = (secrets) ? secrets.PRINTIFY_API_KEY : functions.params.defineSecret("PRINTIFY_API_KEY").value();
+    const uri = (secrets) ? secrets.MONGO_URI : functions.params.defineSecret("MONGO_URI").value();
+    const emailUser = (secrets) ? secrets.EMAIL_USER : functions.params.defineSecret("EMAIL_USER").value();
+    const emailPass = (secrets) ? secrets.EMAIL_PASS : functions.params.defineSecret("EMAIL_PASS").value();
+
 
     // ✅ Fetch orders from Printify
     const ordersUrl = `${printifyShopUrl}/shops/${shopId}/orders.json`;
@@ -42,7 +51,7 @@ export async function updateOrderStatusTask(req?: functions.https.Request, res?:
           );
 
           if (printifyOrder.status === "in-production" && !order['emailOrderCreated']) {
-            await sendEmail(printifyOrder);
+            await sendEmail(emailUser, emailPass, printifyOrder);
             await ordersCollection.updateOne(
               { orderID: printifyOrder.id },
               { $set: { emailOrderCreated: true } }
@@ -50,7 +59,7 @@ export async function updateOrderStatusTask(req?: functions.https.Request, res?:
           }
 
           if (printifyOrder.status === "fulfilled" && !order['emailOrderShipped']) {
-            await sendEmail(printifyOrder);
+            await sendEmail(emailUser, emailPass, printifyOrder);
             await ordersCollection.updateOne(
               { orderID: printifyOrder.id },
               { $set: { emailOrderShipped: true } }
@@ -58,7 +67,7 @@ export async function updateOrderStatusTask(req?: functions.https.Request, res?:
           }
 
           if (printifyOrder.status === "canceled" && !order['emailOrderCanceled']) {
-            await sendEmail(printifyOrder);
+            await sendEmail(emailUser, emailPass, printifyOrder);
             await ordersCollection.updateOne(
               { orderID: printifyOrder.id },
               { $set: { emailOrderCanceled: true } }
@@ -69,29 +78,20 @@ export async function updateOrderStatusTask(req?: functions.https.Request, res?:
     }
 
     await client.close(); // ✅ Close MongoDB connection
-
-    if (res) {
-      res.status(200).json({ message: "Orders processed successfully", orders: printifyOrders });
-    } else {
-      console.log("updateOrderStatus ran via scheduler.");
-    }
   } catch (error: any) {
     console.error("Error processing orders:", error);
-    if (res) {
-      res.status(500).json({ message: "Server Error", error: error.message });
-    }
   }
 }
 
 // ✅ Email Sending Function
-async function sendEmail(printifyOrder: any) {
+async function sendEmail(user: string, pass: string, printifyOrder: any) {
   console.log("Sending email to " + printifyOrder.address_to.email);
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env['EMAIL_USER'] || functions.params.defineSecret("EMAIL_USER").value(),
-      pass: process.env['EMAIL_PASS'] || functions.params.defineSecret("EMAIL_PASS").value(),
+      user: (user) ? user : functions.params.defineSecret("EMAIL_USER").value(),
+      pass: (pass) ? pass : functions.params.defineSecret("EMAIL_PASS").value(),
     },
   });
 

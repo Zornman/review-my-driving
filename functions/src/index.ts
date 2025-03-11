@@ -7,6 +7,15 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 import { onSchedule } from "firebase-functions/v2/scheduler";
+import { defineSecret } from "firebase-functions/params";
+
+// ✅ Define Secrets for Scheduled Function
+const PRINTIFY_STORE_ID = defineSecret("PRINTIFY_STORE_ID");
+const PRINTIFY_URL = defineSecret("PRINTIFY_URL");
+const PRINTIFY_API_KEY = defineSecret("PRINTIFY_API_KEY");
+const MONGO_URI = defineSecret("MONGO_URI");
+const EMAIL_USER = defineSecret("EMAIL_USER");
+const EMAIL_PASS = defineSecret("EMAIL_PASS");
 
 export { createCustomProduct } from "./createCustomProduct.js";
 export { createPrintifyOrder } from "./createPrintifyOrder.js";
@@ -38,12 +47,26 @@ export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 export { updateOrderStatus } from "./updateOrderStatus.js";
 import { updateOrderStatusTask } from "./updateOrderStatusTask.js";
 
-export const updateOrderStatusTaskSchedule = onSchedule("every hour", async (event: any) => {
+export const updateOrderStatusTaskSchedule = onSchedule({schedule: "every hour", secrets: [
+    PRINTIFY_STORE_ID,
+    PRINTIFY_URL,
+    PRINTIFY_API_KEY,
+    MONGO_URI,
+    EMAIL_USER,
+    EMAIL_PASS
+]}, async (event: any) => {
     console.log("Running UpdateOrderStatus task...");
 
     try {
         // Call your existing logic here
-        await updateOrderStatusTask(); // ✅ Replace this with your function logic
+        await updateOrderStatusTask({
+            PRINTIFY_STORE_ID: PRINTIFY_STORE_ID.value(),
+            PRINTIFY_URL: PRINTIFY_URL.value(),
+            PRINTIFY_API_KEY: PRINTIFY_API_KEY.value(),
+            MONGO_URI: MONGO_URI.value(),
+            EMAIL_USER: EMAIL_USER.value(),
+            EMAIL_PASS: EMAIL_PASS.value(),
+          }); // ✅ Replace this with your function logic
         console.log("Running UpdateOrderStatus task - completed successfully.");
     } catch (error) {
     console.error("Error running scheduled function:", error);
