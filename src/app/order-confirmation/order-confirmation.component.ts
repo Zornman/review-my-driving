@@ -20,23 +20,23 @@ export class OrderConfirmationComponent implements OnInit {
     
   }
 
-  ngOnInit() {
-    this.authService.getUser().subscribe((user) => {
-      this.user = user;
-      if (this.user) {
-        this.orderID = this.route.snapshot.paramMap.get('id');
-        this.sendEmailConfirmation();
-        this.insertOrderHistoryRecord();
-      }
-    });
-  }
+  async ngOnInit() {
+      this.authService.getUser().subscribe(async (user) => {
+        this.user = user;
+        if (this.user) {
+          this.orderID = this.route.snapshot.paramMap.get('id');
+          this.insertOrderHistoryRecord();
+          await this.sendEmailConfirmation();
+        }
+      });
+    }
 
-  insertOrderHistoryRecord() {
+  async insertOrderHistoryRecord() {
     const data = {
       userID: this.user?.uid,
       orderID: this.orderID,
       dateOrdered: new Date().toDateString(),
-      emailOrderConfirm: true,
+      emailOrderConfirm: false,
       emailOrderShipped: false,
       emailOrderCanceled: false,
       emailOrderCreated: false

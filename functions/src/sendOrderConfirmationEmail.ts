@@ -7,7 +7,7 @@ import cors from 'cors';
 const corsHandler = cors({ origin: true });
 
 export const sendOrderConfirmationEmail = functions
-.https.onRequest({ secrets: ["PRINTIFY_STORE_ID", "PRINTIFY_URL", "PRINTIFY_API_KEY", "MONGO_URI"] }, async (req, res) => {
+.https.onRequest({ secrets: ["PRINTIFY_STORE_ID", "PRINTIFY_URL", "PRINTIFY_API_KEY", "MONGO_URI", "EMAIL_USER", "EMAIL_PASS"] }, async (req, res) => {
   corsHandler(req, res, async () => {
     if (req.method === "POST") {
       try {
@@ -25,18 +25,17 @@ export const sendOrderConfirmationEmail = functions
           headers: { "Authorization": `Bearer ${api_token}` }
         });
         const printifyOrder = await printifyResponse.json() as any;
-  
         const client = await MongoClient.connect(uri);
         const db = client.db("review_my_driving");
         const ordersCollection = db.collection("user_order_history");
   
         const order = await ordersCollection.findOne({ orderID: printifyOrder.id });
-  
-        if (!order) return;
-  
-        if (order['emailOrderConfirm']) {
-          res.status(200).json({ message: "Email already sent for this order" });
-          return;
+        
+        if (order) {
+          if (order.emailOrderConfirm) {
+            res.status(200).json({ message: "Email already sent for this order" });
+            return;
+          }
         }
   
         // Set up Nodemailer transporter
@@ -47,40 +46,20 @@ export const sendOrderConfirmationEmail = functions
             pass: process.env['EMAIL_PASS'], // Your email password (use an app password for Gmail)
           },
         });
-  
+
         const mailOptions = {
-          from: "reviewmy.driving@gmail.com",
+          from: "reviewmy.driving1@gmail.com",
           to: printifyOrder.address_to.email,
           subject: "Order Confirmation #" + data.orderID,
-          html: `<html><head><style type="text/css">@import url("https://fonts.googleapis.com/css?family=DynaPuff");body {
-                      font-family: "DynaPuff", Arial, serif;
-                  }
-                  </style>
-                  <style>
-                      table {
-                      border-collapse: collapse;
-                      width: 100%;
-                      }
-  
-                      td, th {
-                      border: 1px solid #dddddd;
-                      text-align: left;
-                      padding: 8px;
-                      }
-  
-                      tr:nth-child(even) {
-                      background-color: #dddddd;
-                      }
-                  </style>
-              </head>
-              <body>
-                  ${getEmailContents(printifyOrder)}
-              </body>
-          </html>
-          `,
+          html: "<html><head><style type=\"text/css\">@import url(\"https://fonts.googleapis.com/css?family=DynaPuff\");body {font-family: \"DynaPuff\", Arial, serif;}</style><style> table {border-collapse: collapse;width: 100%;}td, th {border: 1px solid #dddddd;text-align: left;padding: 8px;}tr:nth-child(even) {background-color: #dddddd;}</style></head><body>" + getEmailContents(printifyOrder) + "</body></html>",
         };
   
         await transporter.sendMail(mailOptions);
+
+        await ordersCollection.updateOne(
+          {orderID: printifyOrder.id},
+          {$set: {emailOrderConfirm: true}}
+          );
   
         res.status(200).json({ message: "Email sent successfully!" });
       } catch (error: any) {
@@ -93,40 +72,19 @@ export const sendOrderConfirmationEmail = functions
   });
   
   function getEmailContents(order: any): string {
-    let html = `
-      <h1 style="text-align: center;">Review My Driving</h1>
-      <h2 style="color: #4B0082;">Your order has been confirmed!</h2>
-      <p><strong>Order Number:  </strong> ${order.id}</p>
-      <p><strong>Order Total:  </strong> $${calculateOrderTotal(order)}</p>
-    `;
+    let html = "<h1 style=\"text-align: center;\">Review My Driving</h1><h2 style=\"color: #4B0082;\">Your order has been confirmed!</h2><p><strong>Order Number:  </strong>" + order.id + "</p><p><strong>Order Total:  </strong> $" + calculateOrderTotal(order) + "</p>";
   
-    html += `
-      <h3><strong>Order Details:</strong></h3>
-      <table>
-          <tr>
-              <th>Title</th>
-              <th>Qty</th>
-              <th>Price</th>
-          </tr>
-    `;
+    html += "<h3><strong>Order Details:</strong></h3><table><tr><th>Title</th><th>Qty</th><th>Price</th></tr>";
   
     for (const line_item of order.line_items) {
       const md = line_item.metadata;
-      html += `
-          <tr>
-              <td>${md.title.split("-")[0]}</td>
-              <td style="text-align: center;">${line_item.quantity}</td>
-              <td>$${((md.price * line_item.quantity) / 100)}</td>
-          </tr>
-      `;
+      const linePrice = (md.price as number * line_item.quantity as number) / 100;
+      html += "<tr><td>" + md.title.split("-")[0] + "</td><td style=\"text-align: center;\">" + line_item.quantity + "</td><td>$" + linePrice + "</td></tr>";
     }
   
-    html += `</table>`;
+    html += "</table>";
   
-    html += `
-      <hr style="border: 1px solid #ccc;" />
-      <p style="font-size: 0.9em; color: #555;">This email was generated automatically by <a href="www.reviewmydriving.co">reviewmydriving.co</a></p>
-    `;
+    html += "<hr style=\"border: 1px solid #ccc;\" /><p style=\"font-size: 0.9em; color: #555;\">This email was generated automatically by <a href=\"www.reviewmydriving.co\">reviewmydriving.co</a></p>";
   
     return html;
   }
@@ -135,8 +93,8 @@ export const sendOrderConfirmationEmail = functions
     let orderTotal = 0;
   
     for (const line_item of order.line_items) {
-      const price = line_item.metadata.price;
-      const line_total = price * line_item.quantity;
+      const price = line_item.metadata.price as number;
+      const line_total = price * line_item.quantity as number;
       orderTotal += line_total;
     }
   
