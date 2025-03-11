@@ -42,7 +42,7 @@ export class OrderConfirmationComponent implements OnInit {
       emailOrderCreated: false
     };
 
-    this.dbService.insertUserOrderHistoryRecord(data).subscribe({
+    this.dbService.insertUserOrderHistoryRecord(JSON.stringify(data)).subscribe({
       next: (response: any) => {
         //console.log('Order sent to MongoDB:', response);
       },

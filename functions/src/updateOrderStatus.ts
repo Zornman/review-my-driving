@@ -6,18 +6,6 @@ import cors from 'cors';
 
 const corsHandler = cors({ origin: true });
 
-// const statusArray = [
-//   "pending",
-//   "on-hold",
-//   "sending-to-production",
-//   "in-production",
-//   "canceled",
-//   "fulfilled",
-//   "partially-fulfilled",
-//   "payment-not-received",
-//   "had-issues"
-// ];
-
 export const updateOrderStatus = functions
 .https.onRequest({secrets: ["PRINTIFY_STORE_ID", "PRINTIFY_URL", "PRINTIFY_API_KEY", "MONGO_URI", "EMAIL_USER", "EMAIL_PASS"]}, async (req, res) => {
    corsHandler(req, res, async () => {
@@ -29,7 +17,7 @@ export const updateOrderStatus = functions
          const uri = process.env['MONGO_URI'] as string;
       
           const printifyResponse = await fetch(ordersUrl, {
-            headers: {"Authorization": "Bearer" + apiToken},
+            headers: {"Authorization": "Bearer " + apiToken},
           });
           const printifyOrders = await printifyResponse.json() as any;
       
@@ -39,7 +27,7 @@ export const updateOrderStatus = functions
       
           for (let i = 1; i <= printifyOrders.last_page; i++) {
               const pageResponse = await fetch(ordersUrl + "/?page=" + i, {
-                  headers: {"Authorization": "Bearer" + apiToken}
+                  headers: {"Authorization": "Bearer " + apiToken}
               });
               const printifyOrdersPage = await pageResponse.json() as any;
       

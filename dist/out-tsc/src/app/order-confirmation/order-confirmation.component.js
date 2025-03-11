@@ -33,7 +33,7 @@ let OrderConfirmationComponent = class OrderConfirmationComponent {
             emailOrderCanceled: false,
             emailOrderCreated: false
         };
-        this.dbService.insertUserOrderHistoryRecord(data).subscribe({
+        this.dbService.insertUserOrderHistoryRecord(JSON.stringify(data)).subscribe({
             next: (response) => {
                 //console.log('Order sent to MongoDB:', response);
             },
