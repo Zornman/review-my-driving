@@ -6,6 +6,7 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
 export { createCustomProduct } from "./createCustomProduct.js";
 export { createPrintifyOrder } from "./createPrintifyOrder.js";
@@ -35,12 +36,16 @@ export { sendEmail } from "./sendEmail.js";
 export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 
 export { updateOrderStatus } from "./updateOrderStatus.js";
+import { updateOrderStatusTask } from "./updateOrderStatusTask.js";
 
+export const updateOrderStatusTaskSchedule = onSchedule("every hour", async (event: any) => {
+    console.log("Running UpdateOrderStatus task...");
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
-
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    try {
+        // Call your existing logic here
+        await updateOrderStatusTask(); // ✅ Replace this with your function logic
+        console.log("Running UpdateOrderStatus task - completed successfully.");
+    } catch (error) {
+    console.error("Error running scheduled function:", error);
+    }
+});

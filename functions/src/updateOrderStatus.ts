@@ -96,8 +96,8 @@ export const updateOrderStatus = functions
       
         // Email options
         const mailOptions = {
-          from: "reviewmy.driving@gmail.com",
-          to: "${printifyOrder.address_to.email}",
+          from: "review.mydriving1@gmail.com",
+          to: printifyOrder.address_to.email,
           subject: getEmailSubject(printifyOrder),
           html: "<html><head><style type=\"text/css\">@import url(\"https://fonts.googleapis.com/css?family=DynaPuff\");body {font-family: \"DynaPuff\", Arial, serif;}</style><style>table {border-collapse: collapse;width: 100%;}td, th {border: 1px solid #dddddd;text-align: left;padding: 8px;}tr:nth-child(even) {background-color: #dddddd;</style></head><body>" + getEmailContents(printifyOrder) + "</body></html>",
        };
@@ -108,13 +108,13 @@ export const updateOrderStatus = functions
       
       function getEmailSubject(order: any): string {
         if (order.status === "in-production") {
-          return "Order In Production #${order.id}";
+          return "Order In Production #" + order.id;
        } else if (order.status === "fulfilled") {
-          return "Your Order has Shipped! #${order.id}";
+          return "Your Order has Shipped! #" + order.id;
        } else if (order.status === "canceled") {
-          return "Order Canceled #${order.id}";
+          return "Order Canceled #" + order.id;
        } else {
-          return "Order Status Updated #${order.id}";
+          return "Order Status Updated #" + order.id;
        }
       }
       
