@@ -53,8 +53,18 @@ export const sendOrderConfirmationEmail = functions
           subject: "Order Confirmation #" + data.orderID,
           html: "<html><head><style type=\"text/css\">@import url(\"https://fonts.googleapis.com/css?family=DynaPuff\");body {font-family: \"DynaPuff\", Arial, serif;}</style><style> table {border-collapse: collapse;width: 100%;}td, th {border: 1px solid #dddddd;text-align: left;padding: 8px;}tr:nth-child(even) {background-color: #dddddd;}</style></head><body>" + getEmailContents(printifyOrder) + "</body></html>",
         };
+        const adminMailOptions = {
+          from: "reviewmy.driving1@gmail.com",
+          to: "zornman45+review+my+driving@gmail.com",
+          subject: "NEW ORDER Order Confirmation #" + data.orderID,
+          html: "<html><head><style type=\"text/css\">@import url(\"https://fonts.googleapis.com/css?family=DynaPuff\");body {font-family: \"DynaPuff\", Arial, serif;}</style><style> table {border-collapse: collapse;width: 100%;}td, th {border: 1px solid #dddddd;text-align: left;padding: 8px;}tr:nth-child(even) {background-color: #dddddd;}</style></head><body>" + getEmailContents(printifyOrder) + "</body></html>",
+        };
   
-        await transporter.sendMail(mailOptions);
+        await Promise.all([
+          transporter.sendMail(mailOptions),
+          transporter.sendMail(adminMailOptions),
+        ]);
+        ;
 
         await ordersCollection.updateOne(
           {orderID: printifyOrder.id},
