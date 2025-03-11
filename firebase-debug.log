@@ -1,0 +1,32 @@
+[debug] [2025-03-11T02:17:53.012Z] ----------------------------------------------------------------------
+[debug] [2025-03-11T02:17:53.014Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\zornm\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions
+[debug] [2025-03-11T02:17:53.014Z] CLI Version:   13.33.0
+[debug] [2025-03-11T02:17:53.015Z] Platform:      win32
+[debug] [2025-03-11T02:17:53.015Z] Node Version:  v22.12.0
+[debug] [2025-03-11T02:17:53.015Z] Time:          Mon Mar 10 2025 19:17:53 GMT-0700 (Mountain Standard Time)
+[debug] [2025-03-11T02:17:53.015Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-03-11T02:17:53.169Z] Object "/functions" in "firebase.json" has unknown property: {"additionalProperty":"memory"}
+[debug] [2025-03-11T02:17:53.170Z] Field "/functions" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-03-11T02:17:53.170Z] Field "/functions" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2025-03-11T02:17:53.174Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-03-11T02:17:53.174Z] > authorizing via signed-in user (zornman45@gmail.com)
+[debug] [2025-03-11T02:17:53.174Z] [iam] checking project review-my-driving for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2025-03-11T02:17:53.175Z] Checked if tokens are valid: true, expires at: 1741662954371
+[debug] [2025-03-11T02:17:53.175Z] Checked if tokens are valid: true, expires at: 1741662954371
+[debug] [2025-03-11T02:17:53.176Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/review-my-driving:testIamPermissions [none]
+[debug] [2025-03-11T02:17:53.176Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/review-my-driving:testIamPermissions x-goog-quota-user=projects/review-my-driving
+[debug] [2025-03-11T02:17:53.176Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/review-my-driving:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-03-11T02:17:53.539Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/review-my-driving:testIamPermissions 200
+[debug] [2025-03-11T02:17:53.539Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/review-my-driving:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-03-11T02:17:53.540Z] Checked if tokens are valid: true, expires at: 1741662954371
+[debug] [2025-03-11T02:17:53.540Z] Checked if tokens are valid: true, expires at: 1741662954371
+[debug] [2025-03-11T02:17:53.540Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/review-my-driving/serviceAccounts/review-my-driving@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-03-11T02:17:53.540Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/review-my-driving/serviceAccounts/review-my-driving@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-03-11T02:17:53.952Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/review-my-driving/serviceAccounts/review-my-driving@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-03-11T02:17:53.952Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/review-my-driving/serviceAccounts/review-my-driving@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'review-my-driving'...
+[info] 
+[info] i  deploying functions 
+[info] Running command: npm ci --legacy-peer-deps
