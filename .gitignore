@@ -41,9 +41,7 @@ testem.log
 Thumbs.db
 
 # Ignore environment files (Production)
-src/environments/environment.ts
 src/environments/environment.prod.ts
-src/environments/environment.js
 src/assets/data_storage/serviceAccount.json
 functions/src/environments/environment.prod.ts
 dist/out-tsc/functions/src/environments/environment.prod.js
