@@ -1,0 +1,55 @@
+[debug] [2025-03-11T22:32:06.330Z] ----------------------------------------------------------------------
+[debug] [2025-03-11T22:32:06.332Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\zornm\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2025-03-11T22:32:06.332Z] CLI Version:   13.33.0
+[debug] [2025-03-11T22:32:06.332Z] Platform:      win32
+[debug] [2025-03-11T22:32:06.332Z] Node Version:  v22.12.0
+[debug] [2025-03-11T22:32:06.333Z] Time:          Tue Mar 11 2025 15:32:06 GMT-0700 (Mountain Standard Time)
+[debug] [2025-03-11T22:32:06.333Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-03-11T22:32:06.524Z] Object "/functions" in "firebase.json" has unknown property: {"additionalProperty":"memory"}
+[debug] [2025-03-11T22:32:06.525Z] Field "/functions" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-03-11T22:32:06.525Z] Field "/functions" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2025-03-11T22:32:06.529Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-03-11T22:32:06.530Z] > authorizing via signed-in user (zornman45@gmail.com)
+[info] i  emulators: Starting emulators: functions, hosting, extensions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions, hosting, extensions"}}
+[debug] [2025-03-11T22:32:06.532Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:06.532Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:06.533Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/review-my-driving [none]
+[debug] [2025-03-11T22:32:06.936Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/review-my-driving 200
+[debug] [2025-03-11T22:32:06.936Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/review-my-driving {"projectNumber":"1012437740422","projectId":"review-my-driving","lifecycleState":"ACTIVE","name":"review-my-driving","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-01-09T02:46:39.153858Z"}
+[debug] [2025-03-11T22:32:06.944Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-11T22:32:06.944Z] [hosting] Hosting Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-11T22:32:06.944Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"hosting":[{"address":"127.0.0.1","family":"IPv4","port":5000}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2025-03-11T22:32:06.948Z] [hub] writing locator at C:\Users\zornm\AppData\Local\Temp\hub-review-my-driving.json
+[debug] [2025-03-11T22:32:06.954Z] [Extensions] Started Extensions emulator, this is a noop.
+[debug] [2025-03-11T22:32:06.958Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-11T22:32:06.958Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-11T22:32:06.958Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-11T22:32:06.958Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"hosting":[{"address":"127.0.0.1","family":"IPv4","port":5000}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, pubsub, storage, dataconnect\u001b[22m"}}
+[debug] [2025-03-11T22:32:06.961Z] defaultcredentials: writing to file C:\Users\zornm\AppData\Roaming\firebase\zornman45_gmail_com_application_default_credentials.json
+[debug] [2025-03-11T22:32:06.963Z] Setting GAC to C:\Users\zornm\AppData\Roaming\firebase\zornman45_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\zornm\\AppData\\Roaming\\firebase\\zornman45_gmail_com_application_default_credentials.json"}}
+[debug] [2025-03-11T22:32:06.963Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:06.963Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:06.963Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving/adminSdkConfig [none]
+[debug] [2025-03-11T22:32:07.222Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving/adminSdkConfig 200
+[debug] [2025-03-11T22:32:07.222Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving/adminSdkConfig {"projectId":"review-my-driving","storageBucket":"review-my-driving.firebasestorage.app"}
+[debug] [2025-03-11T22:32:07.240Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:07.240Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:07.240Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/review-my-driving/sites 
+[debug] [2025-03-11T22:32:08.076Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/review-my-driving/sites 200
+[debug] [2025-03-11T22:32:08.076Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/review-my-driving/sites {"sites":[{"name":"projects/review-my-driving/sites/review-my-driving","defaultUrl":"https://review-my-driving.web.app","appId":"1:1012437740422:web:36737aa05fff20e1b79a07","type":"DEFAULT_SITE"}]}
+[debug] [2025-03-11T22:32:08.076Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:08.076Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:08.077Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving/webApps/1:1012437740422:web:36737aa05fff20e1b79a07/config [none]
+[debug] [2025-03-11T22:32:08.304Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving/webApps/1:1012437740422:web:36737aa05fff20e1b79a07/config 200
+[debug] [2025-03-11T22:32:08.304Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving/webApps/1:1012437740422:web:36737aa05fff20e1b79a07/config {"projectId":"review-my-driving","appId":"1:1012437740422:web:36737aa05fff20e1b79a07","storageBucket":"review-my-driving.firebasestorage.app","apiKey":"AIzaSyD4_-XfMZSfXrYQJ92Z3Rx22bMSRMofL40","authDomain":"review-my-driving.firebaseapp.com","messagingSenderId":"1012437740422","measurementId":"G-590DHD4Z5N"}
+[debug] [2025-03-11T22:32:08.309Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:08.309Z] Checked if tokens are valid: true, expires at: 1741734377058
+[debug] [2025-03-11T22:32:08.309Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving [none]
+[debug] [2025-03-11T22:32:08.445Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving 200
+[debug] [2025-03-11T22:32:08.445Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/review-my-driving {"projectId":"review-my-driving","projectNumber":"1012437740422","displayName":"review-my-driving","name":"projects/review-my-driving","resources":{"hostingSite":"review-my-driving"},"state":"ACTIVE","etag":"1_0b98d8c7-61dc-448a-96ff-ac953557c4e0"}
+[info] i  hosting[review-my-driving]: Serving hosting files from: dist/review-my-driving/browser {"metadata":{"emulator":{"name":"hosting"},"message":"Serving hosting files from: \u001b[1mdist/review-my-driving/browser\u001b[22m"}}
+[info] +  hosting[review-my-driving]: Local server: http://127.0.0.1:5000 {"metadata":{"emulator":{"name":"hosting"},"message":"Local server: \u001b[4m\u001b[1mhttp://127.0.0.1:5000\u001b[22m\u001b[24m"}}
+[debug] [2025-03-11T22:32:08.461Z] [Extensions] Connecting Extensions emulator, this is a noop.
+[info] i  functions: Watching "C:\Users\zornm\Desktop\Development\Review_My_Driving\review-my-driving\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Users\\zornm\\Desktop\\Development\\Review_My_Driving\\review-my-driving\\functions\" for Cloud Functions..."}}
