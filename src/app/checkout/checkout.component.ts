@@ -296,7 +296,37 @@ export class CheckoutComponent implements OnInit {
 
     if (error) {
       console.error('Payment failed:', error.message);
+      this.dbService.insertErrorLog(JSON.stringify({
+        fileName: 'checkout.component.ts',
+        method: 'handlePayment() - stripe.confirmCardPayment - error occurred',
+        timestamp: new Date().toString(),
+        error: error
+      })).subscribe({
+        next: (response: any) => {
+        },
+        error: (error: any) => {
+        }
+      });
       this._snackBar.open('Payment failed. Please try again.', 'Ok', { duration: 3000 });
+      this.paymentProcessing = false;
+      return;
+    }
+
+    // ✅ Check if Payment Intent was created but is not successful
+    if (!paymentIntent || paymentIntent.status !== "succeeded") {
+      console.error("Payment not authorized: ", paymentIntent?.status || "No PaymentIntent");
+      this.dbService.insertErrorLog(JSON.stringify({
+        fileName: 'checkout.component.ts',
+        method: 'handlePayment() - stripe.confirmCardPayment - No paymentIntent',
+        timestamp: new Date().toString(),
+        error: paymentIntent?.status || "No PaymentIntent"
+      })).subscribe({
+        next: (response: any) => {
+        },
+        error: (error: any) => {
+        }
+      });
+      this._snackBar.open("Payment was not authorized. Please check your details and try again.", "Ok", { duration: 3000 });
       this.paymentProcessing = false;
       return;
     }
