@@ -32,6 +32,7 @@ export class HomeComponent {
   user_email!: string | null;
   user_settings!: any | null;
   date!: () => string;
+  isProcessing: boolean = false;
 
   formData = {
     user_id: this.user_id,
@@ -131,6 +132,7 @@ export class HomeComponent {
   }
 
   async submit(form: NgForm) {
+    this.isProcessing = true;
     this.ngForm = form;
     await this.insertSubmission();
     await this.sendEmailNotification();
@@ -161,9 +163,11 @@ export class HomeComponent {
       next: (response: any) => {
         this.openConfirmMessage();
         this.resetForm();
+        this.isProcessing = false;
       },
       error: (error) => {
         this._snackBar.open('Error submitting form, try again.', 'Close');
+        this.isProcessing = false;
         this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'home.component.ts',
           method: 'sendEmailNotification()',
@@ -189,6 +193,7 @@ export class HomeComponent {
       },
       error: (error) => {
         this._snackBar.open('Error submitting form, try again.', 'Close');
+        this.isProcessing = false;
         this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'home.component.ts',
           method: 'insertSubmission()',

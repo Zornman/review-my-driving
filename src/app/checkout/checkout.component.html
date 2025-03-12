@@ -263,10 +263,15 @@
                           <div id="card-cvc-element" class="card-input card-cvc"></div>
                         </div>
                       </div>
+                      <div class="row">
+                        <div class="col-xs-12 col-center error-message">
+                          <span>{{ this.errorMessage }}</span>
+                        </div>
+                      </div>
                     </div>
                     <div style="padding-top: 15px"></div>
                     <button mat-button matStepperPrevious class="button-padding-right">Back</button>
-                    <button mat-raised-button color="primary" type="submit" [disabled]="!stripeElementsValid || paymentProcessing">Pay Now ${{ calculateAmountDue().toFixed(2) }}</button>
+                    <button mat-raised-button color="primary" type="submit" [disabled]="paymentProcessing">Pay Now ${{ calculateAmountDue().toFixed(2) }}</button>
                   </form>
                 </div>
               </div>

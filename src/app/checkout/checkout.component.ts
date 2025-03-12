@@ -80,6 +80,7 @@ export class CheckoutComponent implements OnInit {
   shippingCosts: ShippingData[] = [];
   shippingOptionSelected: boolean = false;
   currentStep = 0; // Track active step
+  errorMessage!: string;
 
   stepperOrientation!: Observable<StepperOrientation>;
 
@@ -270,6 +271,11 @@ export class CheckoutComponent implements OnInit {
   }
 
   async handlePayment() {
+    if (!this.stripeElementsValid) {
+      this.errorMessage = 'Payment information is incomplete.';
+      return;
+    }
+
     if (!this.stripe || !this.cardNumber || !this.clientSecret) {
       console.error('Stripe or Card Element not initialized');
       return;
@@ -426,7 +432,7 @@ export class CheckoutComponent implements OnInit {
 
     this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
     
-    this.dbService.insertUserShippingInfo(this.shippingInfoForm.value).subscribe({
+    this.dbService.insertUserShippingInfo(JSON.stringify(this.shippingInfoForm.value)).subscribe({
       next: (response: any) => {
         this.shippingInfoLoaded = true;
         this.getShippingRates();
