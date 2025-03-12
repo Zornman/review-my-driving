@@ -96,7 +96,7 @@
         </div>
         <div class="row">
             <div class="col-12 col-center">
-                <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid" matTooltip="Are you sure?" [matTooltipPosition]="'above'">Submit</button>
+                <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid || isProcessing" matTooltip="Are you sure?" [matTooltipPosition]="'above'">Submit</button>
             </div>
             <div class="col-12 col-center">
                 <span class="pull-right"><a href="/shop">Want your own bumper sticker?</a></span>

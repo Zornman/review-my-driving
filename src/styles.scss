@@ -32,6 +32,10 @@ html {
     .row {
         --bs-gutter-y: 10px !important;
     }
+
+    .error-message {
+        color: #cc0404;
+    }
 }
   
 @media (prefers-color-scheme: dark) {
