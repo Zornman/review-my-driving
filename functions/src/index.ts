@@ -21,6 +21,8 @@ export { createCustomProduct } from "./createCustomProduct.js";
 export { createPrintifyOrder } from "./createPrintifyOrder.js";
 export { createStripeCheckout } from "./createStripeCheckout.js";
 export { createStripePaymentIntent } from "./createStripePaymentIntent.js";
+export { captureStripePaymentIntent } from "./captureStripePaymentIntent.js";
+export { cancelStripePaymentIntent } from "./cancelStripePaymentIntent.js";
 export { fetchProducts } from "./fetchProducts.js";
 export { getPrintifyOrderDetails } from "./getPrintifyOrderDetails.js";
 // export { getPrintifyOrders } from "./getPrintifyOrders";

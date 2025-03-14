@@ -25,7 +25,7 @@ export const createStripePaymentIntent = functions.https.onRequest({ secrets: ["
         const paymentIntent = await stripe.paymentIntents.create({
           amount,
           currency: 'usd',
-          automatic_payment_methods: { enabled: true },
+          capture_method: 'manual'
         });
 
         res.status(200).json({ clientSecret: paymentIntent.client_secret });

@@ -24,6 +24,10 @@ export const getShippingRates = functions
       return;
     }
 
+    if (type === 'economy') {
+      res.status(400).json({ error: 'Economy shipping is not available yet.' });
+    }
+
     const shipping_rates_url = `https://api.printify.com/v2/catalog/blueprints/${blueprint_id}/print_providers/${print_provider_id}/shipping/${type}.json`;
 
     try {
