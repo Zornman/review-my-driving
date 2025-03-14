@@ -278,113 +278,25 @@ export class CheckoutComponent implements OnInit {
 
     if (!this.stripe || !this.cardNumber || !this.clientSecret) {
       console.error('Stripe or Card Element not initialized');
+      this.errorMessage = 'Error processing payment. Please reload the page and try again.';
       return;
     }
 
     this.paymentProcessing = true;
     this._snackBar.open('Processing payment...');
 
-    const { paymentIntent, error } = await this.stripe.confirmCardPayment(this.clientSecret, {
-      payment_method: {
-        card: this.cardNumber,
-        billing_details: {
-          name: this.shippingInfoForm.get('firstName')?.value + ' ' + this.shippingInfoForm.get('lastName')?.value,
-          email: this.shippingInfoForm.get('email')?.value
-        }
-      }
-    });
-
-    if (error) {
-      console.error('Payment failed:', error.message);
-      this.dbService.insertErrorLog(JSON.stringify({
-        fileName: 'checkout.component.ts',
-        method: 'handlePayment() - stripe.confirmCardPayment - error occurred',
-        timestamp: new Date().toString(),
-        error: error
-      })).subscribe({
+    this.paymentService.handlePayment(this.clientSecret, this.cardNumber, this.stripe, this.shippingInfoForm, 
+      this.cartSummary, this.shippingOptionsForm.get('shippingOption')?.value).subscribe({
         next: (response: any) => {
+          console.log(response);
+          this._snackBar.open('Payment captured, order confirmed!', 'Ok', { duration: 3000 });
+          this.cartService.clearCart();
+          this.router.navigate(['/orderConfirmation', response.orderId]); // ✅ Navigate with order ID
         },
-        error: (error: any) => {
+        error: () => {
+          this.paymentProcessing = false;
         }
       });
-      this._snackBar.open('Payment failed. Please try again.', 'Ok', { duration: 3000 });
-      this.paymentProcessing = false;
-      return;
-    }
-
-    // ✅ Check if Payment Intent was created but is not successful
-    if (!paymentIntent || paymentIntent.status !== "succeeded") {
-      console.error("Payment not authorized: ", paymentIntent?.status || "No PaymentIntent");
-      this.dbService.insertErrorLog(JSON.stringify({
-        fileName: 'checkout.component.ts',
-        method: 'handlePayment() - stripe.confirmCardPayment - No paymentIntent',
-        timestamp: new Date().toString(),
-        error: paymentIntent?.status || "No PaymentIntent"
-      })).subscribe({
-        next: (response: any) => {
-        },
-        error: (error: any) => {
-        }
-      });
-      this._snackBar.open("Payment was not authorized. Please check your details and try again.", "Ok", { duration: 3000 });
-      this.paymentProcessing = false;
-      return;
-    }
-  
-    // ✅ Step 2: Prepare Order Data for Printify
-    const orderData = {
-      stripeTransactionId: paymentIntent.id, // Use Stripe transaction ID
-      customerInfo: {
-        firstName: this.shippingInfoForm.get('firstName')?.value,
-        lastName: this.shippingInfoForm.get('lastName')?.value,
-        email: this.shippingInfoForm.get('email')?.value,
-        phone: this.shippingInfoForm.get('phone')?.value,
-        country: this.shippingInfoForm.get('country')?.value,
-        region: this.shippingInfoForm.get('region')?.value,
-        city: this.shippingInfoForm.get('city')?.value,
-        address1: this.shippingInfoForm.get('address1')?.value,
-        address2: this.shippingInfoForm.get('address2')?.value,
-        zip: this.shippingInfoForm.get('zip')?.value
-      },
-      products: [
-        {}
-      ],
-      shippingMethod: this.mapShippingMethod() // Printify Shipping Method (Update based on user selection)
-    };
-
-    orderData.products = [];
-
-    this.cartSummary.forEach((cartItem) => {
-      orderData.products.push({
-          printifyId: cartItem.productId,
-          variantId: cartItem.variantId,
-          quantity: cartItem.quantity
-      })
-    });
-
-    // ✅ Step 3: Call the Printify Order Function
-    this.printifyService.createPrintifyOrder(orderData).subscribe({
-      next: (response: any) => {
-        //console.log('Order sent to Printify:', response);
-        this._snackBar.open('Payment successful, order confirmed!', 'Ok', { duration: 3000 });
-        this.cartService.clearCart();
-        this.router.navigate(['/orderConfirmation', response.orderId]);
-      },
-      error: (error) => {
-        this._snackBar.open('Failed to place order. Please contact support.', 'Ok');
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'checkout.component.ts',
-          method: 'handlePayment() - printifyService.createPrintifyOrder',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-          },
-          error: (error: any) => {
-          }
-        });
-      }
-    });
   }
 
   mapShippingMethod() {
