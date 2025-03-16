@@ -10,6 +10,7 @@ import { AccountSettingsComponent } from './account-settings/account-settings.co
 import { IndexComponent } from './index/index.component';
 import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 export const routes: Routes = [
     { path: '', component: IndexComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
     { path: 'checkout', component: CheckoutComponent },
     { path: 'orderConfirmation/:id', loadComponent: () => import('./order-confirmation/order-confirmation.component').then(m => m.OrderConfirmationComponent) },
     { path: 'login', component: LoginComponent },
+    { path: 'resetPassword', component: ResetPasswordComponent },
     { path: 'account', component: AccountOverviewComponent },
     { path: 'settings', component: AccountSettingsComponent },
     { path: 'about', component: AboutComponent },
