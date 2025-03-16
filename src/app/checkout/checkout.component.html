@@ -243,6 +243,11 @@
                 <p>{{ shippingInfoForm.get('city')?.value + ', ' + shippingInfoForm.get('region')?.value + ' ' + shippingInfoForm.get('zip')?.value }}</p>
               </div>
             </div>
+            <div class="row" *ngIf="quickPayAvailable">
+              <div class="col-xs-12">
+                <div id="payment-request-button"></div>
+              </div>
+            </div>
             <div class="row">
               <div class="col-xs-12">
                 <div class="stripe-payment-container">

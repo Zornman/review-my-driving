@@ -24,7 +24,7 @@ import { FormatPhoneDirective } from '../shared/directives/format-phone.directiv
 import { US_STATES } from '../shared/classes/states';
 import { COUNTRIES } from '../shared/classes/countries';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { loadStripe, Stripe, StripeCardElement, StripeElements } from '@stripe/stripe-js';
+import { loadStripe, Stripe, StripeCardElement, StripeElements, PaymentRequest } from '@stripe/stripe-js';
 import { CartService } from '../services/shopping_cart.service';
 import { MongoService } from '../services/mongo.service';
 import { StripeService } from '../services/stripe.service';
@@ -98,6 +98,8 @@ export class CheckoutComponent implements OnInit {
   clientSecret: string = '';
   paymentProcessing: boolean = false;
   stripeElementsValid: boolean = false;
+  paymentRequestButton!: any | null;
+  quickPayAvailable: boolean = false;
   //#endregion
 
   // Shipping labels
@@ -256,6 +258,68 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
+  createPaymentRequest() {
+    const paymentRequest = this.stripe?.paymentRequest({
+      country: 'US',
+      currency: 'usd',
+      total: {
+        label: 'Total',
+        amount: this.calculateAmountDue() * 100 // Amount in cents
+      },
+      requestPayerName: true,
+      requestPayerEmail: true
+    });
+  
+    if (!paymentRequest) return;
+  
+    paymentRequest.canMakePayment().then((result) => {
+      if (result) {
+        this.quickPayAvailable = true; // ✅ Show quick pay button conditionally
+  
+        const elements = this.stripe!.elements();
+        this.paymentRequestButton = elements.create('paymentRequestButton', {
+          paymentRequest: paymentRequest,
+          style: {
+            paymentRequestButton: {
+              type: 'default', // default, buy, donate
+              theme: 'light',
+              height: '40px'
+            }
+          }
+        });
+  
+        // Mount button in div
+        this.paymentRequestButton.mount('#payment-request-button');
+  
+        // Handle payment event
+        paymentRequest.on('paymentmethod', async (ev) => {
+          try {
+  
+            // Confirm payment
+            const { error: confirmError } = await this.stripe!.confirmCardPayment(
+              this.clientSecret,
+              { payment_method: ev.paymentMethod.id },
+              { handleActions: false }
+            );
+  
+            if (confirmError) {
+              ev.complete('fail');
+              return;
+            }
+  
+            ev.complete('success');
+            // Proceed to order confirmation page here
+          } catch (err) {
+            ev.complete('fail');
+          }
+        });
+      } else {
+        console.log('Quick Pay methods not available');
+      }
+    });
+  }
+  
+
   registrationPage() {
     this.router.navigateByUrl('/register');
   }
@@ -266,6 +330,8 @@ export class CheckoutComponent implements OnInit {
 
   async confirmShippingOption() {
     this.shippingOptionSelected = true;
+
+    this.createPaymentRequest();
 
     await this.fetchClientSecret();
   }
