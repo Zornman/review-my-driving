@@ -273,6 +273,7 @@ export class CheckoutComponent implements OnInit {
     if (!paymentRequest) return;
   
     paymentRequest.canMakePayment().then((result) => {
+      console.log(result);
       if (result) {
         this.quickPayAvailable = true; // ✅ Show quick pay button conditionally
   
@@ -287,7 +288,8 @@ export class CheckoutComponent implements OnInit {
             }
           }
         });
-  
+        console.log(elements);
+        console.log(this.paymentRequestButton);
         // Mount button in div
         this.paymentRequestButton.mount('#payment-request-button');
   
