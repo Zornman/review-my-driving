@@ -2,7 +2,7 @@ import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 const firebaseConfig = {
@@ -98,5 +98,18 @@ export class AuthService {
 
   getUser(): Observable<User | null> {
     return this.user$;
+  }
+
+  sendPasswordResetEmail(email: string): Promise<void> {
+    const auth = getAuth();
+
+    return sendPasswordResetEmail(auth, email)
+    .then(() => {
+      // ✅ Password reset email sent
+      console.log('Password reset email sent.');
+    })
+    .catch((error) => {
+      console.error('Error sending password reset email:', error);
+    })
   }
 }

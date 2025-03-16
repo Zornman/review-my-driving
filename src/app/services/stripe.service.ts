@@ -74,6 +74,12 @@ export class StripeService {
                 return this.printifyService.createPrintifyOrder(this.order).pipe(
                     catchError(error => {
                         console.error('Printify Order Creation Failed:', error);
+                        this.dbService.insertErrorLog(JSON.stringify({
+                            fileName: 'stripe.service.ts',
+                            method: 'handlePayment() - createPrintifyOrder()',
+                            timestamp: new Date().toString(),
+                            error: error
+                        })).subscribe();
                         return this.cancelPayment(paymentIntent.id);
                     })
                 )
@@ -88,7 +94,7 @@ export class StripeService {
                     fileName: 'stripe.service.ts',
                     method: 'handlePayment() - transaction failure',
                     timestamp: new Date().toString(),
-                    error: error.message
+                    error: error
                 })).subscribe();
                 return throwError(() => new Error('Transaction stopped before final charge.'));
             })

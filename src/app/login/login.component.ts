@@ -6,10 +6,11 @@ import { AuthService } from '../services/auth.service';
 import { Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
-  imports: [ FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, RouterModule ],
+  imports: [ FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, RouterModule, MatIconModule ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -17,6 +18,7 @@ export class LoginComponent {
   private _snackBar = inject(MatSnackBar);
   form!: FormGroup;
   errorMessage!: string | null;
+  hidePassword = true;
 
   formData = {
     email: '',
