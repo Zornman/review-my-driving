@@ -392,10 +392,10 @@ export class CheckoutComponent implements OnInit {
 
   loadUserShippingInfo(token: string) {
     this._snackBar.open('Loading shipping information...');
+    this.shippingInfoForm.get('userID')?.setValue(token);
     this.dbService.getUserShippingInfo(token).subscribe({
       next: (response: any) => {
         if (response.result) {
-          this.shippingInfoForm.get('userID')?.setValue(token);
           this.shippingInfoForm.get('firstName')?.setValue(response.result.firstName);
           this.shippingInfoForm.get('lastName')?.setValue(response.result.lastName);
           this.shippingInfoForm.get('address1')?.setValue(response.result.address1);
@@ -441,6 +441,9 @@ export class CheckoutComponent implements OnInit {
     this._snackBar.open('Saving shipping information...');
 
     this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
+
+    console.log(JSON.stringify(this.shippingInfoForm.value));
+    console.log(this.shippingInfoForm.value);
     
     this.dbService.insertUserShippingInfo(JSON.stringify(this.shippingInfoForm.value)).subscribe({
       next: (response: any) => {
