@@ -168,10 +168,11 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
   loadShippingInfo() {
     if (!this.user) return;
 
+    this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
+
     this.dbService.getUserShippingInfo(this.user.uid).subscribe({
       next: (response: any) => {
         if (response.result) {
-          this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
           this.shippingInfoForm.get('firstName')?.setValue(response.result.firstName);
           this.shippingInfoForm.get('lastName')?.setValue(response.result.lastName);
           this.shippingInfoForm.get('address1')?.setValue(response.result.address1);

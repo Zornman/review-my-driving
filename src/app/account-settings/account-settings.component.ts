@@ -99,7 +99,7 @@ export class AccountSettingsComponent {
     };
     const message = 'Settings saved successfully!';
 
-    this.dbService.insertUserSettings(data).subscribe({
+    this.dbService.insertUserSettings(JSON.stringify(data)).subscribe({
       next: (response: any) => {
         if (data.messageStyle === 'popup') {
           this.showConfirmationDialog(message);

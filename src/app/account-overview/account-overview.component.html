@@ -263,6 +263,15 @@
                     </div>
                 </div>
                 <div class="row">
+                  <div class="col-12 col-center">
+                    <ng-container *ngIf="shippingInfoForm.errors as formErrors">
+                      <ng-container *ngFor="let error of formErrors | keyvalue">
+                        <span>{{ error.key }}: {{ error.value }}</span>
+                      </ng-container>
+                    </ng-container>
+                  </div>
+                </div>                
+                <div class="row">
                     <div class="col-12 col-center">
                         <button mat-stroked-button color="primary" type="submit" [disabled]="!shippingInfoForm.valid">Save Shipping Info</button>
                     </div>
