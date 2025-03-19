@@ -441,11 +441,10 @@ export class CheckoutComponent implements OnInit {
     this._snackBar.open('Saving shipping information...');
 
     this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
-
-    console.log(JSON.stringify(this.shippingInfoForm.value));
-    console.log(this.shippingInfoForm.value);
     
-    this.dbService.insertUserShippingInfo(JSON.stringify(this.shippingInfoForm.value)).subscribe({
+    const cleanedData = JSON.parse(JSON.stringify(this.shippingInfoForm.value));
+
+    this.dbService.insertUserShippingInfo(cleanedData).subscribe({
       next: (response: any) => {
         this.shippingInfoLoaded = true;
         this.getShippingRates();

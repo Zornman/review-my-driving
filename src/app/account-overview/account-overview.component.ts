@@ -140,7 +140,9 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
 
     this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
 
-    this.dbService.insertUserShippingInfo(JSON.stringify(this.shippingInfoForm.value)).subscribe({
+    const cleanedData = JSON.parse(JSON.stringify(this.shippingInfoForm.value));
+
+    this.dbService.insertUserShippingInfo(cleanedData).subscribe({
       next: (response: any) => {
         this._snackBar.open('Saved shipping information!', 'Ok', { duration: 3000 });
         //console.log(response);

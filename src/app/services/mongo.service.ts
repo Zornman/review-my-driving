@@ -49,7 +49,8 @@ export class MongoService {
      */
     insertUserShippingInfo(shippingInfo: any): Observable<any> {
         const url = this.getFunctionUrl("insertUserShipping");
-        return this.http.post(url, shippingInfo);
+        const data = JSON.stringify(shippingInfo);
+        return this.http.post(url, data);
     }
 
     insertUserSettings(data: any): Observable<any> {
