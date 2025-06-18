@@ -14,3 +14,35 @@
         align-items: center; /* Vertically align the text */
     }
 }
+
+.light-mode {
+    .quick-review-button {
+        background-color: transparent;
+        color: black;
+        border: 1px solid black; /* Add a border */
+        border-radius: 4px; /* Optional: Add rounded corners */
+        padding: 8px 12px; /* Add padding for better spacing */
+        margin: 0 8px; /* Add margin for spacing between buttons */
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.1); /* Optional: Add a hover effect */
+            cursor: pointer;
+        }
+    }
+}
+
+.dark-mode {
+    .quick-review-button {
+        background-color: transparent;
+        color: white;
+        border: 1px solid white; /* Add a border */
+        border-radius: 4px; /* Optional: Add rounded corners */
+        padding: 8px 12px; /* Add padding for better spacing */
+        margin: 0 8px; /* Add margin for spacing between buttons */
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1); /* Optional: Add a hover effect */
+            cursor: pointer;
+        }
+    }
+}

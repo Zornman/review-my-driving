@@ -33,6 +33,7 @@ export class HomeComponent {
   user_settings!: any | null;
   date!: () => string;
   isProcessing: boolean = false;
+  isQuickMode: boolean = true; // Flag to toggle quick mode
 
   formData = {
     user_id: this.user_id,
@@ -134,6 +135,19 @@ export class HomeComponent {
   async submit(form: NgForm) {
     this.isProcessing = true;
     this.ngForm = form;
+    await this.insertSubmission();
+    await this.sendEmailNotification();
+  }
+
+  async submitQuickReview(reasonForContacting: string) {
+    this.isProcessing = true;
+
+    // Set the form data with the quick review values
+    this.formData.reasonForContacting = reasonForContacting;
+    this.formData.description = reasonForContacting; // Use the reason as the description
+    this.formData.firstName = 'Anonymous';
+    this.formData.lastName = 'User';
+
     await this.insertSubmission();
     await this.sendEmailNotification();
   }
