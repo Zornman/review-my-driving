@@ -70,7 +70,7 @@ body {
         font-family: 'DynaPuff', serif;
     }
 
-    button:not(.mdc-icon-button) {
+    button:not(.mdc-icon-button):not(.quick-review-button) {
         background-color: $color-primary !important;
         color: $color-text-light !important;
         border: none;

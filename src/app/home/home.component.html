@@ -1,4 +1,100 @@
-<form (ngSubmit)="submit(form)" #form="ngForm">
+<div class="container" *ngIf="isQuickMode">
+    <div class="row padding-bottom">
+        <div class="col-12 col-center">
+            <span class="align-middle padding-bottom">
+                Click any of the buttons below to send a review to the driver of the car in question.
+                <br />
+                We will do our best to make sure they are reprimanded.
+            </span>
+        </div>
+        <div clas="col-12 col-center">
+            <h3 class="align-middle">Bad Driving Review</h3>
+            <div class="align-middle">
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Aggressive Driving')">
+                    Aggressive Driving
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Cut Me Off')">
+                    Cut me Off
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Driving Slow')">
+                    Driving Slow
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Not Paying Attention')">
+                    Not Paying Attention
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('You just suck at driving')">
+                    You just suck at driving
+                </button>
+            </div>
+        </div>
+        <div clas="col-12 col-center">
+            <h3 class="align-middle">Good Driving Review</h3>
+            <div class="align-middle">
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Courteous Driver')">
+                    Courteous Driver
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Used Turn Signals')">
+                    Used Turn Signals
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Excellent Park Job')">
+                    Excellent Park Job
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Let me Merge')">
+                    Let me Merge
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('You are a great driver, keep it up!')">
+                    You are a great driver, keep it up!
+                </button>
+            </div>
+        </div>
+        <div clas="col-12 col-center">
+            <h3 class="align-middle">Car Review</h3>
+            <div class="align-middle">
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Looks Brand New')">
+                    Looks Brand New
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Cool Color/Wrap')">
+                    Cool Color/Wrap
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Nice Rims/Wheels')">
+                    Nice Rims/Wheels
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('Unique & Eye-Catching')">
+                    Unique & Eye-Catching
+                </button>
+                <button matButton="outlined" class="quick-review-button" 
+                (click)="submitQuickReview('our car is awesome, I love it!')">
+                    Your car is awesome, I love it!
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-center">
+            <span class="align-middle padding-bottom">
+                <h1><b>OR</b></h1>
+                <br />
+                If you would like to provide more information, <a (click)="isQuickMode = !isQuickMode">click here</a>.
+            </span>
+        </div>
+    </div>
+</div>
+
+<form (ngSubmit)="submit(form)" #form="ngForm" *ngIf="!isQuickMode">
     <div class="container grid-container-padding" style="padding-top: 1vh;">
         <div class="row">
             <div class="col-12 col-center">
@@ -10,11 +106,11 @@
             </div>
         </div>
         <div class="row">
-            <!-- <div class="col-12 col-center">
-                <span class="pull-right">
-                    * = Required
+            <div class="col-12 col-center">
+                <span>
+                    <a (click)="isQuickMode = !isQuickMode">‹ Back</a>
                 </span>
-            </div> -->
+            </div>
             <div class="col-12 col-center">
                 <mat-form-field appearance="outline">
                     <mat-label>First Name</mat-label>
@@ -95,12 +191,16 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12 col-center">
+            <div class="col-12 col-center padding-bottom">
                 <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid || isProcessing" matTooltip="Are you sure?" [matTooltipPosition]="'above'">Submit</button>
-            </div>
-            <div class="col-12 col-center">
-                <span class="pull-right"><a href="/shop">Want your own bumper sticker?</a></span>
             </div>
         </div>
     </div>
 </form>
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-center">
+            <span class="pull-right"><a href="/shop">Want your own bumper sticker?</a></span>
+        </div>
+    </div>
+</div>
