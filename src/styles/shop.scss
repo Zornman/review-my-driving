@@ -148,6 +148,16 @@ mat-card {
     display: -webkit-box;
     -webkit-line-clamp: 5; /* Limit to 5 lines */
     -webkit-box-orient: vertical;
+
+    /* Fallback for browsers that don't support -webkit-line-clamp */
+    word-wrap: break-word; /* For older browsers */
+    word-break: break-word; /* Standard property */
+    overflow-wrap: break-word; /* Modern and widely supported */
+
+    @media screen and (max-width: 576px) {
+        max-height: 120px; /* Adjust height for smaller screens */
+        -webkit-line-clamp: 4; /* Reduce line clamp for smaller screens */
+    }
 }
   
 .read-more-link {

@@ -23,10 +23,17 @@
         border-radius: 4px; /* Optional: Add rounded corners */
         padding: 8px 12px; /* Add padding for better spacing */
         margin: 5px 8px; /* Add margin for spacing between buttons */
+        font-size: 18px; /* Increase font size for better visibility */;
 
         &:hover {
             background-color: rgba(0, 0, 0, 0.1); /* Optional: Add a hover effect */
             cursor: pointer;
+        }
+
+        &:disabled {
+            background-color: rgba(0, 0, 0, 0.2); /* Optional: Add a disabled state */
+            color: rgba(0, 0, 0, 0.5); /* Dim the text color */
+            cursor: not-allowed; /* Change cursor to indicate disabled state */
         }
     }
 }
@@ -38,11 +45,18 @@
         border: 1px solid white; /* Add a border */
         border-radius: 4px; /* Optional: Add rounded corners */
         padding: 8px 12px; /* Add padding for better spacing */
-        margin: 0 8px; /* Add margin for spacing between buttons */
+        margin: 5px 8px; /* Add margin for spacing between buttons */
+        font-size: 18px; /* Increase font size for better visibility */
 
         &:hover {
             background-color: rgba(255, 255, 255, 0.1); /* Optional: Add a hover effect */
             cursor: pointer;
+        }
+
+        &:disabled {
+            background-color: rgba(255, 255, 255, 0.2); /* Optional: Add a disabled state */
+            color: rgba(255, 255, 255, 0.5); /* Dim the text color */
+            cursor: not-allowed; /* Change cursor to indicate disabled state */
         }
     }
 }

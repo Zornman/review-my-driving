@@ -4,79 +4,80 @@
             <span class="align-middle padding-bottom">
                 Click any of the buttons below to send a review to the driver of the car in question.
                 <br />
+                <br />
                 We will do our best to make sure they are reprimanded.
             </span>
         </div>
         <div clas="col-12 col-center">
-            <h3 class="align-middle">Bad Driving Review</h3>
+            <h1 class="align-middle">Bad Driving Review</h1>
             <div class="align-middle">
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Aggressive Driving')">
                     Aggressive Driving
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Cut Me Off')">
                     Cut me Off
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Driving Slow')">
                     Driving Slow
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Not Paying Attention')">
                     Not Paying Attention
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
-                (click)="submitQuickReview('You just suck at driving')">
-                    You just suck at driving
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
+                (click)="submitQuickReview('You suck at driving')">
+                    You suck at driving
                 </button>
             </div>
         </div>
         <div clas="col-12 col-center">
-            <h3 class="align-middle">Good Driving Review</h3>
+            <h1 class="align-middle">Good Driving Review</h1>
             <div class="align-middle">
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Courteous Driver')">
                     Courteous Driver
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Used Turn Signals')">
                     Used Turn Signals
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Excellent Park Job')">
                     Excellent Park Job
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Let me Merge')">
                     Let me Merge
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('You are a great driver, keep it up!')">
                     You are a great driver, keep it up!
                 </button>
             </div>
         </div>
         <div clas="col-12 col-center">
-            <h3 class="align-middle">Car Review</h3>
+            <h1 class="align-middle">Car Review</h1>
             <div class="align-middle">
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Looks Brand New')">
                     Looks Brand New
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Cool Color/Wrap')">
                     Cool Color/Wrap
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Nice Rims/Wheels')">
                     Nice Rims/Wheels
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('Unique & Eye-Catching')">
                     Unique & Eye-Catching
                 </button>
-                <button matButton="outlined" class="quick-review-button" 
+                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
                 (click)="submitQuickReview('our car is awesome, I love it!')">
                     Your car is awesome, I love it!
                 </button>
