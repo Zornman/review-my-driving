@@ -141,7 +141,7 @@ export class HomeComponent {
 
   async submitQuickReview(reasonForContacting: string) {
     this.isProcessing = true;
-
+    this._snackBar.open('Submitting your quick review...', 'Close');
     // Set the form data with the quick review values
     this.formData.reasonForContacting = reasonForContacting;
     this.formData.description = reasonForContacting; // Use the reason as the description
@@ -149,7 +149,7 @@ export class HomeComponent {
     this.formData.lastName = 'User';
 
     await this.insertSubmission();
-    await this.sendEmailNotification();
+    await this.sendEmailNotification(true);
   }
 
   openConfirmMessage() {
@@ -172,12 +172,22 @@ export class HomeComponent {
     }
   }
 
-  async sendEmailNotification() {
+  async sendEmailNotification(isQuickMode: boolean = false) {
     this.emailService.sendSubmissionEmail(JSON.stringify(this.formData)).subscribe({
       next: (response: any) => {
         this.openConfirmMessage();
         this.resetForm();
         this.isProcessing = false;
+
+        if (isQuickMode) {
+          this._snackBar.open('Quick review submitted successfully!', 'Close', {
+            duration: 3000
+          });
+        } else {
+          this._snackBar.open('Form submitted successfully!', 'Close', {
+            duration: 3000
+          });
+        }
       },
       error: (error) => {
         this._snackBar.open('Error submitting form, try again.', 'Close');
@@ -235,7 +245,7 @@ export class HomeComponent {
   }
 
   resetForm() {
-    this.ngForm.resetForm(); // Reset the Angular form state
+    if (this.ngForm) this.ngForm.resetForm(); // Reset the Angular form state
     this.formData = {
       user_id: this.user_id,
       firstName: '',
