@@ -1,14 +1,13 @@
 import * as functions from "firebase-functions/v2";
 import Stripe from "stripe";
 import cors from 'cors';
-import { environment } from "./environments/environment.js";
 
 const corsHandler = cors({ origin: true });
 
 export const cancelStripePaymentIntent = functions.https.onRequest({ secrets: ["STRIPE_SECRET_KEY"] }, async (req, res) => {
     corsHandler(req, res, async () => {
         try {
-            const stripeSecretKey = (process.env.FUNCTIONS_EMULATOR === "true") ? environment.stripeSecretKey : process.env.STRIPE_SECRET_KEY;
+            const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
             if (!stripeSecretKey) {
                 throw new Error("Stripe secret key is missing");
             }
