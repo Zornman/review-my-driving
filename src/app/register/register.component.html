@@ -84,29 +84,31 @@
             <div class="col-xs-12 col-center">
                 <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid">Create Account</button>
             </div>
-            <div class="col-xs-12 col-center">
-                <span>Already have an account? <a routerLink='/login'>Login</a></span>
-            </div>
-            <div class="col-xs-12 col-center">
-                <div class="col-xs-5 sign-up-divider-left">
-                    <hr />
+            <div *ngIf="!this.uniqueId">
+                <div class="col-xs-12 col-center">
+                    <span>Already have an account? <a routerLink='/login'>Login</a></span>
                 </div>
-                <div class="col-xs-2">
-                    <span class="align-middle">
-                        or
-                    </span>
+                <div class="col-xs-12 col-center">
+                    <div class="col-xs-5 sign-up-divider-left">
+                        <hr />
+                    </div>
+                    <div class="col-xs-2">
+                        <span class="align-middle">
+                            or
+                        </span>
+                    </div>
+                    <div class="col-xs-5 sign-up-divider-right">
+                        <hr />
+                    </div>
                 </div>
-                <div class="col-xs-5 sign-up-divider-right">
-                    <hr />
+                <div class="col-xs-12 col-center">
+                    <button mat-fab extended class="icon-button" (click)="signUpWithGoogle()">
+                        <img src="assets/images/Google.png" alt="Google Logo" width="24" height="24" />
+                        <span>
+                            Sign in with Google
+                        </span>
+                    </button>
                 </div>
-            </div>
-            <div class="col-xs-12 col-center">
-                <button mat-fab extended class="icon-button" (click)="signUpWithGoogle()">
-                    <img src="assets/images/Google.png" alt="Google Logo" width="24" height="24" />
-                    <span>
-                        Sign in with Google
-                    </span>
-                </button>
             </div>
         </div>
     </div>

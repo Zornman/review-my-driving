@@ -118,7 +118,13 @@
             </div>
         </div>
     </mat-tab>
-    <mat-tab label="Account Overview">
+    <mat-tab label="Trucks & Drivers" *ngIf="isBusinessUser">
+      <app-truck-and-driver-management></app-truck-and-driver-management>
+    </mat-tab>
+    <mat-tab label="Business Settings" *ngIf="isBusinessUser">
+      <app-business-functions [businessUserInfo]="businessUserInfo"></app-business-functions>
+    </mat-tab>
+    <mat-tab label="Account Overview" *ngIf="!isBusinessUser">
         <h3 class="align-middle">Account Overview</h3>
         <p class="align-middle">
             This information cannot be modified at this time.
@@ -260,6 +266,11 @@
                           Enter a valid zip code.
                         </mat-error>
                       </mat-form-field>
+                    </div>
+                    <div class="col-12">
+                      <mat-checkbox formControlName="smsOptIn">
+                        I consent to receive SMS notifications.
+                      </mat-checkbox>
                     </div>
                 </div>
                 <div class="row">

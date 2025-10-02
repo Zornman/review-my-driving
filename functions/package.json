@@ -23,7 +23,8 @@
     "mongodb": "^6.14.2",
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.10.0",
-    "stripe": "^17.7.0"
+    "stripe": "^17.7.0",
+    "twilio": "^5.8.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",

@@ -18,6 +18,10 @@ import { Router } from '@angular/router';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { COUNTRIES } from '../shared/classes/countries';
 import { US_STATES } from '../shared/classes/states';
+import { BusinessFunctionsComponent } from './business-functions/business-functions.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormatPhoneDirective } from '../shared/directives/format-phone.directive';
+import { TruckAndDriverManagementComponent } from './truck-and-driver-management/truck-and-driver-management.component';
 
 @Component({
   selector: 'app-account-overview',
@@ -33,7 +37,11 @@ import { US_STATES } from '../shared/classes/states';
     MatTableModule,
     MatIconModule,
     MatSelectModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatCheckboxModule,
+    BusinessFunctionsComponent,
+    TruckAndDriverManagementComponent,
+    FormatPhoneDirective
    ],
   templateUrl: './account-overview.component.html',
   styleUrl: './account-overview.component.scss',
@@ -52,6 +60,7 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
   accOverviewForm!: FormGroup;
   shippingInfoForm!: FormGroup;
   user!: User | null;
+  businessUserInfo!: any | null;
   submissions!: any;
   now: Date = new Date();
   month = (this.now.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed, so add 1
@@ -62,6 +71,7 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
   totalSubmissions!: number;
   lastWeekSubmissions!: number;
   lastMonthSubmissions!: number;
+  isBusinessUser: boolean = false;
 
   countries = COUNTRIES;
   states = US_STATES;
@@ -92,6 +102,7 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
       userID: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required]],
+      smsOptIn: [false],
       firstName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z]+$/)]],
       lastName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z]+$/)]],
       address1: ['', Validators.required],
@@ -107,6 +118,7 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
         this.user = user;
         this._snackBar.open('Loading account information...');
         this.initializeAccountOverview();
+        this.initiaizeBusinessUserInfo();
         this.initializeSubmissions();
         this.loadShippingInfo();
         this.initializeOrderHistory();
@@ -127,6 +139,37 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
       this.accOverviewForm.get('email')?.setValue(this.user.email);
       this.accOverviewForm.get('name')?.setValue(this.user.displayName);
     }
+  }
+
+  initiaizeBusinessUserInfo() {
+    if (!this.user) return;
+
+    this.dbService.getBusinessUserInfo(this.user.uid).subscribe({
+      next: (response: any) => {
+        console.log('Business User Info Response:', response);
+        if (response.result) {
+          this.isBusinessUser = true;
+          this.businessUserInfo = response.result;
+        } else {
+          this.isBusinessUser = false;
+        }
+      },
+      error: (error) => {
+        this._snackBar.open('Error loading business user information. Please try again.', 'Ok', { duration: 3000 });
+        this.dbService.insertErrorLog(JSON.stringify({
+          fileName: 'account-overview.component.ts',
+          method: 'initiaizeBusinessUserInfo()',
+          timestamp: new Date().toString(),
+          error: error
+        })).subscribe({
+          next: (response: any) => {
+              console.log(response);
+          },
+          error: (error: any) => {
+          }
+        });
+      }
+    });
   }
 
   saveShippingInfo() {

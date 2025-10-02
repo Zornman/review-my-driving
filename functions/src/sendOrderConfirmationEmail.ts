@@ -32,7 +32,7 @@ export const sendOrderConfirmationEmail = functions
         const order = await ordersCollection.findOne({ orderID: printifyOrder.id });
         
         if (order) {
-          if (order.emailOrderConfirm) {
+          if (order['emailOrderConfirm']) {
             res.status(200).json({ message: "Email already sent for this order" });
             return;
           }

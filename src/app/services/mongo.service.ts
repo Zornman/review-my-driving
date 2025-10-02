@@ -42,6 +42,22 @@ export class MongoService {
         return this.http.get(url, { params });
     }
 
+    getUserByUniqueId(uniqueId: string): Observable<any> {
+        const url = this.getFunctionUrl("getUserByUniqueId");
+        const params = new HttpParams().set('uniqueId', (uniqueId) ? uniqueId : '');
+        return this.http.get(url, { params });
+    }
+
+    getSampleBatches(): Observable<any> {
+        const url = this.getFunctionUrl("getSampleBatches");
+        return this.http.get(url);
+    }
+
+    getBusinessUserInfo(userId: string): Observable<any> {
+        const url = this.getFunctionUrl("getBusinessUserInfo");
+        return this.http.get(url, { params: new HttpParams().set('userId', (userId) ? userId : '') });
+    }
+
     /**
      * Inserts or updates a record in the user_shipping_info table
      * @param shippingInfo 
@@ -75,6 +91,26 @@ export class MongoService {
 
     insertErrorLog(data: any): Observable<any> {
         const url = this.getFunctionUrl("logError");
+        return this.http.post(url, data);
+    }
+
+    insertSampleMapper(data: any): Observable<any> {
+        const url = this.getFunctionUrl("insertSampleMapper");
+        return this.http.post(url, data);
+    }
+
+    insertSampleBatch(data: any): Observable<any> {
+        const url = this.getFunctionUrl("insertSampleBatch");
+        return this.http.post(url, data);
+    }
+
+    /**
+     * 
+     * Updates an existing sample mapper record with a userId.
+     * @param data - The data to update, should include a unique identifier for the sample.
+     */
+    updateSampleMapper(data: any): Observable<any> {
+        const url = this.getFunctionUrl("updateSampleMapper");
         return this.http.post(url, data);
     }
 

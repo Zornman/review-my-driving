@@ -1,0 +1,20 @@
+.expand-column {
+    max-width: 60px !important; /* Set a smaller width for the expand column */
+    text-align: center; /* Center-align the content */
+}
+
+.assigned-driver-column {
+    min-width: 160px; /* Set a larger width for the assigned driver column */
+}
+
+.license-plate-column {
+    min-width: 130px; /* Set a larger width for the license plate column */
+}
+
+.stack-section {
+    display: block; /* Add spacing between sections */
+}
+
+.expanded-detail {
+    width: 100%;
+}

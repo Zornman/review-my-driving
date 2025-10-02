@@ -11,13 +11,14 @@ import { IndexComponent } from './index/index.component';
 import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { AdminFunctionsComponent } from './admin/admin-functions/admin-functions.component';
 
 export const routes: Routes = [
     { path: '', component: IndexComponent },
     { path: 'index', component: IndexComponent },
     { path: 'home', component: HomeComponent },
     { path: 'shop', component: ShopComponent },
-    { path: 'register', component: RegisterComponent },
+    { path: 'register/:uniqueId', component: RegisterComponent },
     { path: 'product/:id', loadComponent: () => import('./shop/product-page/product-page.component').then(m => m.ProductPageComponent) },
     { path: 'cart', component: CartOverviewComponent },
     { path: 'checkout', component: CheckoutComponent },
@@ -28,5 +29,6 @@ export const routes: Routes = [
     { path: 'settings', component: AccountSettingsComponent },
     { path: 'about', component: AboutComponent },
     { path: 'contact', component: ContactComponent },
+    { path: 'admin-functions', component: AdminFunctionsComponent },
     { path: '**', redirectTo: '/index' }
 ];

@@ -1,0 +1,89 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center">Admin Functions</h1>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary" (click)="toggleBulkCreateForm()">Bulk Create QR Codes</button>
+            <button type="submit" class="btn btn-primary" (click)="toggleSampleBatches()">View Sample Batches</button>
+        </div>
+    </div>
+    <div class="row" *ngIf="showBulkCreateForm">
+        <div class="col-12">
+            <div class="col-12 padding-bottom">
+                <span>Bulk create QR codes for guest users</span>
+            </div>
+            <form [formGroup]="bulkCreateForm" (ngSubmit)="onBulkCreate()">
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Number of Codes:</mat-label>
+                        <input matInput type="text" name="numberOfCodes" formControlName="numberOfCodes" />
+                        <mat-error *ngIf="bulkCreateForm.get('numberOfCodes')?.hasError('required')">
+                            Number to Create is required.
+                        </mat-error>
+                        <mat-error *ngIf="bulkCreateForm.get('numberOfCodes')?.hasError('pattern')">
+                            Please enter a valid positive number.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Select Product to Sample</mat-label>
+                        <mat-select name="productList" formControlName="productList">
+                            <mat-option *ngFor="let product of products" [value]="product.id">
+                                {{ product.title }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="bulkCreateForm.get('numberOfCodes')?.hasError('required')">
+                            Sample Product is required.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Batch Number (ex. BATCH-123456)</mat-label>
+                        <input matInput type="text" name="batchNumber" formControlName="batchNumber" />
+                        <mat-error *ngIf="bulkCreateForm.get('batchNumber')?.hasError('required')">
+                            Batch number is required.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Campaign ID (ex. SUMMER2025-DrivingMagnets)</mat-label>
+                        <input matInput type="text" name="campaignId" formControlName="campaignId" />
+                        <mat-error *ngIf="bulkCreateForm.get('campaignId')?.hasError('required')">
+                            Campaign ID is required.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Description</mat-label>
+                        <input matInput type="text" name="description" formControlName="description" />
+                        <mat-error *ngIf="bulkCreateForm.get('description')?.hasError('required')">
+                            Description is required.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Notes</mat-label>
+                        <input matInput type="text" name="notes" formControlName="notes" />
+                        <mat-error *ngIf="bulkCreateForm.get('notes')?.hasError('required')">
+                            Notes is required.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="bulkCreateForm.invalid">Create QR Codes</button>
+            </form>
+        </div>
+    </div>
+    <div class="row" *ngIf="showSampleBatches">
+        <div class="col-12">
+            <h2>Sample Batches</h2>
+            <app-view-sample-batches></app-view-sample-batches>
+        </div>
+    </div>
+</div>
