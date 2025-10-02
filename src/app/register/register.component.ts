@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
@@ -6,8 +6,10 @@ import { EmailValidatorDirective } from '../shared/directives/validate-email.dir
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MongoService } from '../services/mongo.service';
+import { User } from 'firebase/auth';
 
 @Component({
   selector: 'app-register',
@@ -24,26 +26,32 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);
   form!: FormGroup;
   errorMessage: string | null = null;
   hidePassword = true;
   hideConfirmPassword = true;
+  uniqueId!: string | null;
 
   constructor(
+    private activatedRoute: ActivatedRoute,
     private fb: FormBuilder,
     private authService: AuthService,
     private location: Location,
-    private router: Router
+    private router: Router,
+    private dbService: MongoService
   ) {
-    this.createForm();
-
     this.authService.getUser().subscribe(user => {
       if (user) {
         this.router.navigate(['/account']);
       }
     });
+  }
+
+  ngOnInit(): void {
+    this.uniqueId = this.activatedRoute.snapshot.paramMap.get('uniqueId');
+    this.createForm();
   }
 
   // Initialize the form group with validators
@@ -55,6 +63,7 @@ export class RegisterComponent {
         email: ['', [Validators.required, Validators.email]], // Use Angular's email validator
         password: ['', [Validators.required, Validators.minLength(8)]],
         confirmPassword: ['', Validators.required],
+        uniqueId: [this.uniqueId] // Add uniqueId to the form
       },
       { validators: this.passwordsMatchValidator }
     );
@@ -111,10 +120,29 @@ export class RegisterComponent {
       return;
     }
 
-    const { firstName, lastName, email, password } = this.form.value;
+    const { firstName, lastName, email, password, uniqueId } = this.form.value;
 
     this.authService.signUpWithEmail(email, password, `${firstName} ${lastName}`)
       .then(() => {
+        if (uniqueId) {
+          let userData = null as User | null;;
+          this.authService.getUser().subscribe(user => {
+            if (user) {
+              userData = user; // Assign the current user to the variable
+            }
+          }); // Get the current user's ID
+          const data = {
+            uniqueId: uniqueId,
+            userId: userData?.uid, // Use the current user's ID
+            status: 'claimed',
+          };
+          // If uniqueId is provided, save it to the database
+          this.dbService.updateSampleMapper(data).subscribe({
+            next: () => console.log('Unique ID saved successfully'),
+            error: (error) => console.error('Error saving unique ID:', error)
+          });
+        }
+
         this.location.back();
         this.errorMessage = null;
         this._snackBar.open('Sign up successful!', 'Ok', { duration: 3000 });

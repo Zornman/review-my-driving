@@ -12,6 +12,7 @@ import { User } from 'firebase/auth';
 import { ThemeService } from '../services/theme.service';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -32,11 +33,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   cartQuantity!: number;
   private cartSubscription!: Subscription;
   user!: User | null;
+  isAdmin: boolean = false;
   isDarkMode!: boolean;
 
   constructor(private cartService: CartService, private router: Router, private authService: AuthService, private themeService: ThemeService) {
     this.authService.getUser().subscribe((user) => {
       this.user = user;
+
+      if (this.user?.uid === environment.adminUserId) 
+        this.isAdmin = true;
     });
 
     this.isDarkMode = this.themeService.getIsDarkMode();
@@ -47,6 +52,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.cartSubscription = this.cartService.cart$.subscribe((cart) => {
       this.cartQuantity = cart.reduce((total, item) => total + item.quantity, 0);
     });
+
   }
 
   ngOnDestroy(): void {
@@ -104,5 +110,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   contactPage() {
     this.router.navigateByUrl('/contact');
+  }
+
+  adminFunctionsPage() {
+    this.router.navigateByUrl('/admin-functions');
   }
 }

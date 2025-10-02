@@ -10,13 +10,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { US_STATES } from '../shared/classes/states';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MongoService } from '../services/mongo.service';
 import { EmailService } from '../services/email.service';
 import { FirebaseService } from '../services/firebase.service';
 import { MessageDialogComponent } from '../shared/modals/message-dialog/message-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { environment } from '../../environments/environment';
+import { SampleNotRegisteredDialogComponent } from '../shared/modals/sample-not-registered-dialog/sample-not-registered-dialog.component';
 
 @Component({
   selector: 'app-home',
@@ -31,9 +31,11 @@ export class HomeComponent {
   user_id!: string | null;
   user_email!: string | null;
   user_settings!: any | null;
+  user_phone!: string | null;
   date!: () => string;
   isProcessing: boolean = false;
   isQuickMode: boolean = true; // Flag to toggle quick mode
+  uniqueId!: string;
 
   formData = {
     user_id: this.user_id,
@@ -48,7 +50,8 @@ export class HomeComponent {
   };
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
+    private router: Router, 
     private dbService: MongoService, 
     private emailService: EmailService,
     private firebaseService: FirebaseService,
@@ -72,11 +75,15 @@ export class HomeComponent {
   async ngOnInit(): Promise<void> {
     // Extract the 'id' query parameter
     this.route.queryParamMap.subscribe(async params => {
-      this.user_id = params.get('id'); // Get the value of 'id'
+      this.user_id = params.get('id') || ''; // Get the value of 'id'
+      this.uniqueId = params.get('uniqueId') || ''; // Get the value of 'uniqueId' if it exists
 
       if (this.user_id) {
         await this.getUserEmail();
         this.getUserSettings();
+        this.getUserPhone();
+      } else if (this.uniqueId) {
+        this.getUserByUniqueId();
       }
     });
   }
@@ -89,12 +96,37 @@ export class HomeComponent {
         this.formData.user_id = this.user_id;
         this.user_email = response.email;
         this.formData.emailTo = response.email;
-        //console.log(this.formData);
       },
       error: (error) => {
         this.dbService.insertErrorLog(JSON.stringify({
           fileName: 'home.component.ts',
           method: 'getUserEmail()',
+          timestamp: new Date().toString(),
+          error: error
+        })).subscribe({
+          next: (response: any) => {
+              console.log(response);
+          },
+          error: (error: any) => {
+          }
+        });
+      },
+    });
+  }
+
+  async getUserPhone() {
+    if (!this.user_id) return;
+
+    await this.dbService.getUserShippingInfo(this.user_id).subscribe({
+      next: (response: any) => {
+        if (response.result) {
+          this.user_phone = response.result.phone;
+        }
+      },
+      error: (error) => {
+        this.dbService.insertErrorLog(JSON.stringify({
+          fileName: 'home.component.ts',
+          method: 'getUserPhone()',
           timestamp: new Date().toString(),
           error: error
         })).subscribe({
@@ -132,6 +164,35 @@ export class HomeComponent {
     });
   }
 
+  getUserByUniqueId() {
+    if (!this.uniqueId) return;
+
+    this.dbService.getUserByUniqueId(this.uniqueId).subscribe({
+      next: (response: any) => {
+        if (response && response.result.userId) {
+          this.user_id = response.result.userId;
+          this.getUserEmail();
+          this.getUserSettings();
+          this.getUserPhone();
+        } else {
+          if (response && response.result.status === 'unclaimed') {
+            this.dialog.open(SampleNotRegisteredDialogComponent, {
+              width: '400px',
+              disableClose: true,
+              data: {
+                message: 'This QR Code is unclaimed. Please contact support for assistance. If you are the owner, please register to claim it.',
+                action: 'Claim Now',
+                actionCallback: () => {
+                  this.router.navigate(['/register', this.uniqueId]); // Redirect to register page
+                }
+              }
+            });
+          }
+        }
+      }
+    });
+  }
+
   async submit(form: NgForm) {
     this.isProcessing = true;
     this.ngForm = form;
@@ -149,7 +210,7 @@ export class HomeComponent {
     this.formData.lastName = 'User';
 
     await this.insertSubmission();
-    await this.sendEmailNotification(true);
+    await this.sendEmailNotification();
   }
 
   openConfirmMessage() {
@@ -172,22 +233,12 @@ export class HomeComponent {
     }
   }
 
-  async sendEmailNotification(isQuickMode: boolean = false) {
+  async sendEmailNotification() {
     this.emailService.sendSubmissionEmail(JSON.stringify(this.formData)).subscribe({
       next: (response: any) => {
         this.openConfirmMessage();
         this.resetForm();
         this.isProcessing = false;
-
-        if (isQuickMode) {
-          this._snackBar.open('Quick review submitted successfully!', 'Close', {
-            duration: 3000
-          });
-        } else {
-          this._snackBar.open('Form submitted successfully!', 'Close', {
-            duration: 3000
-          });
-        }
       },
       error: (error) => {
         this._snackBar.open('Error submitting form, try again.', 'Close');
@@ -211,6 +262,11 @@ export class HomeComponent {
   async insertSubmission() {
     this.formData.user_id = this.user_id;
     this.formData.dateSubmitted = this.date();
+
+    if (this.user_phone) {
+      this.sendTextAlert(this.formatToE164(this.user_phone), `New submission received from ${this.formData.firstName} ${this.formData.lastName} Reason for Contacting: "${this.formData.reasonForContacting}".`).catch((err: any) => { });
+    }
+
     this.dbService.insertSubmission(JSON.stringify(this.formData)).subscribe({
       next: (response: any) => {
 
@@ -230,6 +286,27 @@ export class HomeComponent {
           error: (error: any) => {
           }
         });
+      },
+    });
+  }
+
+  async sendTextAlert(phoneNumber: string, message: string) {
+    this.isProcessing = true;
+    // This assumes you’ll have a Firebase Function or API endpoint
+    // that listens for this request and sends the SMS (via Twilio, etc.)
+    this.firebaseService.sendTextMessage(phoneNumber, message).subscribe({
+      next: (response: any) => {
+        this._snackBar.open('Text alert sent successfully!', 'Close', { duration: 3000 });
+      },
+      error: (error) => {
+        this._snackBar.open('Error sending text alert, try again.', 'Close');
+        // Log the error into your mongo errors collection
+        this.dbService.insertErrorLog(JSON.stringify({
+          fileName: 'home.component.ts',
+          method: 'sendTextAlert()',
+          timestamp: new Date().toString(),
+          error: error
+        })).subscribe();
       },
     });
   }
@@ -257,5 +334,13 @@ export class HomeComponent {
       dateSubmitted: new Date().getDate().toString(),
       emailTo: this.user_email
     };
+  }
+
+  formatToE164(phone: string, countryCode = "1"): string {
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, "");
+  
+    // Add the country code at the beginning
+    return `+${countryCode}${digits}`;
   }
 }

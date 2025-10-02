@@ -1,0 +1,98 @@
+<div style="display: block;">
+    <canvas baseChart
+      [datasets]="barChartData"
+      [labels]="barChartLabels"
+      [options]="barChartOptions"
+      [legend]="true"
+      chartType="bar">
+    </canvas>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <mat-table [dataSource]="batchesDataSource" multiTemplateDataRows class="mat-elevation-z8">
+                <!-- Define columns -->
+                <ng-container matColumnDef="batchNumber">
+                    <mat-header-cell *matHeaderCellDef> Batch Number </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{ element.batchNumber }} </mat-cell>
+                </ng-container>
+                
+                <ng-container matColumnDef="campaignId">
+                    <mat-header-cell *matHeaderCellDef> Campaign ID </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{ element.campaignId }} </mat-cell>
+                </ng-container>
+                
+                <ng-container matColumnDef="productType">
+                    <mat-header-cell *matHeaderCellDef> Product Type </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{ element.productType }} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="description">
+                    <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{ element.description }} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="claimedCount">
+                    <mat-header-cell *matHeaderCellDef> Claimed Count </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{ element.claimedCount }} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="unclaimedCount">
+                    <mat-header-cell *matHeaderCellDef> Unclaimed Count </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{ element.unclaimedCount }} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="totalSample">
+                    <mat-header-cell *matHeaderCellDef> Total Samples </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{ element.totalSample }} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="percentClaimed">
+                    <mat-header-cell *matHeaderCellDef> Total Samples </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{ ((element.claimedCount / element.totalSample) * 100).toString() }}% </mat-cell>
+                </ng-container>
+                
+                <!-- Expand/Collapse Column -->
+                <ng-container matColumnDef="expand">
+                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                    <button mat-icon-button>
+                        <mat-icon>{{ expandedElement === element ? 'expand_less' : 'expand_more' }}</mat-icon>
+                    </button>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="expandedDetail">
+                    <mat-cell *matCellDef="let element" [attr.colspan]="batchColumnsToDisplay.length" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                        <div class="expanded-detail">
+                            <p><strong>Created At:</strong> {{ element.createdBy }}</p>
+                            <p><strong>Created At:</strong> {{ element.createdAt | date:'medium' }}</p>
+                            <p><strong>Updated At:</strong> {{ element.updatedAt | date:'medium' }}</p>
+                            <p><strong>Notes:</strong> {{ element.notes }}</p>
+                        </div>
+                    </mat-cell>
+                </ng-container>
+                
+                <!-- Header Row -->
+                <mat-header-row *matHeaderRowDef="batchColumnsToDisplay"></mat-header-row>
+                
+                <!-- Data Row -->
+                <mat-row 
+                    class="submission-row"
+                    *matRowDef="let element; columns: batchColumnsToDisplay;" 
+                    (click)="toggleRow(element, $event)">
+                </mat-row>
+                
+                <!-- Expanded Detail Row -->
+                <mat-row *matRowDef="let element; columns: ['expandedDetail']" class="detail-row" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"></mat-row>
+
+                <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="4">No submissions yet, you're driving too well!</td>
+                </tr>
+            </mat-table>
+            <div><br /></div>
+            <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of submissions"></mat-paginator>
+        </div>
+    </div>
+</div>

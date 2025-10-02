@@ -21,4 +21,12 @@ export class FirebaseService {
         }
         return environment.apiBaseUrl.replace("{function}", functionName);
     }
+
+    sendTextMessage(phoneNumber: string, message: string): Observable<any> {
+        const url = this.getFunctionUrl("sendSMSAlert");
+        const body = { phoneNumber, message };
+        console.log('Sending SMS with body:', body);
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        return this.http.post(url, body, { headers });
+    }
 }

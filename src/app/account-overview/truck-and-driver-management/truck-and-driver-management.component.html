@@ -1,0 +1,232 @@
+<h3 class="align-middle">Trucks & Drivers</h3>
+    <p class="align-middle">
+        Manage your trucks and drivers here. You can add, edit, or remove trucks and drivers associated with your business account.
+    </p>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-center">
+            <button mat-raised-button color="primary">
+                Add New Truck
+            </button>
+            <div class="spacer" style="margin: 0px 10px;"></div>
+            <button mat-raised-button color="primary">
+                Add New Driver
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <h4 class="align-middle" style="margin-top: 20px;">Trucks</h4>
+                <mat-table [dataSource]="trucksDataSource" multiTemplateDataRows class="mat-elevation-z8">
+                    <!-- Define columns -->
+                    <ng-container matColumnDef="truckId">
+                        <mat-header-cell *matHeaderCellDef> Truck ID </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{ element.truckId }} </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="licensePlate">
+                        <mat-header-cell *matHeaderCellDef class="license-plate-column"> License Plate </mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="license-plate-column"> {{ element.licensePlate }} </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="assignedDriver">
+                        <mat-header-cell *matHeaderCellDef class="assigned-driver-column"> Assigned Driver </mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="assigned-driver-column"> {{ element.assignedDriver }} </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="odometer">
+                        <mat-header-cell *matHeaderCellDef> Odometer </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{ element.odometer | number }} </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{ element.status }} </mat-cell>
+                    </ng-container>
+
+                    <!-- Expand/Collapse Column -->
+                    <ng-container matColumnDef="expand">
+                        <mat-header-cell *matHeaderCellDef class="expand-column"></mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="expand-column">
+                        <button mat-icon-button>
+                            <mat-icon>{{ expandedTruck === element ? 'expand_less' : 'expand_more' }}</mat-icon>
+                        </button>
+                        </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="expandedDetail">
+                        <mat-cell *matCellDef="let element" [attr.colspan]="trucksColumnsToDisplay.length" [@detailExpand]="element == expandedTruck ? 'expanded' : 'collapsed'">
+                            <div class="expanded-detail">
+                                <div class="row">
+                                    <div class="col-3 col-center stack-section">
+                                        <p><strong>State:</strong></p>
+                                        <p>{{ element.state }}</p>
+                                    </div>
+                                    <div class="col-3 col-center stack-section">
+                                        <p><strong>Make:</strong></p>
+                                        <p>{{ element.make }}</p>
+                                    </div>
+                                    <div class="col-3 col-center stack-section">
+                                        <p><strong>Model:</strong></p>
+                                        <p>{{ element.model }}</p>
+                                    </div>
+                                    <div class="col-3 col-center stack-section">
+                                        <p><strong>Year:</strong></p>
+                                        <p>{{ element.year }}</p>
+                                    </div>
+                                    <div class="col-6 col-center stack-section">
+                                        <p><strong>Vin:</strong></p>
+                                        <p>{{ element.vin }}</p>
+                                    </div>
+                                    <div class="col-6 col-center stack-section">
+                                        <p><strong>Registration Expiration Date:</strong></p>
+                                        <p>{{ element.registrationExpiration | date }}</p>
+                                    </div>
+                                </div>
+                                <div class="row" style="text-align: center;">
+                                    <div class="col-12">
+                                        <h4 class="align-middle">Actions</h4>
+                                        <button mat-raised-button color="primary" style="margin-right: 5px;">
+                                            Edit Truck
+                                        </button>
+                                        <button mat-raised-button color="primary" style="margin-right: 5px;">
+                                            Assign Driver
+                                        </button>
+                                        <button mat-raised-button color="primary" style="margin-right: 5px;" (click)="updateTruckStatus(element)">
+                                            Update Status
+                                        </button>
+                                        <button mat-raised-button color="primary">
+                                            Delete Truck
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+    
+                    <!-- Header Row -->
+                    <mat-header-row *matHeaderRowDef="trucksColumnsToDisplay"></mat-header-row>
+                    
+                    <!-- Data Row -->
+                    <mat-row 
+                        class="submission-row"
+                        *matRowDef="let element; columns: trucksColumnsToDisplay;" 
+                        (click)="toggleTruckRow(element, $event)">
+                    </mat-row>
+
+                    <!-- Expanded Detail Row -->
+                    <mat-row *matRowDef="let element; columns: ['expandedDetail']" class="detail-row" [@detailExpand]="element == expandedTruck ? 'expanded' : 'collapsed'"></mat-row>
+                    
+                    <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="4">
+                            <p>No trucks added yet, add a truck to get started!</p>
+                        </td>
+                    </tr>
+                </mat-table>
+            </div>
+            <div class="col-6">
+                <h4 class="align-middle" style="margin-top: 20px;">Drivers</h4>
+                <mat-table [dataSource]="driversDataSource" multiTemplateDataRows class="mat-elevation-z8">
+                    <!-- Define columns -->
+                    <ng-container matColumnDef="driverId">
+                        <mat-header-cell *matHeaderCellDef> Driver ID </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{ element.driverId }} </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{ element.name }} </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="phone">
+                        <mat-header-cell *matHeaderCellDef> Phone </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{ element.phone }} </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{ element.status }} </mat-cell>
+                    </ng-container>
+
+                    <!-- Expand/Collapse Column -->
+                    <ng-container matColumnDef="expand">
+                        <mat-header-cell *matHeaderCellDef class="expand-column"></mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="expand-column">
+                        <button mat-icon-button>
+                            <mat-icon>{{ expandedDriver === element ? 'expand_less' : 'expand_more' }}</mat-icon>
+                        </button>
+                        </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="expandedDetail">
+                        <mat-cell *matCellDef="let element" [attr.colspan]="driversColumnsToDisplay.length" [@detailExpand]="element == expandedDriver ? 'expanded' : 'collapsed'">
+                            <div class="expanded-detail">
+                                <div class="row">
+                                    <div class="col-6 col-center stack-section">
+                                        <h4 class="align-middle">License Info</h4>
+                                        <p><strong>License Number:</strong></p>
+                                        <p>{{ element.license[0]?.licenseNumber }}</p>
+                                        <p><strong>License State:</strong></p>
+                                        <p>{{ element.license[0]?.state }}</p>
+                                        <p><strong>License Expiration:</strong></p>
+                                        <p>{{ element.license[0]?.expiration | date }}</p>
+                                    </div>
+                                    <div class="col-6 col-center stack-section">
+                                        <h4 class="align-middle">Address</h4>
+                                        <p><strong>Address 1:</strong></p>
+                                        <p>{{ element.address[0]?.address1 }}</p>
+                                        <p *ngIf="element.address[0]?.address2"><strong>Address 2:</strong></p>
+                                        <p *ngIf="element.address[0]?.address2">{{ element.address[0]?.address2 }}</p>
+                                        <p><strong>City:</strong></p>
+                                        <p>{{ element.address[0]?.city }}</p>
+                                        <p><strong>State:</strong></p>
+                                        <p>{{ element.address[0]?.state }}</p>
+                                        <p><strong>Zip:</strong></p>
+                                        <p>{{ element.address[0]?.zip }}</p>
+                                    </div>
+                                </div>
+                                <div class="row" style="text-align: center;">
+                                    <div class="col-12">
+                                        <h4 class="align-middle">Actions</h4>
+                                        <button mat-raised-button color="primary" style="margin-right: 5px;">
+                                            Edit License Info
+                                        </button>
+                                        <button mat-raised-button color="primary" style="margin-right: 5px;">
+                                            Edit Address Info
+                                        </button>
+                                        <button mat-raised-button color="primary" style="margin-right: 5px;" (click)="updateDriverStatus(element)">
+                                            Update Status
+                                        </button>
+                                        <button mat-raised-button color="primary">
+                                            Delete Driver
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+    
+                    <!-- Header Row -->
+                    <mat-header-row *matHeaderRowDef="driversColumnsToDisplay"></mat-header-row>
+                    
+                    <!-- Data Row -->
+                    <mat-row 
+                        class="submission-row"
+                        *matRowDef="let element; columns: driversColumnsToDisplay;" 
+                        (click)="toggleDriverRow(element, $event)">
+                    </mat-row>
+
+                    <!-- Expanded Detail Row -->
+                    <mat-row *matRowDef="let element; columns: ['expandedDetail']" class="detail-row" [@detailExpand]="element == expandedDriver ? 'expanded' : 'collapsed'"></mat-row>
+                    
+                    <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="4">
+                            <p>No drivers added yet, add a driver to get started!</p>
+                        </td>
+                    </tr>
+                </mat-table>
+            </div>
+        </div>
+    </div>
+</div>

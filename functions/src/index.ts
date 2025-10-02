@@ -31,21 +31,28 @@ export { getProduct } from "./getProduct.js";
 export { getShippingOptions } from "./getShippingOptions.js";
 export { getShippingRates } from "./getShippingRates.js";
 export { getSubmissionsByUser } from "./getSubmissionsByUser.js";
+export { getBusinessUserInfo } from "./getBusinessUserInfo.js";
 export { getUserByUID } from "./getUserByUID.js";
+export { getUserByUniqueId } from "./getUserByUniqueId.js";
 export { getUserOrderHistory } from "./getUserOrderHistory.js";
 export { getUserSettings } from "./getUserSettings.js";
 export { getUserShipping } from "./getUserShipping.js";
+export { getSampleBatches } from "./getSampleBatches.js";
 
+export { insertSampleBatch } from "./insertSampleBatch.js";
+export { insertSampleMapper } from "./insertSampleMapper.js";
 export { insertSubmission } from "./insertSubmission.js";
 export { insertUserOrder } from "./insertUserOrder.js";
 export { insertUserSettings } from "./insertUserSettings.js";
 export { insertUserShipping } from "./insertUserShipping.js";
 
 export { logError } from "./logError.js";
+export { sendSMSAlert } from "./sendSMSAlert.js";
 export { sendContactEmail } from "./sendContactEmail.js";
 export { sendEmail } from "./sendEmail.js";
 export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 
+export { updateSampleMapper } from "./updateSampleMapper.js";
 export { updateOrderStatus } from "./updateOrderStatus.js";
 import { updateOrderStatusTask } from "./updateOrderStatusTask.js";
 

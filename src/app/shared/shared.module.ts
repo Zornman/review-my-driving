@@ -3,9 +3,7 @@ import { NgModule } from '@angular/core';
 import { ShippingInformationComponent } from './components/shipping-information/shipping-information.component';
 
 @NgModule({
-  declarations: [
-    ShippingInformationComponent
-  ],
+  declarations: [],
   imports: [ShippingInformationComponent],
   exports: []
 })

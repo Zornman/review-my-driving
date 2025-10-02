@@ -1,0 +1,60 @@
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="align-middle">Business Settings & Information</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <form [formGroup]="businessUserForm" class="align-middle" style="max-width: 90%;">
+                <mat-form-field appearance="outline">
+                    <mat-label>User ID</mat-label>
+                    <input matInput formControlName="userId" name="userId">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Business Name</mat-label>
+                    <input matInput formControlName="businessName" name="businessName">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>E-Mail</mat-label>
+                    <input matInput formControlName="contactEmail" name="contactEmail">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Phone</mat-label>
+                    <input matInput formatPhone formControlName="contactPhone" name="contactPhone">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Notify On New Review</mat-label>
+                    <mat-select formControlName="notifyOnNewReview" name="notifyOnNewReview">
+                        <mat-option [value]="true">Yes</mat-option>
+                        <mat-option [value]="false">No</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Daily Summary Email</mat-label>
+                    <mat-select formControlName="dailySummaryEmail" name="dailySummaryEmail">
+                        <mat-option [value]="true">Yes</mat-option>
+                        <mat-option [value]="false">No</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Last Updated</mat-label>
+                    <input matInput formControlName="updatedAt" name="updatedAt" [disabled]="true">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Created Date</mat-label>
+                    <input matInput formControlName="createdAt" name="createdAt" [disabled]="true">
+                </mat-form-field>
+                <div class="row">
+                    <div class="col-12 col-center">
+                        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="businessUserForm.invalid || isLoading">
+                            Save Changes
+                            <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="20" style="margin-left: 10px;"></mat-progress-spinner>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

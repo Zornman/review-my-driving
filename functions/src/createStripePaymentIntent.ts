@@ -7,7 +7,7 @@ const corsHandler = cors({ origin: true });
 export const createStripePaymentIntent = functions.https.onRequest({ secrets: ["STRIPE_SECRET_KEY"] }, async (req, res) => {
     corsHandler(req, res, async () => {
       try {
-        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+        const stripeSecretKey = process.env['STRIPE_SECRET_KEY'];
         if (!stripeSecretKey) {
           throw new Error("Stripe secret key is missing");
         }
