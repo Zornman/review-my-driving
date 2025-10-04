@@ -81,7 +81,7 @@ export class HomeComponent {
       if (this.user_id) {
         await this.getUserEmail();
         this.getUserSettings();
-        this.getUserPhone();
+        //this.getUserPhone();
       } else if (this.uniqueId) {
         this.getUserByUniqueId();
       }
