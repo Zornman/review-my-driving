@@ -53,7 +53,7 @@ export class ViewSampleBatchesComponent implements OnInit {
   };
 
   batchesDataSource = new MatTableDataSource<any>([]);
-  batchColumnsToDisplay = ['batchNumber', 'campaignId', 'productType', 'description', 'claimedCount', 'unclaimedCount', 'totalSample', 'percentClaimed', 'expand'];
+  batchColumnsToDisplay = ['batchNumber', 'claimedCount', 'unclaimedCount', 'totalSample', 'percentClaimed', 'expand'];
   bhColumnsToDisplayWithExpand = [...this.batchColumnsToDisplay, 'expandedDetail'];
   expandedElement: any | null;
 

@@ -16,21 +16,6 @@
                     <mat-header-cell *matHeaderCellDef> Batch Number </mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{ element.batchNumber }} </mat-cell>
                 </ng-container>
-                
-                <ng-container matColumnDef="campaignId">
-                    <mat-header-cell *matHeaderCellDef> Campaign ID </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{ element.campaignId }} </mat-cell>
-                </ng-container>
-                
-                <ng-container matColumnDef="productType">
-                    <mat-header-cell *matHeaderCellDef> Product Type </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{ element.productType }} </mat-cell>
-                </ng-container>
-
-                <ng-container matColumnDef="description">
-                    <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{ element.description }} </mat-cell>
-                </ng-container>
 
                 <ng-container matColumnDef="claimedCount">
                     <mat-header-cell *matHeaderCellDef> Claimed Count </mat-header-cell>
@@ -65,7 +50,10 @@
                 <ng-container matColumnDef="expandedDetail">
                     <mat-cell *matCellDef="let element" [attr.colspan]="batchColumnsToDisplay.length" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
                         <div class="expanded-detail">
-                            <p><strong>Created At:</strong> {{ element.createdBy }}</p>
+                            <p><strong>Campaign ID:</strong> {{ element.campaignId }}</p>
+                            <p><strong>Product Type:</strong> {{ element.productType }}</p>
+                            <p><strong>Description:</strong> {{ element.description }}</p>
+                            <p><strong>Created By:</strong> {{ element.createdBy }}</p>
                             <p><strong>Created At:</strong> {{ element.createdAt | date:'medium' }}</p>
                             <p><strong>Updated At:</strong> {{ element.updatedAt | date:'medium' }}</p>
                             <p><strong>Notes:</strong> {{ element.notes }}</p>
