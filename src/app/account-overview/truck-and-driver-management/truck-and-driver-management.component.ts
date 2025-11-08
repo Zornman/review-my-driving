@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
+import { ConfirmDialogComponent } from '../../shared/modals/confirm-dialog/confirm-dialog.component';
+import { AssignDriverDialogComponent } from '../../shared/modals/assign-driver-dialog/assign-driver-dialog.component';
 
 @Component({
   selector: 'app-truck-and-driver-management',
@@ -44,7 +47,7 @@ export class TruckAndDriverManagementComponent implements OnInit {
   driversDataSource: any[] = [];
   expandedDriver: any | null = null;
 
-  constructor() { }
+  constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
     // Placeholder data for trucks
@@ -214,6 +217,65 @@ export class TruckAndDriverManagementComponent implements OnInit {
     } else {
       driver.status = 'Active';
     }
+  }
+
+  deleteTruck(): void {
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: {
+        title: 'Delete Truck?',
+        message: 'Are you sure you want to delete this truck?',
+        confirmText: 'Yes, delete',
+        cancelText: 'Cancel'
+      }
+    }).afterClosed().subscribe(result => {
+      if (result === true) {
+        this.trucksDataSource = this.trucksDataSource.filter(truck => truck !== this.expandedTruck);
+        this.expandedTruck = null;
+      }
+    });
+  }
+
+  deleteDriver(): void {
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: {
+        title: 'Delete Driver?',
+        message: 'Are you sure you want to delete this driver?',
+        confirmText: 'Yes, delete',
+        cancelText: 'Cancel'
+      }
+    }).afterClosed().subscribe(result => {
+      if (result === true) {
+        this.driversDataSource = this.driversDataSource.filter(driver => driver !== this.expandedDriver);
+        this.expandedDriver = null;
+      }
+    });
+  }
+
+  reassignDriver(): void {
+    this.dialog.open(AssignDriverDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: {
+        drivers: this.driversDataSource
+      }
+    }).afterClosed().subscribe(selectedDriver => {
+      if (selectedDriver) {
+        if (this.expandedTruck) {
+          this.expandedTruck.assignedDriver = selectedDriver;
+
+          // Update the trucksDataSource to reflect the change
+          this.trucksDataSource = this.trucksDataSource.map(truck =>
+            truck.truckId === this.expandedTruck.truckId
+              ? { ...truck, assignedDriver: selectedDriver }
+              : truck
+          );
+        }
+      }
+    });
   }
 
   toggleTruckRow(row: any, event: Event): void {

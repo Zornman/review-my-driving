@@ -88,13 +88,13 @@
                                         <button mat-raised-button color="primary" style="margin-right: 5px;">
                                             Edit Truck
                                         </button>
-                                        <button mat-raised-button color="primary" style="margin-right: 5px;">
+                                        <button mat-raised-button color="primary" style="margin-right: 5px;" (click)="reassignDriver()">
                                             Assign Driver
                                         </button>
                                         <button mat-raised-button color="primary" style="margin-right: 5px;" (click)="updateTruckStatus(element)">
                                             Update Status
                                         </button>
-                                        <button mat-raised-button color="primary">
+                                        <button mat-raised-button color="primary" (click)="deleteTruck()">
                                             Delete Truck
                                         </button>
                                     </div>
@@ -197,7 +197,7 @@
                                         <button mat-raised-button color="primary" style="margin-right: 5px;" (click)="updateDriverStatus(element)">
                                             Update Status
                                         </button>
-                                        <button mat-raised-button color="primary">
+                                        <button mat-raised-button color="primary" (click)="deleteDriver()">
                                             Delete Driver
                                         </button>
                                     </div>

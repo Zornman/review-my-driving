@@ -60,29 +60,26 @@ export class AdminFunctionsComponent implements OnInit {
 
   loadProducts(): void {
     let cachedProducts = null;
-        if (isPlatformBrowser(this.platformId)) {
-          cachedProducts = localStorage?.getItem('products');
-        }
-    
-        if (!cachedProducts) {
-          this.printifyService.getProducts().subscribe({
-            next: (response: any) => {
-              this.products = response.data.map((item: any) => {
-                  return new Product(item);
-              });
-      
-              this.products = this.products.filter(x => x.visible);
-              if (isPlatformBrowser(this.platformId)) {
-                localStorage.setItem('products', JSON.stringify(this.products));
-              }
-            },
-            error: (error) => {
-              
-            },
+
+    if (!cachedProducts) {
+      this.printifyService.getProducts().subscribe({
+        next: (response: any) => {
+          this.products = response.map((item: any) => {
+              return new Product(item);
           });
-        } else {
-          this.products = JSON.parse(cachedProducts);
-        }
+  
+          this.products = this.products.filter(x => x.visible);
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('products', JSON.stringify(this.products));
+          }
+        },
+        error: (error) => {
+          
+        },
+      });
+    } else {
+      this.products = JSON.parse(cachedProducts);
+    }
   }
 
   toggleBulkCreateForm(): void {

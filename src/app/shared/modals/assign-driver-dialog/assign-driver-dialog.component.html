@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Assign Driver</h2>
+<mat-dialog-content>
+  <form [formGroup]="assignDriverForm">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Select Driver</mat-label>
+      <mat-select formControlName="assignedDriver">
+        <mat-option *ngFor="let driver of drivers" [value]="driver.name">
+          {{ driver.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button color="primary" [disabled]="assignDriverForm.invalid" (click)="onSubmit()">Assign</button>
+</mat-dialog-actions>

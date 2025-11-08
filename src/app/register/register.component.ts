@@ -10,6 +10,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MongoService } from '../services/mongo.service';
 import { User } from 'firebase/auth';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -102,15 +103,40 @@ export class RegisterComponent implements OnInit {
   }
 
   // Handle Google Sign-Up
-  signUpWithGoogle(): void {
-    this.authService.googleSignIn()
-      .then(() => {
+  async signUpWithGoogle(): Promise<void> {
+    try {
+      await this.authService.googleSignIn();
+  
+      if (this.uniqueId) {
+        const userData = await firstValueFrom(this.authService.getUser());
+        if (userData) {
+          const data = {
+            uniqueId: this.uniqueId,
+            userId: userData.uid, // Use the current user's ID
+            status: 'claimed',
+          };
+  
+          this.dbService.updateSampleMapper(data).subscribe({
+            next: () => {
+              console.log('Unique ID saved successfully');
+              this.location.back();
+              this._snackBar.open('Sign up successful!', 'Ok', { duration: 3000 });
+            },
+            error: (error) => {
+              console.error('Error saving unique ID:', error);
+              this.errorMessage = 'Failed to save unique ID. Please try again.';
+            },
+          });
+        } else {
+          this.errorMessage = 'Failed to retrieve user data. Please try again.';
+        }
+      } else {
         this.location.back();
         this._snackBar.open('Sign up successful!', 'Ok', { duration: 3000 });
-      })
-      .catch((error) => {
-        this.errorMessage = 'Google Sign-In failed: ' + error.message;
-      });
+      }
+    } catch (error: any) {
+      this.errorMessage = 'Google Sign-In failed: ' + error.message;
+    }
   }
 
   // Handle Email/Password Sign-Up
@@ -125,7 +151,7 @@ export class RegisterComponent implements OnInit {
     this.authService.signUpWithEmail(email, password, `${firstName} ${lastName}`)
       .then(() => {
         if (uniqueId) {
-          let userData = null as User | null;;
+          let userData = null as User | null;
           this.authService.getUser().subscribe(user => {
             if (user) {
               userData = user; // Assign the current user to the variable
