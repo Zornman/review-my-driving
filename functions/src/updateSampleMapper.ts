@@ -1,11 +1,12 @@
 import * as functions from 'firebase-functions/v2';
 import { MongoClient } from 'mongodb';
 import cors from 'cors';
+import nodemailer from 'nodemailer';
 
 const corsHandler = cors({ origin: true });
 
 export const updateSampleMapper = functions
-.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
+.https.onRequest({ secrets: ["MONGO_URI", "EMAIL_USER", "EMAIL_PASS"] }, async (req, res) => {
   corsHandler(req, res, async () => {
     if (req.method !== 'POST') {
       res.status(405).json({ message: 'Method Not Allowed' });
@@ -58,6 +59,36 @@ export const updateSampleMapper = functions
           },
         }
       );
+
+      // 5️⃣ Send an email notification
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env['EMAIL_USER'],
+          pass: process.env['EMAIL_PASS'],
+        },
+      });
+
+      const emailTo = data.emailTo ?? 'zornman45@gmail.com';
+
+      const mailOptions = {
+        from: 'donotreply@reviewmydriving.co',
+        to: emailTo,
+        subject: `Sample Mapper Updated: ${data.uniqueId}`,
+        html: `
+          <h2>Sample Mapper Updated</h2>
+          <p><strong>Unique ID:</strong> ${data.uniqueId}</p>
+          <p><strong>User ID:</strong> ${data.userId}</p>
+          <p><strong>Status:</strong> ${data.status}</p>
+          <p><strong>Batch Number:</strong> ${batchNumber}</p>
+          <p><strong>Campaign ID:</strong> ${campaignId}</p>
+          <p><strong>Claimed At:</strong> ${new Date().toISOString()}</p>
+          <hr />
+          <p>This email was generated automatically by <a href="www.reviewmydriving.co">reviewmydriving.co</a>.</p>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
   
       await client.close();
   

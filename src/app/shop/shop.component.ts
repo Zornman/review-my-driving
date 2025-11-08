@@ -22,23 +22,16 @@ export class ShopComponent implements OnInit {
   constructor(@Inject(PLATFORM_ID) private platformId: any, private router: Router, private printifyService: PrintifyService, private dbService: MongoService) {}
 
   ngOnInit(): void {
-
     let cachedProducts = null;
-    if (isPlatformBrowser(this.platformId)) {
-      cachedProducts = localStorage?.getItem('products');
-    }
 
     if (!cachedProducts) {
       this.printifyService.getProducts().subscribe({
         next: (response: any) => {
-          this.products = response.data.map((item: any) => {
+          this.products = response.map((item: any) => {
               return new Product(item);
           });
   
           this.products = this.products.filter(x => x.visible);
-          if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem('products', JSON.stringify(this.products));
-          }
         },
         error: (error) => {
           this.dbService.insertErrorLog(JSON.stringify({
@@ -61,6 +54,6 @@ export class ShopComponent implements OnInit {
   }
 
   viewProduct(product: Product): void {
-    this.router.navigate(['/product', product.id]);
+    this.router.navigate(['/product', product.id], { state: { product } });
   }
 }

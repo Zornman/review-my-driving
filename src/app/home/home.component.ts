@@ -17,6 +17,7 @@ import { FirebaseService } from '../services/firebase.service';
 import { MessageDialogComponent } from '../shared/modals/message-dialog/message-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SampleNotRegisteredDialogComponent } from '../shared/modals/sample-not-registered-dialog/sample-not-registered-dialog.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -58,18 +59,7 @@ export class HomeComponent {
     private dialog: MatDialog
   ) 
   { 
-    this.date = () => {
-      const now = new Date();
-    
-      const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed, so add 1
-      const day = now.getDate().toString().padStart(2, '0'); // Get day and pad if needed
-      const year = now.getFullYear(); // Get full year
-      const hour = now.getUTCHours();
-      const min = now.getUTCMinutes();
-      const sec = now.getUTCSeconds();
-    
-      return `${month}/${day}/${year} ${hour}:${min}:${sec}`;
-    };
+    this.date = () => new Date().toISOString();
   }
 
   async ngOnInit(): Promise<void> {
@@ -77,11 +67,21 @@ export class HomeComponent {
     this.route.queryParamMap.subscribe(async params => {
       this.user_id = params.get('id') || ''; // Get the value of 'id'
       this.uniqueId = params.get('uniqueId') || ''; // Get the value of 'uniqueId' if it exists
-
+      this.isProcessing = true;
       if (this.user_id) {
-        await this.getUserEmail();
-        this.getUserSettings();
-        //this.getUserPhone();
+        forkJoin([
+          this.firebaseService.getUserByUID(this.user_id),
+          this.dbService.getUserSettings(this.user_id)
+        ]).subscribe({
+          next: ([userResponse, settingsResponse]) => {
+            this.user_email = userResponse.email;
+            this.user_settings = (settingsResponse as any).result;
+            this.isProcessing = false;
+          },
+          error: (error) => {
+            console.error('Error fetching data:', error);
+          }
+        });
       } else if (this.uniqueId) {
         this.getUserByUniqueId();
       }
@@ -173,9 +173,11 @@ export class HomeComponent {
           this.user_id = response.result.userId;
           this.getUserEmail();
           this.getUserSettings();
-          this.getUserPhone();
+          //this.getUserPhone();
+          this.isProcessing = false;
         } else {
           if (response && response.result.status === 'unclaimed') {
+            this.isProcessing = false;
             this.dialog.open(SampleNotRegisteredDialogComponent, {
               width: '400px',
               disableClose: true,
