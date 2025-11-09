@@ -126,7 +126,7 @@ export class ProductPageComponent {
 
     await this.printifyService.getProducts().subscribe({
       next: (response: any) => {
-        let products = response.data.map((item: any) => {
+        let products = response.map((item: any) => {
           return new Product(item);
         });
 
