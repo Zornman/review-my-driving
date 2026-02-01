@@ -7,7 +7,9 @@ import { DAILY_REPORT_PHOTO_SLOTS, sha256Hex } from "./_shared/dailyReports.js";
 // Allow both www + apex, and local dev if needed.
 const allowedOrigins = new Set([
   "https://reviewmydriving.co",
-  "https://www.reviewmydriving.co", 
+  "https://www.reviewmydriving.co",
+  // "http://localhost:5173",
+  // "http://localhost:3000",
 ]);
 
 const corsHandler = cors({
@@ -17,7 +19,8 @@ const corsHandler = cors({
     return callback(null, allowedOrigins.has(origin));
   },
   methods: ["POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  // Don't list Authorization unless you actually use it; it often triggers preflight.
+  allowedHeaders: ["Content-Type"],
   maxAge: 86400,
 });
 
@@ -27,13 +30,21 @@ type SubmitDailyReportBody = {
   issues?: string;
   issuesSummary?: string;
   // In MVP we don't upload binaries here; later these can be storage paths.
-  photos?: Array<{ slot: string; storagePath?: string; url?: string; mongoFileId?: string; fileName?: string; contentType?: string; size?: number }>;
+  photos?: Array<{
+    slot: string;
+    storagePath?: string;
+    url?: string;
+    mongoFileId?: string;
+    fileName?: string;
+    contentType?: string;
+    size?: number;
+  }>;
 };
 
-export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
-  corsHandler(req, res, async () => {
+export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["MONGO_URI"] }, (req, res) => {
+  // Important: return the cors handler so the platform waits for it to complete.
+  return corsHandler(req, res, async () => {
     if (req.method === "OPTIONS") {
-      // Handle preflight request
       res.status(204).send("");
       return;
     }
@@ -70,6 +81,13 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
       }
 
       const now = new Date();
+
+      // Magic link should be single-use (recommended).
+      if (tokenDoc.usedAt) {
+        res.status(401).json({ message: "Token already used" });
+        return;
+      }
+
       if (tokenDoc.revokedAt) {
         res.status(401).json({ message: "Token revoked" });
         return;
@@ -85,8 +103,8 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
 
       const photos = Array.isArray(body.photos) ? body.photos : [];
       const normalizedPhotos = photos
-        .filter(p => p && typeof p.slot === "string")
-        .map(p => ({
+        .filter((p) => p && typeof p.slot === "string")
+        .map((p) => ({
           slot: p.slot,
           storagePath: typeof p.storagePath === "string" ? p.storagePath : null,
           url: typeof p.url === "string" ? p.url : null,
@@ -97,8 +115,8 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
         }));
 
       // Enforce that the report expects 4 slots.
-      const slotsProvided = new Set(normalizedPhotos.map(p => p.slot));
-      const missingSlots = DAILY_REPORT_PHOTO_SLOTS.filter(s => !slotsProvided.has(s));
+      const slotsProvided = new Set(normalizedPhotos.map((p) => p.slot));
+      const missingSlots = DAILY_REPORT_PHOTO_SLOTS.filter((s) => !slotsProvided.has(s));
 
       const reportKey = {
         businessId: tokenDoc.businessId,
@@ -127,9 +145,17 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
       };
 
       await db.collection("daily_reports").updateOne(reportKey, { $set: reportDoc }, { upsert: true });
-      await db.collection("daily_report_tokens").updateOne({ _id: tokenDoc._id }, { $set: { usedAt: now } });
 
-      await client.close();
+      // Mark token used (conditional helps with races).
+      const usedRes = await db.collection("daily_report_tokens").updateOne(
+        { _id: tokenDoc._id, usedAt: { $exists: false } },
+        { $set: { usedAt: now } }
+      );
+      if (usedRes.matchedCount === 0) {
+        res.status(409).json({ message: "Token already used" });
+        return;
+      }
+
       res.status(200).json({ message: "Submitted", submittedAt: now });
     } catch (error: any) {
       console.error("Error submitting daily report:", error);
