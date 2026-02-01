@@ -4,7 +4,22 @@ import cors from "cors";
 import { parseJsonBody } from "./_shared/http.js";
 import { DAILY_REPORT_PHOTO_SLOTS, sha256Hex } from "./_shared/dailyReports.js";
 
-const corsHandler = cors({ origin: true });
+// Allow both www + apex, and local dev if needed.
+const allowedOrigins = new Set([
+  "https://reviewmydriving.co",
+  "https://www.reviewmydriving.co",
+]);
+
+const corsHandler = cors({
+  origin(origin, callback) {
+    // Non-browser / server-to-server calls might have no Origin header.
+    if (!origin) return callback(null, true);
+    return callback(null, allowedOrigins.has(origin));
+  },
+  methods: ["POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400,
+});
 
 type SubmitDailyReportBody = {
   token: string;
@@ -18,6 +33,7 @@ type SubmitDailyReportBody = {
 export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
   corsHandler(req, res, async () => {
     if (req.method === "OPTIONS") {
+      // Handle preflight request
       res.status(204).send("");
       return;
     }
@@ -49,20 +65,17 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
       const tokenHash = sha256Hex(body.token);
       const tokenDoc: any = await db.collection("daily_report_tokens").findOne({ tokenHash });
       if (!tokenDoc) {
-        await client.close();
         res.status(401).json({ message: "Invalid token" });
         return;
       }
 
       const now = new Date();
       if (tokenDoc.revokedAt) {
-        await client.close();
         res.status(401).json({ message: "Token revoked" });
         return;
       }
 
       if (tokenDoc.expiresAt && new Date(tokenDoc.expiresAt) < now) {
-        await client.close();
         res.status(401).json({ message: "Token expired" });
         return;
       }
@@ -95,7 +108,6 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
 
       const existing = await db.collection("daily_reports").findOne(reportKey);
       if (existing?.submittedAt) {
-        await client.close();
         res.status(200).json({ message: "Already submitted", alreadySubmitted: true });
         return;
       }
@@ -122,6 +134,8 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
     } catch (error: any) {
       console.error("Error submitting daily report:", error);
       res.status(500).json({ message: "Error submitting daily report", error: error.message });
+    } finally {
+      await client.close().catch(() => {});
     }
   });
 });
