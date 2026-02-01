@@ -4,25 +4,7 @@ import cors from "cors";
 import { parseJsonBody } from "./_shared/http.js";
 import { DAILY_REPORT_PHOTO_SLOTS, sha256Hex } from "./_shared/dailyReports.js";
 
-// Allow both www + apex, and local dev if needed.
-const allowedOrigins = new Set([
-  "https://reviewmydriving.co",
-  "https://www.reviewmydriving.co",
-  // "http://localhost:5173",
-  // "http://localhost:3000",
-]);
-
-const corsHandler = cors({
-  origin(origin, callback) {
-    // Non-browser / server-to-server calls might have no Origin header.
-    if (!origin) return callback(null, true);
-    return callback(null, allowedOrigins.has(origin));
-  },
-  methods: ["POST", "OPTIONS"],
-  // Don't list Authorization unless you actually use it; it often triggers preflight.
-  allowedHeaders: ["Content-Type"],
-  maxAge: 86400,
-});
+const corsHandler = cors({ origin: true });
 
 type SubmitDailyReportBody = {
   token: string;
