@@ -1,0 +1,33 @@
+.step-actions {
+    :first-child {
+        margin-right: 5px;
+    }
+}
+
+/*
+  This dialog should always be "light" even if the app is in dark-mode.
+  We scope the override to ONLY this component's stepper instance.
+*/
+:host ::ng-deep .always-light-stepper {
+    /* Key variable used by your global theme */
+    --mat-stepper-container-color: #FFFFFF;
+
+    /* Extra: make sure text stays dark on white */
+    --mdc-theme-surface: #FFFFFF;
+    --mdc-theme-on-surface: #000000;
+
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+:host ::ng-deep .always-light-stepper .mat-stepper-horizontal,
+:host ::ng-deep .always-light-stepper .mat-stepper-vertical,
+:host ::ng-deep .always-light-stepper .mat-horizontal-stepper-wrapper,
+:host ::ng-deep .always-light-stepper .mat-vertical-stepper-wrapper {
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+:host ::ng-deep .always-light-stepper .mat-step-header {
+    color: #000000;
+}

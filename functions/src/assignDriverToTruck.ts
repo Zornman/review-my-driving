@@ -1,0 +1,99 @@
+import * as functions from "firebase-functions/v2";
+import { MongoClient, ObjectId } from "mongodb";
+import cors from "cors";
+import { getActor, normalizeBusinessId, parseJsonBody, toObjectId } from "./_shared/http.js";
+import { writeAuditEvent } from "./_shared/audit.js";
+
+const corsHandler = cors({ origin: true });
+
+export const assignDriverToTruck = functions.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
+  corsHandler(req, res, async () => {
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
+
+    if (req.method !== "POST") {
+      res.status(405).json({ message: "Method Not Allowed" });
+      return;
+    }
+
+    const uri = process.env["MONGO_URI"] as string;
+    const client = new MongoClient(uri);
+
+    try {
+      const body = parseJsonBody<any>(req);
+      const actor = getActor(body);
+      const businessId = normalizeBusinessId(body.businessId, body.businessIdAsObjectId);
+
+      const truckObjectId: ObjectId | null = body.truckObjectId ? toObjectId(body.truckObjectId, "truckObjectId") : null;
+      const truckId: string | null = typeof body.truckId === "string" ? body.truckId : null;
+
+      const driverObjectId: ObjectId | null = body.driverObjectId ? toObjectId(body.driverObjectId, "driverObjectId") : null;
+      const unassign = body.unassign === true;
+
+      if (!truckObjectId && !truckId) {
+        res.status(400).json({ message: "Provide truckObjectId or truckId" });
+        return;
+      }
+
+      if (!unassign && !driverObjectId) {
+        res.status(400).json({ message: "Provide driverObjectId, or set unassign=true" });
+        return;
+      }
+
+      await client.connect();
+      const db = client.db("review_my_driving");
+      const trucks = db.collection("trucks");
+
+      const filter: any = { businessId, "audit.deletedAt": null };
+      if (truckObjectId) filter._id = truckObjectId;
+      if (truckId) filter.truckId = truckId;
+
+      const existing = await trucks.findOne(filter);
+      if (!existing) {
+        await client.close();
+        res.status(404).json({ message: "Truck not found" });
+        return;
+      }
+
+      const now = new Date();
+
+      const nextAssignedDriverId = unassign ? null : driverObjectId;
+
+      const result = await trucks.updateOne(
+        { _id: existing._id },
+        {
+          $set: {
+            "assignment.assignedDriverId": nextAssignedDriverId,
+            "assignment.assignedAt": unassign ? null : now,
+            "assignment.assignedBy": unassign ? null : actor,
+            "audit.updatedAt": now,
+            "audit.updatedBy": actor,
+          },
+          $inc: { "audit.version": 1 },
+        }
+      );
+
+      await writeAuditEvent({
+        db,
+        businessId,
+        entityType: "truck",
+        entityId: existing._id,
+        entityKey: existing.truckId,
+        action: unassign ? "unassign_driver" : "assign_driver",
+        actor,
+        changes: [
+          { path: "assignment.assignedDriverId", from: existing.assignment?.assignedDriverId ?? null, to: nextAssignedDriverId },
+        ],
+        requestId: body.requestId,
+      });
+
+      await client.close();
+      res.status(200).json({ message: unassign ? "Driver unassigned" : "Driver assigned", result });
+    } catch (error: any) {
+      console.error("Error assigning/unassigning driver:", error);
+      res.status(500).json({ message: "Error assigning/unassigning driver", error: error.message });
+    }
+  });
+});

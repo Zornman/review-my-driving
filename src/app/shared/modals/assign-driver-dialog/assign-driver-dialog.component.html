@@ -3,14 +3,16 @@
   <form [formGroup]="assignDriverForm">
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Select Driver</mat-label>
-      <mat-select formControlName="assignedDriver">
-        <mat-option *ngFor="let driver of drivers" [value]="driver.name">
-          {{ driver.name }}
+      <mat-select formControlName="assignedDriver" [compareWith]="compareDrivers">
+        <mat-option [value]="null">Unassigned</mat-option>
+        <mat-option *ngFor="let driver of drivers; trackBy: trackByDriver" [value]="driver" [disabled]="isCurrentDriver(driver)">
+          {{ driver.name }}{{ isCurrentDriver(driver) ? ' (Current)' : '' }}
         </mat-option>
       </mat-select>
     </mat-form-field>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button color="primary" [disabled]="assignDriverForm.invalid" (click)="onSubmit()">Assign</button>
+  <button mat-button color="primary" [disabled]="compareDrivers(assignDriverForm.get('assignedDriver')?.value, currentDriver)" (click)="onSubmit()">Assign</button>
+  <button mat-button (click)="onCancel()">Cancel</button>
 </mat-dialog-actions>

@@ -12,6 +12,7 @@ import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { AdminFunctionsComponent } from './admin/admin-functions/admin-functions.component';
+import { DailyReportComponent } from './daily-report/daily-report.component';
 
 export const routes: Routes = [
     { path: '', component: IndexComponent },
@@ -30,5 +31,6 @@ export const routes: Routes = [
     { path: 'about', component: AboutComponent },
     { path: 'contact', component: ContactComponent },
     { path: 'admin-functions', component: AdminFunctionsComponent },
+    { path: 'daily-report', component: DailyReportComponent },
     { path: '**', redirectTo: '/index' }
 ];

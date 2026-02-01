@@ -9,6 +9,30 @@
             <button type="submit" class="btn btn-primary" (click)="toggleSampleBatches()">View Sample Batches</button>
         </div>
     </div>
+
+    <div class="row" style="margin-top: 15px;">
+        <div class="col-12">
+            <h2>Daily Reports - Admin Tools</h2>
+            <p style="margin: 0 0 10px; color: #666;">
+                Run these against emulator (local) or production to verify daily-report scheduling.
+            </p>
+        </div>
+        <div class="col-12 col-md-6" style="margin-bottom: 10px;">
+            <button mat-stroked-button color="primary" type="button" (click)="initDailyReportIndexes()" [disabled]="isInitDailyReportIndexesLoading">
+                Init Daily Report Indexes
+                <mat-progress-spinner *ngIf="isInitDailyReportIndexesLoading" mode="indeterminate" diameter="18" style="margin-left: 10px;"></mat-progress-spinner>
+            </button>
+        </div>
+        <div class="col-12 col-md-6" style="margin-bottom: 10px;">
+            <button mat-stroked-button color="accent" type="button" (click)="runDailyReportSchedulerOnce()" [disabled]="isRunDailyReportSchedulerLoading">
+                Run Scheduler Once
+                <mat-progress-spinner *ngIf="isRunDailyReportSchedulerLoading" mode="indeterminate" diameter="18" style="margin-left: 10px;"></mat-progress-spinner>
+            </button>
+        </div>
+        <div class="col-12" *ngIf="lastDailyReportSchedulerResult">
+            <pre style="white-space: pre-wrap; background:#f6f6f6; padding:10px; border-radius:8px;">{{ lastDailyReportSchedulerResult | json }}</pre>
+        </div>
+    </div>
     <div class="row" *ngIf="showBulkCreateForm">
         <div class="col-12">
             <div class="col-12 padding-bottom">

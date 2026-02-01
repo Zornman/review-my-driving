@@ -57,6 +57,8 @@ html, body {
 }
 
 body {
+    --mat-datepicker-calendar-container-background-color: white;
+    --mat-datepicker-calendar-container-text-color: black;
     margin: 0;
     font-family: 'DynaPuff', serif;
     overflow: hidden;
@@ -70,7 +72,7 @@ body {
         font-family: 'DynaPuff', serif;
     }
 
-    button:not(.mdc-icon-button):not(.quick-review-button) {
+    button:not(.mdc-icon-button):not(.quick-review-button):not(.mat-calendar-body-cell) {
         background-color: $color-primary !important;
         color: $color-text-light !important;
         border: none;
@@ -122,6 +124,26 @@ body {
                 margin-right: 0px;
             }
         }
+    }
+
+    .mat-calendar {
+        border: 1px solid black;
+    }
+
+    .mat-calendar-body-cell {
+        background-color: #F3F4F6;
+        border: none;
+        border-radius: 999px;
+
+        &:hover {
+            background-color: #dddee1;
+            cursor: pointer;
+        }
+    }
+
+    .mat-calendar-body-selected {
+        background-color: $color-primary !important;
+        color: $color-text-light !important;
     }
 }
 
@@ -202,6 +224,11 @@ input, textarea, select, label {
     bottom: 0;
     z-index: 1000; /* Ensure it stays on top of other content */
     text-align: center;
+}
+
+/* Ensure Angular Material overlays (mat-select, dialogs, etc.) appear above sticky header/footer. */
+.cdk-overlay-container {
+    z-index: 2000 !important;
 }
 
 .content {

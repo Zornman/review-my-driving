@@ -1,0 +1,89 @@
+<h2 mat-dialog-title>Add New Driver</h2>
+<mat-dialog-content>
+	<mat-stepper linear class="always-light-stepper">
+		<mat-step [stepControl]="licenseForm">
+			<form [formGroup]="licenseForm">
+				<ng-template matStepLabel class="stepper-header">License Info</ng-template>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>Driver Name</mat-label>
+					<input matInput formControlName="name" />
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>Email</mat-label>
+					<input matInput formControlName="email" />
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>Phone</mat-label>
+					<input matInput formControlName="phone" formatPhone />
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>License Number</mat-label>
+					<input matInput formControlName="licenseNumber" />
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>License State</mat-label>
+					<mat-select formControlName="licenseState">
+						<mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
+					</mat-select>
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>License Expiration</mat-label>
+					<input matInput formControlName="licenseExpiration" [matDatepicker]="licenseExpPicker" />
+					<mat-datepicker-toggle matIconSuffix [for]="licenseExpPicker"></mat-datepicker-toggle>
+					<mat-datepicker #licenseExpPicker></mat-datepicker>
+				</mat-form-field>
+
+				<div class="step-actions">
+					<button mat-button matStepperNext color="primary" [disabled]="licenseForm.invalid">Next</button>
+				</div>
+			</form>
+		</mat-step>
+
+		<mat-step [stepControl]="addressForm">
+			<form [formGroup]="addressForm">
+				<ng-template matStepLabel class="stepper-header">Address Info</ng-template>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>Address 1</mat-label>
+					<input matInput formControlName="address1" />
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>Address 2</mat-label>
+					<input matInput formControlName="address2" />
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>City</mat-label>
+					<input matInput formControlName="city" />
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>State</mat-label>
+					<mat-select formControlName="state">
+						<mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
+					</mat-select>
+				</mat-form-field>
+
+				<mat-form-field appearance="fill" class="full-width">
+					<mat-label>Zip</mat-label>
+					<input matInput formControlName="zip" />
+				</mat-form-field>
+
+				<div class="step-actions">
+					<button mat-button matStepperPrevious>Back</button>
+					<button mat-button color="primary" [disabled]="addressForm.invalid" (click)="onComplete()">Finish</button>
+				</div>
+			</form>
+		</mat-step>
+	</mat-stepper>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+	<button mat-button (click)="onCancel()">Cancel</button>
+</mat-dialog-actions>

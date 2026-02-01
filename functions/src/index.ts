@@ -16,6 +16,7 @@ const PRINTIFY_API_KEY = defineSecret("PRINTIFY_API_KEY");
 const MONGO_URI = defineSecret("MONGO_URI");
 const EMAIL_USER = defineSecret("EMAIL_USER");
 const EMAIL_PASS = defineSecret("EMAIL_PASS");
+const APP_BASE_URL = defineSecret("APP_BASE_URL");
 
 export { createCustomProduct } from "./createCustomProduct.js";
 export { createPrintifyOrder } from "./createPrintifyOrder.js";
@@ -32,6 +33,7 @@ export { getShippingOptions } from "./getShippingOptions.js";
 export { getShippingRates } from "./getShippingRates.js";
 export { getSubmissionsByUser } from "./getSubmissionsByUser.js";
 export { getBusinessUserInfo } from "./getBusinessUserInfo.js";
+export { updateBusinessUserInfo } from "./updateBusinessUserInfo.js";
 export { getUserByUID } from "./getUserByUID.js";
 export { getUserByUniqueId } from "./getUserByUniqueId.js";
 export { getUserOrderHistory } from "./getUserOrderHistory.js";
@@ -46,6 +48,28 @@ export { insertUserOrder } from "./insertUserOrder.js";
 export { insertUserSettings } from "./insertUserSettings.js";
 export { insertUserShipping } from "./insertUserShipping.js";
 
+// Trucks & Drivers
+export { insertTruck } from "./insertTruck.js";
+export { getTrucksByBusiness } from "./getTrucksByBusiness.js";
+export { updateTruck } from "./updateTruck.js";
+export { deleteTruck } from "./deleteTruck.js";
+export { assignDriverToTruck } from "./assignDriverToTruck.js";
+
+export { insertDriver } from "./insertDriver.js";
+export { getDriversByBusiness } from "./getDriversByBusiness.js";
+export { updateDriver } from "./updateDriver.js";
+export { deleteDriver } from "./deleteDriver.js";
+
+// Daily Reports (magic-link)
+export { initDailyReportIndexes } from "./initDailyReportIndexes.js";
+export { createDailyReportToken } from "./createDailyReportToken.js";
+export { getDailyReportContextByToken } from "./getDailyReportContextByToken.js";
+export { submitDailyReportByToken } from "./submitDailyReportByToken.js";
+export { runDailyReportMagicLinksOnce } from "./runDailyReportMagicLinksOnce.js";
+export { getDailyReportsSummary } from "./getDailyReportsSummary.js";
+export { uploadDailyReportPhotoByToken } from "./uploadDailyReportPhotoByToken.js";
+export { getDailyReportPhoto } from "./getDailyReportPhoto.js";
+
 export { logError } from "./logError.js";
 export { sendSMSAlert } from "./sendSMSAlert.js";
 export { sendContactEmail } from "./sendContactEmail.js";
@@ -55,6 +79,7 @@ export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 export { updateSampleMapper } from "./updateSampleMapper.js";
 export { updateOrderStatus } from "./updateOrderStatus.js";
 import { updateOrderStatusTask } from "./updateOrderStatusTask.js";
+import { sendDailyReportMagicLinksTask } from "./sendDailyReportMagicLinksTask.js";
 
 export const updateOrderStatusTaskSchedule = onSchedule({schedule: "every hour", secrets: [
     PRINTIFY_STORE_ID,
@@ -81,3 +106,26 @@ export const updateOrderStatusTaskSchedule = onSchedule({schedule: "every hour",
     console.error("Error running scheduled function:", error);
     }
 });
+
+export const sendDailyReportMagicLinksSchedule = onSchedule(
+    {
+        schedule: "every 15 minutes",
+        secrets: [MONGO_URI, EMAIL_USER, EMAIL_PASS, APP_BASE_URL],
+    },
+    async () => {
+        console.log("Running Daily Report magic-link scheduler...");
+
+        try {
+            const result = await sendDailyReportMagicLinksTask({
+                MONGO_URI: MONGO_URI.value(),
+                EMAIL_USER: EMAIL_USER.value(),
+                EMAIL_PASS: EMAIL_PASS.value(),
+                APP_BASE_URL: APP_BASE_URL.value(),
+            });
+
+            console.log("Daily Report scheduler completed:", result);
+        } catch (error) {
+            console.error("Error running Daily Report scheduler:", error);
+        }
+    }
+);

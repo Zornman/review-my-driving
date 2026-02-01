@@ -1,0 +1,129 @@
+<mat-card appearance="outlined" class="summary-shell">
+	<mat-card-title>Daily Report Summary</mat-card-title>
+	<mat-card-subtitle>Track completion and review submitted details.</mat-card-subtitle>
+
+	<mat-divider></mat-divider>
+
+	<form [formGroup]="form" class="controls" (ngSubmit)="refresh()">
+		<mat-form-field appearance="outline" class="control">
+			<mat-label>Start date</mat-label>
+			<input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+			<mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+			<mat-datepicker #startPicker></mat-datepicker>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="control">
+			<mat-label>End date</mat-label>
+			<input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+			<mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+			<mat-datepicker #endPicker></mat-datepicker>
+		</mat-form-field>
+
+		<button mat-raised-button color="primary" type="submit" [disabled]="isLoading || form.invalid">
+			<mat-icon>refresh</mat-icon>
+			Refresh
+		</button>
+	</form>
+
+	<div class="status-row" *ngIf="isLoading">
+		<mat-progress-spinner diameter="22" mode="indeterminate"></mat-progress-spinner>
+		<span>Loading summaries…</span>
+	</div>
+
+	<div class="error" *ngIf="loadError">{{ loadError }}</div>
+
+	<div class="empty" *ngIf="!isLoading && !loadError && days.length === 0">
+		No daily reports found for this date range.
+	</div>
+
+	<mat-accordion class="days" *ngIf="!isLoading && !loadError && days.length">
+		<mat-expansion-panel
+			*ngFor="let day of days; trackBy: trackByDay"
+			[expanded]="expandedDay === day.reportDateLocal"
+			(opened)="expandedDay = day.reportDateLocal">
+
+			<mat-expansion-panel-header>
+				<mat-panel-title>
+					<span class="day-title">{{ day.reportDateLocal }}</span>
+				</mat-panel-title>
+				<mat-panel-description>
+					<span class="day-stats">
+						{{ day.totals.submitted + day.totals.waived }}/{{ day.totals.expected }} complete
+						· {{ day.totals.pending }} pending
+						· {{ day.totals.missing }} missing
+					</span>
+				</mat-panel-description>
+			</mat-expansion-panel-header>
+
+			<div class="day-progress">
+				<mat-progress-bar mode="determinate" [value]="completionPercent(day)"></mat-progress-bar>
+				<div class="day-progress-label">{{ completionPercent(day) }}%</div>
+			</div>
+
+			<mat-accordion class="drivers" multi>
+				<mat-expansion-panel *ngFor="let group of groupByDriver(day.rows); trackBy: trackByDriverGroup">
+					<mat-expansion-panel-header>
+						<mat-panel-title>
+							<span class="driver-name">{{ group.driverName }}</span>
+							<span class="driver-email" *ngIf="group.driverEmail">({{ group.driverEmail }})</span>
+						</mat-panel-title>
+						<mat-panel-description>
+							<span class="driver-count">{{ group.rows.length }} truck(s)</span>
+						</mat-panel-description>
+					</mat-expansion-panel-header>
+
+					<div class="truck" *ngFor="let row of group.rows; trackBy: trackByTruckRow">
+						<div class="truck-header">
+							<div class="truck-left">
+								<div class="truck-title">{{ row.truckLabel || 'Truck' }}</div>
+								<div class="truck-meta" *ngIf="row.token?.sentAt">Email sent: {{ row.token?.sentAt | date:'short' }}</div>
+							</div>
+
+							<mat-chip-set aria-label="Report status">
+								<mat-chip class="status-chip" [ngClass]="'status-' + row.status">
+									<mat-icon class="status-icon">{{ statusIcon(row.status) }}</mat-icon>
+									{{ statusLabel(row.status) }}
+								</mat-chip>
+							</mat-chip-set>
+						</div>
+
+						<div class="report" *ngIf="row.report">
+							<div class="report-grid">
+								<div><strong>Submitted:</strong> {{ row.report.submittedAt | date:'short' }}</div>
+								<div><strong>Odometer:</strong> {{ row.report.odometer ?? '—' }}</div>
+								<div><strong>Issues:</strong> {{ row.report.issues || '—' }}</div>
+								<div><strong>Issues Summary:</strong> {{ row.report.issuesSummary || '—' }}</div>
+							</div>
+
+							<div class="photos" *ngIf="row.report.photos?.length">
+								<div class="photos-title">Photos</div>
+								<div class="photos-grid">
+									<div class="photo" *ngFor="let p of row.report.photos">
+										<div class="photo-slot">{{ p.slot }}</div>
+										<img *ngIf="photoUrl(p)" [src]="photoUrl(p)" [alt]="p.slot" />
+										<div class="photo-missing" *ngIf="!photoUrl(p)">
+											<span *ngIf="p.storagePath">Stored: {{ p.storagePath }}</span>
+											<span *ngIf="!p.storagePath">No URL available</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="photos" *ngIf="!row.report.photos?.length">
+								<div class="photos-title">Photos</div>
+								<div class="photo-missing">No photos recorded on this report.</div>
+							</div>
+						</div>
+
+						<div class="report" *ngIf="!row.report">
+							<div class="report-empty">
+								<span *ngIf="row.status === 'pending'">Waiting for submission.</span>
+								<span *ngIf="row.status === 'missing'">No active token/report found.</span>
+							</div>
+						</div>
+					</div>
+				</mat-expansion-panel>
+			</mat-accordion>
+		</mat-expansion-panel>
+	</mat-accordion>
+</mat-card>

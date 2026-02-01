@@ -1,7 +1,7 @@
 <span class="align-middle">Last login Time: {{ user?.metadata?.lastSignInTime }}</span>
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" (selectedTabChange)="onTabChange($event)">
-    <mat-tab label="Submissions">
-        <h3 class="align-middle">Submissions</h3>
+    <mat-tab [label]="isBusinessUser ? 'Overview' : 'Submissions'">
+        <h3 class="align-middle">{{ isBusinessUser ? 'Overview' : 'Submissions' }}</h3>
         <div class="account-overview-container">
             <div class="account-card">
                 <mat-card appearance="outlined">
@@ -121,8 +121,11 @@
     <mat-tab label="Trucks & Drivers" *ngIf="isBusinessUser">
       <app-truck-and-driver-management></app-truck-and-driver-management>
     </mat-tab>
+    <mat-tab label="Daily Report Summary" *ngIf="isBusinessUser">
+      <app-daily-reports-summary *ngIf="businessUserInfo" [businessUserInfo]="businessUserInfo"></app-daily-reports-summary>
+    </mat-tab>
     <mat-tab label="Business Settings" *ngIf="isBusinessUser">
-      <app-business-functions [businessUserInfo]="businessUserInfo"></app-business-functions>
+      <app-business-functions *ngIf="businessUserInfo" [businessUserInfo]="businessUserInfo"></app-business-functions>
     </mat-tab>
     <mat-tab label="Account Overview" *ngIf="!isBusinessUser">
         <h3 class="align-middle">Account Overview</h3>
@@ -290,7 +293,7 @@
             </div>
         </form>
     </mat-tab>
-    <mat-tab label="Order History">
+    <mat-tab label="Order History" *ngIf="!isBusinessUser">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-center">

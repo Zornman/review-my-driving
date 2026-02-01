@@ -3,12 +3,34 @@
     text-align: center; /* Center-align the content */
 }
 
-.assigned-driver-column {
-    min-width: 160px; /* Set a larger width for the assigned driver column */
+.truck-id-column {
+    max-width: 100px !important;
 }
 
-.license-plate-column {
-    min-width: 130px; /* Set a larger width for the license plate column */
+.assigned-driver-column {
+    @media screen and (max-width: 767px) {
+        display: none; /* Hide on small screens */;
+    }
+}
+
+.odometer-column {
+    @media screen and (max-width: 550px) {
+        display: none; /* Hide on small screens */;
+    }
+}
+
+.phone-column {
+    @media screen and (max-width: 500px) {
+        display: none; /* Hide on small screens */;
+    }
+}
+
+.driver-id-column {
+    max-width: 120px !important; /* Set a smaller width for the driver ID column */
+}
+
+.status-column {
+    max-width: fit-content !important; /* Set a larger width for the status column */
 }
 
 .stack-section {
@@ -17,4 +39,138 @@
 
 .expanded-detail {
     width: 100%;
+}
+
+.detail-item {
+    text-align: right;
+    justify-content: right;
+}
+
+.driver-expanded-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+/* Keep section headings aligned with their content */
+.driver-expanded-grid .stack-section > h4 {
+    margin: 0 0 8px 0;
+    text-align: left;
+}
+
+/* Address usually has more lines, so let it span full width on larger screens */
+.driver-address-section {
+    grid-column: 1 / -1;
+}
+
+.detail-kv {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-kv-row {
+    display: grid;
+    /* Let the label be only as wide as it needs; value takes the rest */
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.detail-kv-label {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.detail-kv-value {
+    overflow-wrap: anywhere;
+}
+
+.actions-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+/* Default: let buttons wrap naturally but keep consistent sizing */
+.actions-buttons > button {
+    flex: 0 1 auto;
+    white-space: nowrap;
+}
+
+/* Small screens: switch to a controlled 2-column layout */
+@media screen and (max-width: 576px) {
+    .actions-buttons > button {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 140px;
+    }
+}
+
+/* Extra small: single column for best tap targets */
+@media screen and (max-width: 380px) {
+    .actions-buttons > button {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+}
+
+/*
+  Expanded truck details should include values that are hidden in the table at smaller widths.
+  Match the exact breakpoints used by the table column CSS.
+*/
+.truck-detail-show-when-assigned-driver-hidden {
+    display: none;
+
+    @media screen and (max-width: 767px) {
+        display: block;
+    }
+}
+
+.truck-detail-show-when-odometer-hidden {
+    display: none;
+
+    @media screen and (max-width: 550px) {
+        display: block;
+    }
+}
+
+/* Drivers: show Phone in expanded detail when the table column is hidden */
+.driver-phone-detail-show-when-phone-hidden {
+    display: none;
+
+    @media screen and (max-width: 500px) {
+        display: grid;
+    }
+}
+
+/* Make expanded detail readable on small screens */
+@media screen and (max-width: 576px) {
+    .expanded-detail {
+        .detail-item {
+            text-align: left;
+            justify-content: left;
+        }
+
+        .stack-section {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+    }
+
+    .driver-expanded-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .detail-kv-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .detail-kv-label {
+        text-align: left;
+    }
 }

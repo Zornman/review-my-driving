@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>{{ truck ? 'Edit' : 'Add' }} Truck</h2>
+<mat-dialog-content>
+    <form [formGroup]="truckForm">
+        <mat-form-field appearance="fill" class="full-width" *ngIf="truck">
+            <mat-label>Truck ID</mat-label>
+            <input matInput formControlName="truckId" name="truckId" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>License Plate</mat-label>
+            <input matInput formControlName="licensePlate" name="licensePlate" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Assigned Driver</mat-label>
+            <mat-select formControlName="assignedDriverId">
+                <mat-option [value]="null">Unassigned</mat-option>
+                <mat-option *ngFor="let driver of drivers" [value]="(driver._id?.$oid ?? driver._id)">
+                    {{ driver.name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>State</mat-label>
+            <mat-select formControlName="state" name="state">
+                <mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Make</mat-label>
+            <input matInput formControlName="make" name="make" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Model</mat-label>
+            <input matInput formControlName="model" name="model" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Year</mat-label>
+            <input matInput formControlName="year" name="year" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>VIN</mat-label>
+            <input matInput formControlName="vin" name="vin" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Odometer</mat-label>
+            <input matInput formControlName="odometer" name="odometer" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Registration Expiration</mat-label>
+            <input matInput formControlName="registrationExpiration" [matDatepicker]="registrationExpPicker" />
+            <mat-datepicker-toggle matIconSuffix [for]="registrationExpPicker"></mat-datepicker-toggle>
+            <mat-datepicker #registrationExpPicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Status</mat-label>
+            <input matInput formControlName="status" name="status" />
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button color="primary" [disabled]="truckForm.invalid || (truck && truckForm.pristine)" (click)="onSubmit()">{{ truck ? 'Edit' : 'Add' }} Truck</button>
+</mat-dialog-actions>

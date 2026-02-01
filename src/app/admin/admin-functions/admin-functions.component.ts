@@ -12,6 +12,7 @@ import { Product } from '../../shared/models/product';
 import { MongoService } from '../../services/mongo.service';
 import { AuthService } from '../../services/auth.service';
 import { ViewSampleBatchesComponent } from './view-sample-batches/view-sample-batches.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-admin-functions',
@@ -23,6 +24,7 @@ import { ViewSampleBatchesComponent } from './view-sample-batches/view-sample-ba
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
+    MatProgressSpinnerModule,
     ViewSampleBatchesComponent
   ],
   templateUrl: './admin-functions.component.html',
@@ -35,6 +37,10 @@ export class AdminFunctionsComponent implements OnInit {
   products: Product[] = []; // Replace with actual product type if available
   userId: string | undefined = undefined;
   showSampleBatches: boolean = false;
+
+  isInitDailyReportIndexesLoading = false;
+  isRunDailyReportSchedulerLoading = false;
+  lastDailyReportSchedulerResult: any | null = null;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: any, 
@@ -91,6 +97,42 @@ export class AdminFunctionsComponent implements OnInit {
 
   toggleSampleBatches(): void {
     this.showSampleBatches = !this.showSampleBatches;
+  }
+
+  initDailyReportIndexes(): void {
+    this.isInitDailyReportIndexesLoading = true;
+    this._snackBar.open('Initializing daily report indexes...', 'Close');
+
+    this.mongoService.initDailyReportIndexes().subscribe({
+      next: (result: any) => {
+        this.isInitDailyReportIndexesLoading = false;
+        this._snackBar.open(result?.message ?? 'Indexes initialized.', 'Ok', { duration: 3000 });
+      },
+      error: (err: any) => {
+        this.isInitDailyReportIndexesLoading = false;
+        this._snackBar.open(err?.error?.message ?? 'Error initializing indexes.', 'Ok', { duration: 5000 });
+      }
+    });
+  }
+
+  runDailyReportSchedulerOnce(): void {
+    this.isRunDailyReportSchedulerLoading = true;
+    this.lastDailyReportSchedulerResult = null;
+    this._snackBar.open('Running daily report scheduler once...', 'Close');
+
+    this.mongoService.runDailyReportMagicLinksOnce().subscribe({
+      next: (result: any) => {
+        this.isRunDailyReportSchedulerLoading = false;
+        this.lastDailyReportSchedulerResult = result?.result ?? result;
+        const sent = this.lastDailyReportSchedulerResult?.emailsSent ?? 0;
+        const created = this.lastDailyReportSchedulerResult?.tokensCreated ?? 0;
+        this._snackBar.open(`Scheduler finished. Emails: ${sent}, Tokens: ${created}`, 'Ok', { duration: 5000 });
+      },
+      error: (err: any) => {
+        this.isRunDailyReportSchedulerLoading = false;
+        this._snackBar.open(err?.error?.message ?? 'Error running scheduler.', 'Ok', { duration: 5000 });
+      }
+    });
   }
 
   onBulkCreate(): void {

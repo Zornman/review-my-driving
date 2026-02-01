@@ -1,0 +1,125 @@
+<div class="daily-report-page">
+	<mat-card appearance="outlined" class="daily-report-card">
+		<mat-card-header style="padding-bottom: 10px;">
+			<mat-card-title class="daily-report-header">
+				<span class="daily-report-title">Daily Report</span>
+			</mat-card-title>
+			<mat-card-subtitle class="daily-report-subtitle" *ngIf="token; else missingToken">Submit today’s end-of-day report</mat-card-subtitle>
+		</mat-card-header>
+
+		<ng-template #missingToken>
+			<mat-card-subtitle>Invalid or missing link token</mat-card-subtitle>
+		</ng-template>
+
+		<mat-card-content>
+			<div class="alert alert-warn" *ngIf="!token">
+				This link is missing its security token. Please request a new daily report email.
+			</div>
+
+			<div class="alert alert-error" *ngIf="submitError">{{ submitError }}</div>
+			<div class="alert alert-success" *ngIf="submitted">Thanks — your daily report was submitted.</div>
+
+			<form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!submitted">
+				<mat-form-field appearance="outline" class="full-width padding-bottom">
+					<mat-label>Odometer (miles)</mat-label>
+					<input matInput type="number" formControlName="odometer" min="0" inputmode="numeric" [disabled]="isSubmitting || !token" />
+					<mat-error *ngIf="form.get('odometer')?.invalid && (form.get('odometer')?.touched || form.get('odometer')?.dirty)">
+						Odometer is required
+					</mat-error>
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="full-width padding-bottom">
+					<mat-label>Any issues today?</mat-label>
+					<input matInput formControlName="issues" placeholder="No / Yes" [disabled]="isSubmitting || !token" />
+					<mat-hint>Type “No” if everything looked good.</mat-hint>
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="full-width padding-bottom" *ngIf="requiresIssuesSummary">
+					<mat-label>Issues summary (optional details)</mat-label>
+					<textarea matInput rows="4" formControlName="issuesSummary" placeholder="Describe any damage, warnings, mechanical issues, etc."></textarea>
+				</mat-form-field>
+
+				<div class="photos">
+					<h3>Truck photos (required)</h3>
+					<p class="muted">Drag & drop anywhere below, or click a tile to replace that photo.</p>
+
+					<div
+						class="upload-zone"
+						[class.upload-zone-disabled]="isSubmitting || !token"
+						[class.upload-zone-dragover]="isDragOver"
+						(dragover)="onDragOver($event)"
+						(dragleave)="onDragLeave($event)"
+						(drop)="onDrop($event)"
+					>
+						<input
+							#photosInput
+							type="file"
+							accept="image/*"
+							multiple
+							(change)="onFilesSelected($event)"
+							[disabled]="isSubmitting || !token"
+						/>
+						<div class="upload-zone-content">
+							<mat-icon class="upload-icon">cloud_upload</mat-icon>
+							<div class="upload-title">Photos: {{ photoCount }}/4</div>
+							<div class="upload-subtitle">Front, back, driver-side, passenger-side</div>
+							<div class="upload-subtitle">Active slot: <strong>{{ labelFor(activeSlotKey) }}</strong></div>
+							<button mat-stroked-button color="primary" type="button" (click)="photosInput.click()" [disabled]="isSubmitting || !token">
+								Choose photos
+							</button>
+							<div class="upload-subtitle" *ngIf="missingPhotoLabels.length">
+								Missing: <strong>{{ missingPhotoLabels.join(', ') }}</strong>
+							</div>
+						</div>
+					</div>
+
+					<mat-progress-bar mode="determinate" [value]="photoProgressPercent"></mat-progress-bar>
+
+					<div class="preview-grid">
+						<div
+							class="preview-tile"
+							*ngFor="let slot of photoSlots"
+							[class.preview-active]="isActiveSlot(slot.key)"
+							(click)="openPickerFor(slot.key, photosInput)"
+							role="button"
+							tabindex="0"
+						>
+							<button
+								mat-icon-button
+								type="button"
+								class="preview-remove"
+								(click)="$event.stopPropagation(); clearPhoto(slot.key)"
+								[disabled]="isSubmitting"
+								aria-label="Remove photo"
+							>
+								<mat-icon>close</mat-icon>
+							</button>
+
+							<div class="preview-image" *ngIf="previewUrlFor(slot.key); else previewPlaceholder">
+								<img [src]="previewUrlFor(slot.key)" alt="{{ slot.label }} preview" />
+							</div>
+
+							<ng-template #previewPlaceholder>
+								<div class="preview-placeholder">
+									<div class="preview-placeholder-title">{{ slot.label }}</div>
+									<div class="preview-placeholder-subtitle">Tap to upload</div>
+								</div>
+							</ng-template>
+
+							<div class="preview-caption">
+								<span class="preview-caption-label">{{ slot.label }}</span>
+								<span class="preview-caption-file" *ngIf="fileNameFor(slot.key)">{{ fileNameFor(slot.key) }}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="actions">
+					<button mat-raised-button color="primary" type="submit" [disabled]="isSubmitting || !token || form.invalid || !photosComplete">
+						{{ isSubmitting ? 'Submitting…' : 'Submit Report' }}
+					</button>
+				</div>
+			</form>
+		</mat-card-content>
+	</mat-card>
+</div>
