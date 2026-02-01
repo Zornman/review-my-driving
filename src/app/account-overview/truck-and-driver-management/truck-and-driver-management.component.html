@@ -1,30 +1,33 @@
 <h3 class="align-middle">Trucks & Drivers</h3>
-    <p class="align-middle">
-        Manage your trucks and drivers here. You can add, edit, or remove trucks and drivers associated with your business account.
-    </p>
-    <div class="container">
-        <div class="row">
-            <div class="col-12 col-center">
-            <button mat-raised-button color="primary">
+<p class="align-middle">
+    Manage your trucks and drivers here. You can add, edit, or remove trucks and drivers associated with your business account.
+</p>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-center">
+            <button mat-raised-button color="primary" (click)="openAddTruckDialog()">
                 Add New Truck
             </button>
             <div class="spacer" style="margin: 0px 10px;"></div>
-            <button mat-raised-button color="primary">
+            <button mat-raised-button color="primary" (click)="openAddDriverDialog()">
                 Add New Driver
             </button>
         </div>
-        <div class="row">
-            <div class="col-6">
+    </div>
+
+    <div class="row">
+            <div class="col-12">
                 <h4 class="align-middle" style="margin-top: 20px;">Trucks</h4>
                 <mat-table [dataSource]="trucksDataSource" multiTemplateDataRows class="mat-elevation-z8">
                     <!-- Define columns -->
                     <ng-container matColumnDef="truckId">
-                        <mat-header-cell *matHeaderCellDef> Truck ID </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{ element.truckId }} </mat-cell>
+                        <mat-header-cell *matHeaderCellDef class="truck-id-column"> Truck ID </mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="truck-id-column"> {{ element.truckId }} </mat-cell>
                     </ng-container>
     
                     <ng-container matColumnDef="licensePlate">
-                        <mat-header-cell *matHeaderCellDef class="license-plate-column"> License Plate </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef class="license-plate-column"> Plate # </mat-header-cell>
                         <mat-cell *matCellDef="let element" class="license-plate-column"> {{ element.licensePlate }} </mat-cell>
                     </ng-container>
     
@@ -34,13 +37,13 @@
                     </ng-container>
     
                     <ng-container matColumnDef="odometer">
-                        <mat-header-cell *matHeaderCellDef> Odometer </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{ element.odometer | number }} </mat-cell>
+                        <mat-header-cell *matHeaderCellDef class="odometer-column"> Odometer </mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="odometer-column"> {{ element.odometer | number }} </mat-cell>
                     </ng-container>
     
                     <ng-container matColumnDef="status">
-                        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{ element.status }} </mat-cell>
+                        <mat-header-cell *matHeaderCellDef class="status-column"> Status </mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="status-column"> {{ element.status }} </mat-cell>
                     </ng-container>
 
                     <!-- Expand/Collapse Column -->
@@ -57,27 +60,40 @@
                         <mat-cell *matCellDef="let element" [attr.colspan]="trucksColumnsToDisplay.length" [@detailExpand]="element == expandedTruck ? 'expanded' : 'collapsed'">
                             <div class="expanded-detail">
                                 <div class="row">
-                                    <div class="col-3 col-center stack-section">
+                                    <div class="col-6 col-md-3 col-center stack-section">
                                         <p><strong>State:</strong></p>
                                         <p>{{ element.state }}</p>
                                     </div>
-                                    <div class="col-3 col-center stack-section">
+                                    <div class="col-6 col-md-3 col-center stack-section">
                                         <p><strong>Make:</strong></p>
                                         <p>{{ element.make }}</p>
                                     </div>
-                                    <div class="col-3 col-center stack-section">
+                                    <div class="col-6 col-md-3 col-center stack-section">
                                         <p><strong>Model:</strong></p>
                                         <p>{{ element.model }}</p>
                                     </div>
-                                    <div class="col-3 col-center stack-section">
+                                    <div class="col-6 col-md-3 col-center stack-section">
                                         <p><strong>Year:</strong></p>
                                         <p>{{ element.year }}</p>
                                     </div>
-                                    <div class="col-6 col-center stack-section">
+
+                                    <!-- Shown only when Assigned Driver column is hidden (< 767px) -->
+                                    <div class="col-12 col-sm-6 col-center stack-section truck-detail-show-when-assigned-driver-hidden">
+                                        <p><strong>Assigned Driver:</strong></p>
+                                        <p>{{ element.assignedDriver }}</p>
+                                    </div>
+
+                                    <!-- Shown only when Odometer column is hidden (< 550px) -->
+                                    <div class="col-12 col-sm-6 col-center stack-section truck-detail-show-when-odometer-hidden">
+                                        <p><strong>Odometer:</strong></p>
+                                        <p>{{ element.odometer | number }}</p>
+                                    </div>
+
+                                    <div class="col-12 col-md-6 col-center stack-section">
                                         <p><strong>Vin:</strong></p>
                                         <p>{{ element.vin }}</p>
                                     </div>
-                                    <div class="col-6 col-center stack-section">
+                                    <div class="col-12 col-md-6 col-center stack-section">
                                         <p><strong>Registration Expiration Date:</strong></p>
                                         <p>{{ element.registrationExpiration | date }}</p>
                                     </div>
@@ -85,18 +101,20 @@
                                 <div class="row" style="text-align: center;">
                                     <div class="col-12">
                                         <h4 class="align-middle">Actions</h4>
-                                        <button mat-raised-button color="primary" style="margin-right: 5px;">
-                                            Edit Truck
-                                        </button>
-                                        <button mat-raised-button color="primary" style="margin-right: 5px;" (click)="reassignDriver()">
-                                            Assign Driver
-                                        </button>
-                                        <button mat-raised-button color="primary" style="margin-right: 5px;" (click)="updateTruckStatus(element)">
-                                            Update Status
-                                        </button>
-                                        <button mat-raised-button color="primary" (click)="deleteTruck()">
-                                            Delete Truck
-                                        </button>
+                                        <div class="actions-buttons">
+                                            <button mat-raised-button color="primary" (click)="editTruck(element); $event.stopPropagation()">
+                                                Edit Truck
+                                            </button>
+                                            <button mat-raised-button color="primary" (click)="reassignDriver(); $event.stopPropagation()">
+                                                Assign Driver
+                                            </button>
+                                            <button mat-raised-button color="primary" (click)="updateTruckStatus(element); $event.stopPropagation()">
+                                                Update Status
+                                            </button>
+                                            <button mat-raised-button color="primary" (click)="deleteTruck(); $event.stopPropagation()">
+                                                Delete Truck
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -123,14 +141,20 @@
                         </td>
                     </tr>
                 </mat-table>
+                <mat-paginator
+                    #trucksPaginator
+                    [pageSize]="5"
+                    [pageSizeOptions]="[5, 10, 25]"
+                    showFirstLastButtons>
+                </mat-paginator>
             </div>
-            <div class="col-6">
+            <div class="col-12">
                 <h4 class="align-middle" style="margin-top: 20px;">Drivers</h4>
                 <mat-table [dataSource]="driversDataSource" multiTemplateDataRows class="mat-elevation-z8">
                     <!-- Define columns -->
                     <ng-container matColumnDef="driverId">
-                        <mat-header-cell *matHeaderCellDef> Driver ID </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{ element.driverId }} </mat-cell>
+                        <mat-header-cell *matHeaderCellDef class="driver-id-column"> Driver ID </mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="driver-id-column"> {{ element.driverId }} </mat-cell>
                     </ng-container>
     
                     <ng-container matColumnDef="name">
@@ -139,13 +163,13 @@
                     </ng-container>
     
                     <ng-container matColumnDef="phone">
-                        <mat-header-cell *matHeaderCellDef> Phone </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{ element.phone }} </mat-cell>
+                        <mat-header-cell *matHeaderCellDef class="phone-column"> Phone </mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="phone-column"> {{ element.phone }} </mat-cell>
                     </ng-container>
     
                     <ng-container matColumnDef="status">
-                        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{ element.status }} </mat-cell>
+                        <mat-header-cell *matHeaderCellDef class="status-column"> Status </mat-header-cell>
+                        <mat-cell *matCellDef="let element" class="status-column"> {{ element.status }} </mat-cell>
                     </ng-container>
 
                     <!-- Expand/Collapse Column -->
@@ -161,45 +185,84 @@
                     <ng-container matColumnDef="expandedDetail">
                         <mat-cell *matCellDef="let element" [attr.colspan]="driversColumnsToDisplay.length" [@detailExpand]="element == expandedDriver ? 'expanded' : 'collapsed'">
                             <div class="expanded-detail">
-                                <div class="row">
-                                    <div class="col-6 col-center stack-section">
-                                        <h4 class="align-middle">License Info</h4>
-                                        <p><strong>License Number:</strong></p>
-                                        <p>{{ element.license[0]?.licenseNumber }}</p>
-                                        <p><strong>License State:</strong></p>
-                                        <p>{{ element.license[0]?.state }}</p>
-                                        <p><strong>License Expiration:</strong></p>
-                                        <p>{{ element.license[0]?.expiration | date }}</p>
+                                <div class="driver-expanded-grid">
+                                    <div class="stack-section">
+                                        <h4 class="align-middle"><u>Contact</u></h4>
+                                        <div class="detail-kv">
+                                            <!-- Shown only when Phone column is hidden (<= 500px) -->
+                                            <div class="detail-kv-row driver-phone-detail-show-when-phone-hidden">
+                                                <div class="detail-kv-label"><strong>Phone:</strong></div>
+                                                <div class="detail-kv-value">{{ element.phone }}</div>
+                                            </div>
+                                            <div class="detail-kv-row" *ngIf="element.email">
+                                                <div class="detail-kv-label"><strong>Email:</strong></div>
+                                                <div class="detail-kv-value">{{ element.email }}</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-6 col-center stack-section">
-                                        <h4 class="align-middle">Address</h4>
-                                        <p><strong>Address 1:</strong></p>
-                                        <p>{{ element.address[0]?.address1 }}</p>
-                                        <p *ngIf="element.address[0]?.address2"><strong>Address 2:</strong></p>
-                                        <p *ngIf="element.address[0]?.address2">{{ element.address[0]?.address2 }}</p>
-                                        <p><strong>City:</strong></p>
-                                        <p>{{ element.address[0]?.city }}</p>
-                                        <p><strong>State:</strong></p>
-                                        <p>{{ element.address[0]?.state }}</p>
-                                        <p><strong>Zip:</strong></p>
-                                        <p>{{ element.address[0]?.zip }}</p>
+
+                                    <div class="stack-section">
+                                        <h4 class="align-middle"><u>License Info</u></h4>
+                                        <div class="detail-kv">
+                                            <div class="detail-kv-row">
+                                                <div class="detail-kv-label"><strong>License Number:</strong></div>
+                                                <div class="detail-kv-value">{{ element.license[0]?.licenseNumber }}</div>
+                                            </div>
+                                            <div class="detail-kv-row">
+                                                <div class="detail-kv-label"><strong>License State:</strong></div>
+                                                <div class="detail-kv-value">{{ element.license[0]?.state }}</div>
+                                            </div>
+                                            <div class="detail-kv-row">
+                                                <div class="detail-kv-label"><strong>License Expiration:</strong></div>
+                                                <div class="detail-kv-value">{{ element.license[0]?.expiration | date }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="stack-section driver-address-section">
+                                        <h4 class="align-middle"><u>Address</u></h4>
+                                        <div class="detail-kv">
+                                            <div class="detail-kv-row">
+                                                <div class="detail-kv-label"><strong>Address 1:</strong></div>
+                                                <div class="detail-kv-value">{{ element.address[0]?.address1 }}</div>
+                                            </div>
+                                            <div class="detail-kv-row" *ngIf="element.address[0]?.address2">
+                                                <div class="detail-kv-label"><strong>Address 2:</strong></div>
+                                                <div class="detail-kv-value">{{ element.address[0]?.address2 }}</div>
+                                            </div>
+                                            <div class="detail-kv-row">
+                                                <div class="detail-kv-label"><strong>City:</strong></div>
+                                                <div class="detail-kv-value">{{ element.address[0]?.city }}</div>
+                                            </div>
+                                            <div class="detail-kv-row">
+                                                <div class="detail-kv-label"><strong>State:</strong></div>
+                                                <div class="detail-kv-value">{{ element.address[0]?.state }}</div>
+                                            </div>
+                                            <div class="detail-kv-row">
+                                                <div class="detail-kv-label"><strong>Zip:</strong></div>
+                                                <div class="detail-kv-value">{{ element.address[0]?.zip }}</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div class="row" style="text-align: center;">
                                     <div class="col-12">
                                         <h4 class="align-middle">Actions</h4>
-                                        <button mat-raised-button color="primary" style="margin-right: 5px;">
-                                            Edit License Info
-                                        </button>
-                                        <button mat-raised-button color="primary" style="margin-right: 5px;">
-                                            Edit Address Info
-                                        </button>
-                                        <button mat-raised-button color="primary" style="margin-right: 5px;" (click)="updateDriverStatus(element)">
-                                            Update Status
-                                        </button>
-                                        <button mat-raised-button color="primary" (click)="deleteDriver()">
-                                            Delete Driver
-                                        </button>
+                                        <div class="actions-buttons">
+                                            <button mat-raised-button color="primary" (click)="editLicenseInfo(element); $event.stopPropagation()">
+                                                Edit License Info
+                                            </button>
+                                            <button mat-raised-button color="primary" (click)="editAddressInfo(element); $event.stopPropagation()">
+                                                Edit Address Info
+                                            </button>
+                                            <button mat-raised-button color="primary" (click)="updateDriverStatus(element); $event.stopPropagation()">
+                                                Update Status
+                                            </button>
+                                            <button mat-raised-button color="primary" (click)="deleteDriver(); $event.stopPropagation()">
+                                                Delete Driver
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -226,7 +289,13 @@
                         </td>
                     </tr>
                 </mat-table>
+
+                <mat-paginator
+                    #driversPaginator
+                    [pageSize]="5"
+                    [pageSizeOptions]="[5, 10, 25]"
+                    showFirstLastButtons>
+                </mat-paginator>
             </div>
         </div>
     </div>
-</div>

@@ -58,6 +58,11 @@ export class MongoService {
         return this.http.get(url, { params: new HttpParams().set('userId', (userId) ? userId : '') });
     }
 
+    updateBusinessUserInfo(data: any): Observable<any> {
+        const url = this.getFunctionUrl("updateBusinessUserInfo");
+        return this.http.patch(url, data);
+    }
+
     /**
      * Inserts or updates a record in the user_shipping_info table
      * @param shippingInfo 
@@ -102,6 +107,122 @@ export class MongoService {
     insertSampleBatch(data: any): Observable<any> {
         const url = this.getFunctionUrl("insertSampleBatch");
         return this.http.post(url, data);
+    }
+
+    // ---------------------------------------------------------------------
+    // Daily Reports (admin tools)
+    // ---------------------------------------------------------------------
+
+    initDailyReportIndexes(): Observable<any> {
+        const url = this.getFunctionUrl("initDailyReportIndexes");
+        return this.http.post(url, {});
+    }
+
+    runDailyReportMagicLinksOnce(): Observable<any> {
+        const url = this.getFunctionUrl("runDailyReportMagicLinksOnce");
+        return this.http.post(url, {});
+    }
+
+    getDailyReportsSummary(params: {
+        businessId: string;
+        startDateLocal: string;
+        endDateLocal: string;
+        businessIdAsObjectId?: boolean;
+    }): Observable<any> {
+        const url = this.getFunctionUrl("getDailyReportsSummary");
+
+        let httpParams = new HttpParams()
+            .set('businessId', params.businessId ? params.businessId : '')
+            .set('startDateLocal', params.startDateLocal ? params.startDateLocal : '')
+            .set('endDateLocal', params.endDateLocal ? params.endDateLocal : '');
+
+        if (params.businessIdAsObjectId) {
+            httpParams = httpParams.set('businessIdAsObjectId', 'true');
+        }
+
+        return this.http.get(url, { params: httpParams });
+    }
+
+    // ---------------------------------------------------------------------
+    // Daily Report submission (driver)
+    // ---------------------------------------------------------------------
+
+    uploadDailyReportPhotoByToken(formData: FormData): Observable<any> {
+        const url = this.getFunctionUrl("uploadDailyReportPhotoByToken");
+        return this.http.post(url, formData);
+    }
+
+    submitDailyReportByToken(body: {
+        token: string;
+        odometer: number;
+        issues?: string;
+        issuesSummary?: string;
+        photos?: Array<{ slot: string; mongoFileId?: string; url?: string; storagePath?: string; fileName?: string; contentType?: string; size?: number }>;
+    }): Observable<any> {
+        const url = this.getFunctionUrl("submitDailyReportByToken");
+        return this.http.post(url, body);
+    }
+
+    getDailyReportPhotoUrl(fileId: string): string {
+        const url = this.getFunctionUrl("getDailyReportPhoto");
+        return `${url}?fileId=${encodeURIComponent(fileId)}`;
+    }
+
+    // ---------------------------------------------------------------------
+    // Trucks & Drivers
+    // ---------------------------------------------------------------------
+
+    getTrucksByBusiness(businessId: string, businessIdAsObjectId: boolean = false): Observable<any> {
+        const url = this.getFunctionUrl("getTrucksByBusiness");
+        let params = new HttpParams().set('businessId', businessId ? businessId : '');
+        if (businessIdAsObjectId) {
+            params = params.set('businessIdAsObjectId', 'true');
+        }
+        return this.http.get(url, { params });
+    }
+
+    insertTruck(data: any): Observable<any> {
+        const url = this.getFunctionUrl("insertTruck");
+        return this.http.post(url, data);
+    }
+
+    updateTruck(data: any): Observable<any> {
+        const url = this.getFunctionUrl("updateTruck");
+        return this.http.patch(url, data);
+    }
+
+    deleteTruck(data: any): Observable<any> {
+        const url = this.getFunctionUrl("deleteTruck");
+        return this.http.request('delete', url, { body: data });
+    }
+
+    assignDriverToTruck(data: any): Observable<any> {
+        const url = this.getFunctionUrl("assignDriverToTruck");
+        return this.http.post(url, data);
+    }
+
+    getDriversByBusiness(businessId: string, businessIdAsObjectId: boolean = false): Observable<any> {
+        const url = this.getFunctionUrl("getDriversByBusiness");
+        let params = new HttpParams().set('businessId', businessId ? businessId : '');
+        if (businessIdAsObjectId) {
+            params = params.set('businessIdAsObjectId', 'true');
+        }
+        return this.http.get(url, { params });
+    }
+
+    insertDriver(data: any): Observable<any> {
+        const url = this.getFunctionUrl("insertDriver");
+        return this.http.post(url, data);
+    }
+
+    updateDriver(data: any): Observable<any> {
+        const url = this.getFunctionUrl("updateDriver");
+        return this.http.patch(url, data);
+    }
+
+    deleteDriver(data: any): Observable<any> {
+        const url = this.getFunctionUrl("deleteDriver");
+        return this.http.request('delete', url, { body: data });
     }
 
     /**

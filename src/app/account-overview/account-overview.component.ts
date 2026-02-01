@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { AuthService } from '../services/auth.service';
 import { User } from '@firebase/auth';
@@ -22,6 +22,8 @@ import { BusinessFunctionsComponent } from './business-functions/business-functi
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormatPhoneDirective } from '../shared/directives/format-phone.directive';
 import { TruckAndDriverManagementComponent } from './truck-and-driver-management/truck-and-driver-management.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DailyReportsSummaryComponent } from './daily-reports-summary/daily-reports-summary.component';
 
 @Component({
   selector: 'app-account-overview',
@@ -41,7 +43,8 @@ import { TruckAndDriverManagementComponent } from './truck-and-driver-management
     MatCheckboxModule,
     BusinessFunctionsComponent,
     TruckAndDriverManagementComponent,
-    FormatPhoneDirective
+    FormatPhoneDirective,
+    DailyReportsSummaryComponent
    ],
   templateUrl: './account-overview.component.html',
   styleUrl: './account-overview.component.scss',
@@ -55,6 +58,7 @@ import { TruckAndDriverManagementComponent } from './truck-and-driver-management
 })
 export class AccountOverviewComponent implements OnInit, AfterViewInit {
   private _snackBar = inject(MatSnackBar);
+  private destroyRef = inject(DestroyRef);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   
   accOverviewForm!: FormGroup;
@@ -118,7 +122,7 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
         this.user = user;
         this._snackBar.open('Loading account information...');
         this.initializeAccountOverview();
-        this.initiaizeBusinessUserInfo();
+        this.initializeBusinessUserInfo();
         this.initializeSubmissions();
         this.loadShippingInfo();
         this.initializeOrderHistory();
@@ -141,35 +145,19 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
     }
   }
 
-  initiaizeBusinessUserInfo() {
-    if (!this.user) return;
-
-    this.dbService.getBusinessUserInfo(this.user.uid).subscribe({
-      next: (response: any) => {
-        console.log('Business User Info Response:', response);
-        if (response.result) {
-          this.isBusinessUser = true;
-          this.businessUserInfo = response.result;
-        } else {
-          this.isBusinessUser = false;
-        }
-      },
-      error: (error) => {
-        this._snackBar.open('Error loading business user information. Please try again.', 'Ok', { duration: 3000 });
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'account-overview.component.ts',
-          method: 'initiaizeBusinessUserInfo()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      }
-    });
+  initializeBusinessUserInfo() {
+    this.authService.isBusinessUser$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((isBusiness) => {
+        this.isBusinessUser = !!isBusiness;
+      });
+      
+    this.authService.businessUserInfo$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((info) => {
+        console.log(info);
+        this.businessUserInfo = info;
+      });
   }
 
   saveShippingInfo() {

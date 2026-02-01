@@ -7,52 +7,165 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <form [formGroup]="businessUserForm" class="align-middle" style="max-width: 90%;">
-                <mat-form-field appearance="outline">
-                    <mat-label>User ID</mat-label>
-                    <input matInput formControlName="userId" name="userId">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Business Name</mat-label>
-                    <input matInput formControlName="businessName" name="businessName">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>E-Mail</mat-label>
-                    <input matInput formControlName="contactEmail" name="contactEmail">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Phone</mat-label>
-                    <input matInput formatPhone formControlName="contactPhone" name="contactPhone">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Notify On New Review</mat-label>
-                    <mat-select formControlName="notifyOnNewReview" name="notifyOnNewReview">
-                        <mat-option [value]="true">Yes</mat-option>
-                        <mat-option [value]="false">No</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Daily Summary Email</mat-label>
-                    <mat-select formControlName="dailySummaryEmail" name="dailySummaryEmail">
-                        <mat-option [value]="true">Yes</mat-option>
-                        <mat-option [value]="false">No</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Last Updated</mat-label>
-                    <input matInput formControlName="updatedAt" name="updatedAt" [disabled]="true">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Created Date</mat-label>
-                    <input matInput formControlName="createdAt" name="createdAt" [disabled]="true">
-                </mat-form-field>
-                <div class="row">
-                    <div class="col-12 col-center">
-                        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="businessUserForm.invalid || isLoading">
-                            Save Changes
-                            <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="20" style="margin-left: 10px;"></mat-progress-spinner>
-                        </button>
+            <form [formGroup]="businessUserForm" class="business-form">
+                <div class="card section-card">
+                    <div class="card-body">
+                        <h3 class="section-title">Business Info</h3>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>User ID</mat-label>
+                                    <input matInput formControlName="userId" name="userId">
+                                </mat-form-field>
+                            </div>
+                            <div class="col-12 col-md-8">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Business Name</mat-label>
+                                    <input matInput formControlName="businessName" name="businessName">
+                                    <mat-error *ngIf="businessUserForm.get('businessName')?.hasError('required') && businessUserForm.get('businessName')?.touched">
+                                        Business name is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>E-Mail</mat-label>
+                                    <input matInput type="email" formControlName="contactEmail" name="contactEmail">
+                                    <mat-error *ngIf="businessUserForm.get('contactEmail')?.hasError('required') && businessUserForm.get('contactEmail')?.touched">
+                                        Email is required
+                                    </mat-error>
+                                    <mat-error *ngIf="businessUserForm.get('contactEmail')?.hasError('email') && businessUserForm.get('contactEmail')?.touched">
+                                        Enter a valid email
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Phone</mat-label>
+                                    <input matInput type="tel" formatPhone formControlName="contactPhone" name="contactPhone">
+                                    <mat-error *ngIf="businessUserForm.get('contactPhone')?.hasError('required') && businessUserForm.get('contactPhone')?.touched">
+                                        Phone is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div class="card section-card">
+                    <div class="card-body">
+                        <h3 class="section-title">Notifications</h3>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Notify On New Review</mat-label>
+                                    <mat-select formControlName="notifyOnNewReview" name="notifyOnNewReview">
+                                        <mat-option [value]="true">Yes</mat-option>
+                                        <mat-option [value]="false">No</mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="businessUserForm.get('notifyOnNewReview')?.hasError('required') && businessUserForm.get('notifyOnNewReview')?.touched">
+                                        This field is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Daily Summary Email</mat-label>
+                                    <mat-select formControlName="dailySummaryEmail" name="dailySummaryEmail">
+                                        <mat-option [value]="true">Yes</mat-option>
+                                        <mat-option [value]="false">No</mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="businessUserForm.get('dailySummaryEmail')?.hasError('required') && businessUserForm.get('dailySummaryEmail')?.touched">
+                                        This field is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card section-card">
+                    <div class="card-body">
+                        <h3 class="section-title">Daily Reports</h3>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Daily Reports Enabled</mat-label>
+                                    <mat-select formControlName="dailyReportsEnabled" name="dailyReportsEnabled">
+                                        <mat-option [value]="true">Yes</mat-option>
+                                        <mat-option [value]="false">No</mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="businessUserForm.get('dailyReportsEnabled')?.hasError('required') && businessUserForm.get('dailyReportsEnabled')?.touched">
+                                        This field is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <ng-container *ngIf="isDailyReportsEnabled">
+                            <div class="row g-3 mt-0">
+                                <div class="col-12 col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Start Time</mat-label>
+                                        <input matInput formControlName="dailyReportsStartTime" name="dailyReportsStartTime">
+                                        <mat-hint>24-hour format (e.g., 14:30)</mat-hint>
+                                        <mat-error *ngIf="businessUserForm.get('dailyReportsStartTime')?.hasError('required') && businessUserForm.get('dailyReportsStartTime')?.touched">
+                                            Start time is required
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>End Time</mat-label>
+                                        <input matInput formControlName="dailyReportsEndTime" name="dailyReportsEndTime">
+                                        <mat-hint>24-hour format (e.g., 18:00)</mat-hint>
+                                        <mat-error *ngIf="businessUserForm.get('dailyReportsEndTime')?.hasError('required') && businessUserForm.get('dailyReportsEndTime')?.touched">
+                                            End time is required
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Timezone</mat-label>
+                                        <mat-select formControlName="timezone" name="timezone">
+                                            <mat-option *ngFor="let tz of timezones" [value]="tz.value">{{ tz.name }}</mat-option>
+                                        </mat-select>
+                                        <mat-hint>Used for scheduling</mat-hint>
+                                        <mat-error *ngIf="businessUserForm.get('timezone')?.hasError('required') && businessUserForm.get('timezone')?.touched">
+                                            Timezone is required
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <div class="card section-card">
+                    <div class="card-body">
+                        <h3 class="section-title">Metadata</h3>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Last Updated</mat-label>
+                                    <input matInput formControlName="updatedAt" name="updatedAt" [disabled]="true">
+                                </mat-form-field>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Created Date</mat-label>
+                                    <input matInput formControlName="createdAt" name="createdAt" [disabled]="true">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-row">
+                    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="businessUserForm.invalid || isLoading || !hasUnsavedChanges">
+                        Save Changes
+                        <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="20" style="margin-left: 10px;"></mat-progress-spinner>
+                    </button>
                 </div>
             </form>
         </div>

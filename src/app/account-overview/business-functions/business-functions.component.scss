@@ -1,0 +1,28 @@
+.business-form {
+	max-width: 1100px;
+	margin: 0 auto;
+	text-align: left;
+
+	/* Undo global mat-form-field padding for a tighter grid layout on this screen */
+	mat-form-field {
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
+
+.section-card {
+	margin: 12px 0;
+	border-radius: 12px;
+}
+
+.section-title {
+	margin: 0 0 10px 0;
+	font-size: 1.1rem;
+	font-weight: 600;
+}
+
+.actions-row {
+	display: flex;
+	justify-content: center;
+	margin: 18px 0 8px 0;
+}
