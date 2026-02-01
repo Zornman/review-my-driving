@@ -7,7 +7,7 @@ import { DAILY_REPORT_PHOTO_SLOTS, sha256Hex } from "./_shared/dailyReports.js";
 // Allow both www + apex, and local dev if needed.
 const allowedOrigins = new Set([
   "https://reviewmydriving.co",
-  "https://www.reviewmydriving.co",
+  "https://www.reviewmydriving.co", 
 ]);
 
 const corsHandler = cors({
