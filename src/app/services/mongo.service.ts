@@ -292,9 +292,6 @@ export class MongoService {
     }
 
     getFunctionUrl(functionName: string): string {
-        if (environment.production) {
-            functionName = functionName.toLocaleLowerCase();
-        }
         return environment.apiBaseUrl.replace("{function}", functionName);
     }
 }

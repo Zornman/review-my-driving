@@ -12,11 +12,20 @@ type SubmitDailyReportBody = {
   issues?: string;
   issuesSummary?: string;
   // In MVP we don't upload binaries here; later these can be storage paths.
-  photos?: Array<{ slot: string; storagePath?: string; url?: string; mongoFileId?: string; fileName?: string; contentType?: string; size?: number }>;
+  photos?: Array<{
+    slot: string;
+    storagePath?: string;
+    url?: string;
+    mongoFileId?: string;
+    fileName?: string;
+    contentType?: string;
+    size?: number;
+  }>;
 };
 
-export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
-  corsHandler(req, res, async () => {
+export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["MONGO_URI"] }, (req, res) => {
+  // Important: return the cors handler so the platform waits for it to complete.
+  return corsHandler(req, res, async () => {
     if (req.method === "OPTIONS") {
       res.status(204).send("");
       return;
@@ -49,20 +58,24 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
       const tokenHash = sha256Hex(body.token);
       const tokenDoc: any = await db.collection("daily_report_tokens").findOne({ tokenHash });
       if (!tokenDoc) {
-        await client.close();
         res.status(401).json({ message: "Invalid token" });
         return;
       }
 
       const now = new Date();
+
+      // Magic link should be single-use (recommended).
+      if (tokenDoc.usedAt) {
+        res.status(401).json({ message: "Token already used" });
+        return;
+      }
+
       if (tokenDoc.revokedAt) {
-        await client.close();
         res.status(401).json({ message: "Token revoked" });
         return;
       }
 
       if (tokenDoc.expiresAt && new Date(tokenDoc.expiresAt) < now) {
-        await client.close();
         res.status(401).json({ message: "Token expired" });
         return;
       }
@@ -72,8 +85,8 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
 
       const photos = Array.isArray(body.photos) ? body.photos : [];
       const normalizedPhotos = photos
-        .filter(p => p && typeof p.slot === "string")
-        .map(p => ({
+        .filter((p) => p && typeof p.slot === "string")
+        .map((p) => ({
           slot: p.slot,
           storagePath: typeof p.storagePath === "string" ? p.storagePath : null,
           url: typeof p.url === "string" ? p.url : null,
@@ -84,8 +97,8 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
         }));
 
       // Enforce that the report expects 4 slots.
-      const slotsProvided = new Set(normalizedPhotos.map(p => p.slot));
-      const missingSlots = DAILY_REPORT_PHOTO_SLOTS.filter(s => !slotsProvided.has(s));
+      const slotsProvided = new Set(normalizedPhotos.map((p) => p.slot));
+      const missingSlots = DAILY_REPORT_PHOTO_SLOTS.filter((s) => !slotsProvided.has(s));
 
       const reportKey = {
         businessId: tokenDoc.businessId,
@@ -95,7 +108,6 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
 
       const existing = await db.collection("daily_reports").findOne(reportKey);
       if (existing?.submittedAt) {
-        await client.close();
         res.status(200).json({ message: "Already submitted", alreadySubmitted: true });
         return;
       }
@@ -115,13 +127,23 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
       };
 
       await db.collection("daily_reports").updateOne(reportKey, { $set: reportDoc }, { upsert: true });
-      await db.collection("daily_report_tokens").updateOne({ _id: tokenDoc._id }, { $set: { usedAt: now } });
 
-      await client.close();
+      // Mark token used (conditional helps with races).
+      const usedRes = await db.collection("daily_report_tokens").updateOne(
+        { _id: tokenDoc._id, usedAt: { $exists: false } },
+        { $set: { usedAt: now } }
+      );
+      if (usedRes.matchedCount === 0) {
+        res.status(409).json({ message: "Token already used" });
+        return;
+      }
+
       res.status(200).json({ message: "Submitted", submittedAt: now });
     } catch (error: any) {
       console.error("Error submitting daily report:", error);
       res.status(500).json({ message: "Error submitting daily report", error: error.message });
+    } finally {
+      await client.close().catch(() => {});
     }
   });
 });
