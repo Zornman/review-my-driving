@@ -81,6 +81,12 @@ export { updateOrderStatus } from "./updateOrderStatus.js";
 import { updateOrderStatusTask } from "./updateOrderStatusTask.js";
 import { sendDailyReportMagicLinksTask } from "./sendDailyReportMagicLinksTask.js";
 
+export { insertBusinessQRCodes } from "./insertBusinessQRCodes.js";
+export { getBusinessQrContext } from "./getBusinessQrContext.js";
+export { getBusinessQRCodesByBusiness } from "./getBusinessQRCodesByBusiness.js";
+export { assignBusinessQrToTruck } from "./assignBusinessQrToTruck.js";
+export { getAllBusinessUsers } from "./getAllBusinessUsers.js";
+
 export const updateOrderStatusTaskSchedule = onSchedule({schedule: "every hour", secrets: [
     PRINTIFY_STORE_ID,
     PRINTIFY_URL,

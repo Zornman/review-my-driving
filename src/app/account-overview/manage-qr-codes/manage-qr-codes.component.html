@@ -1,0 +1,114 @@
+<div class="page">
+	<div class="header">
+		<div>
+			<h3 class="title">QR Codes</h3>
+			<p class="subtitle">Assign each QR code to the correct truck so feedback routes properly.</p>
+		</div>
+
+		<button mat-stroked-button color="primary" (click)="refresh()" [disabled]="isLoading || !businessId">
+			<mat-icon>refresh</mat-icon>
+			Refresh
+		</button>
+	</div>
+
+	<mat-card appearance="outlined" class="card">
+		<mat-card-content>
+			<form class="filters" [formGroup]="filtersForm">
+				<mat-form-field appearance="outline" class="filter">
+					<mat-label>Status</mat-label>
+					<mat-select formControlName="status">
+						<mat-option value="all">All</mat-option>
+						<mat-option value="assigned">Assigned</mat-option>
+						<mat-option value="unassigned">Unassigned</mat-option>
+					</mat-select>
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="search">
+					<mat-label>Search</mat-label>
+					<input matInput formControlName="search" placeholder="Asset ID, status, truck id…" />
+					<button
+						mat-icon-button
+						matSuffix
+						type="button"
+						aria-label="Clear"
+						*ngIf="filtersForm.get('search')?.value"
+						(click)="filtersForm.get('search')?.setValue('')"
+					>
+						<mat-icon>close</mat-icon>
+					</button>
+				</mat-form-field>
+			</form>
+
+			<div class="table-wrap">
+				<mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+					<ng-container matColumnDef="assetId">
+						<mat-header-cell *matHeaderCellDef>Asset ID</mat-header-cell>
+						<mat-cell *matCellDef="let row" class="mono">{{ row.assetId }}</mat-cell>
+					</ng-container>
+
+					<ng-container matColumnDef="status">
+						<mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+						<mat-cell *matCellDef="let row">
+							<span class="pill" [class.assigned]="row.status === 'assigned'" [class.unassigned]="row.status !== 'assigned'">
+								{{ row.status || 'unknown' }}
+							</span>
+						</mat-cell>
+					</ng-container>
+
+					<ng-container matColumnDef="truck">
+						<mat-header-cell *matHeaderCellDef>Truck</mat-header-cell>
+						<mat-cell *matCellDef="let row" class="mono">{{ row.truckId || '—' }}</mat-cell>
+					</ng-container>
+
+					<ng-container matColumnDef="createdAt">
+						<mat-header-cell *matHeaderCellDef>Created</mat-header-cell>
+						<mat-cell *matCellDef="let row">{{ row.createdAt ? (row.createdAt | date : 'short') : '—' }}</mat-cell>
+					</ng-container>
+
+					<ng-container matColumnDef="assignedAt">
+						<mat-header-cell *matHeaderCellDef>Assigned</mat-header-cell>
+						<mat-cell *matCellDef="let row">{{ row.assignedAt ? (row.assignedAt | date : 'short') : '—' }}</mat-cell>
+					</ng-container>
+
+					<ng-container matColumnDef="actions">
+						<mat-header-cell *matHeaderCellDef class="actions">Actions</mat-header-cell>
+						<mat-cell *matCellDef="let row" class="actions">
+							<button mat-flat-button color="primary" (click)="openAssignDialog(row)" [disabled]="isLoading">
+								{{ row.status === 'assigned' ? 'Reassign' : 'Assign' }}
+							</button>
+							<button
+								mat-button
+								type="button"
+								(click)="confirmUnassign(row)"
+								[disabled]="isLoading || row.status !== 'assigned'"
+							>
+								Unassign
+							</button>
+						</mat-cell>
+					</ng-container>
+
+					<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+					<mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+
+					<tr class="mat-row" *matNoDataRow>
+						<td class="mat-cell" [attr.colspan]="displayedColumns.length">
+							<div class="empty">
+								<div class="empty-title">No QR codes found</div>
+								<div class="empty-subtitle">Try changing your filters, or generate codes first.</div>
+							</div>
+						</td>
+					</tr>
+				</mat-table>
+			</div>
+
+			<div class="loading" *ngIf="isLoading">
+				<mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+				<span>Loading…</span>
+			</div>
+
+			<div class="hint" *ngIf="!businessId">
+				Business context not loaded yet.
+			</div>
+		</mat-card-content>
+	</mat-card>
+</div>

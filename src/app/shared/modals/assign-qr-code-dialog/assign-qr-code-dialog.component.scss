@@ -1,0 +1,51 @@
+.subtext {
+  margin-top: 0;
+  opacity: 0.8;
+}
+
+:host {
+  display: block;
+  max-width: 100%;
+}
+
+mat-dialog-content {
+  overflow-x: hidden;
+}
+
+mat-form-field {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  padding-top: 4px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.full {
+  width: 100%;
+  min-width: 0;
+}
+
+.truck-option {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.empty {
+  padding: 8px 0;
+  opacity: 0.75;
+}

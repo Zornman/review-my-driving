@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../services/auth.service';
 import { User } from 'firebase/auth';
@@ -6,9 +6,10 @@ import { MongoService } from '../services/mongo.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
@@ -19,27 +20,40 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatButtonModule, 
     MatTableModule,
     MatIconModule,
+    MatDividerModule,
     RouterModule,
     MatExpansionModule
   ],
   templateUrl: './index.component.html',
-  styleUrl: './index.component.scss',
+  styleUrls: ['./index.component.scss'],
   animations: [
     trigger('detailExpand', [
       state('collapsed,void', style({height: '0px', minHeight: '0'})),
       state('expanded', style({height: '*'})),
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('600ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ]),
+    trigger('scaleIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.95)' }),
+        animate('500ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+      ])
     ])
   ],
 })
-export class IndexComponent {
+export class IndexComponent implements OnInit {
 
   user!: User | null;
   submissions!: any;
   now: Date = new Date();
-  month = (this.now.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed, so add 1
-  day = this.now.getDate().toString().padStart(2, '0'); // Get day and pad if needed
-  year = this.now.getFullYear(); // Get full year
+  month = (this.now.getMonth() + 1).toString().padStart(2, '0');
+  day = this.now.getDate().toString().padStart(2, '0');
+  year = this.now.getFullYear();
   todaysDate: string = this.month + "/" + this.day + "/" + this.year;
 
   totalSubmissions!: number;
@@ -50,13 +64,22 @@ export class IndexComponent {
   submissionsColumnsToDisplayWithExpand = [...this.submissionsColumnsToDisplay, 'expandedDetail'];
   expandedElement: any | null;
 
-  constructor(private authService: AuthService, private dbService: MongoService) {
+  // Quick stats for dashboard
+  totalReviews!: number;
+  averageRating!: number;
+  topCategory!: string;
+
+  constructor(private authService: AuthService, private dbService: MongoService, private router: Router) {
     this.authService.getUser().subscribe((user) => {
-      if (!user) return;
-      
       this.user = user;
-      this.initializeSubmissions();
+      if (user) {
+        this.initializeSubmissions();
+      }
     });
+  }
+
+  ngOnInit(): void {
+    // Additional initialization if needed
   }
 
   initializeSubmissions() {
@@ -69,17 +92,16 @@ export class IndexComponent {
         const sevenDaysAgo = new Date(now);
         sevenDaysAgo.setDate(now.getDate() - 7);
 
-        // Sort submissions by Date descending before setting table data source
         this.submissions = response.submissions.sort((a: any, b: any) => {
           const dateA = this.parseDate(a.dateSubmitted);
           const dateB = this.parseDate(b.dateSubmitted);
   
-          if (!dateA || !dateB) return 0; // Ignore invalid dates
+          if (!dateA || !dateB) return 0;
   
-          return dateB.getTime() - dateA.getTime(); // Sort in descending order (latest first)
+          return dateB.getTime() - dateA.getTime();
         });
 
-        this.submissions = this.submissions.slice(0, 5);
+        this.submissions = this.submissions.slice(0, 10);
 
         this.submissionsDataSource = new MatTableDataSource(this.submissions);
         this.totalSubmissions = response.submissions.length;
@@ -91,27 +113,13 @@ export class IndexComponent {
       },
       error: (error) => {
         console.error('Error getting data:', error);
-        // this.dbService.insertErrorLog({
-        //   fileName: 'account-overview.component.ts',
-        //   method: 'initializeSubmissions()',
-        //   timestamp: new Date().toString(),
-        //   error: error.message
-        // }).subscribe({
-        //   next: (response: any) => {
-        //       console.log(response);
-        //   },
-        //   error: (error: any) => {
-        //   }
-        // });
       }
     });
   }
 
   parseDate(dateString: string): Date {
-    // Assumes the format is MM/DD/YYYY HH:mm:ss
     const dateTimeParts = dateString.split(' ');
 
-    // If we don't have a time, just parse the date
     if (dateTimeParts.length !== 2) {
       const [month, day, year] = dateTimeParts[0].split('/').map(Number);
       return new Date(year, month - 1, day)
@@ -127,5 +135,9 @@ export class IndexComponent {
   toggleRow(row: any, event: Event): void {
     event.stopPropagation();
     this.expandedElement = this.expandedElement === row ? null : row;
+  }
+
+  navigateTo(route: string): void {
+    this.router.navigateByUrl(route);
   }
 }

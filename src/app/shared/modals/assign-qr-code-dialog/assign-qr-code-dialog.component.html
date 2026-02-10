@@ -1,0 +1,37 @@
+<h2 mat-dialog-title>Assign QR Code</h2>
+
+<mat-dialog-content>
+  <p class="subtext">Select which truck should receive notifications for this QR code.</p>
+
+  <form [formGroup]="form" class="form">
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>QR Asset ID</mat-label>
+      <input matInput formControlName="assetId" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Truck</mat-label>
+      <mat-select formControlName="truckId" [disabled]="isLoading">
+        <mat-option *ngFor="let t of trucks" [value]="t?._id?.$oid ?? t?._id ?? t?.truckObjectId ?? t?.truckId">
+          <span class="truck-option">{{ t?.truckId }} — {{ t?.licensePlate }}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="loading" *ngIf="isLoading">
+      <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+      <span>Loading trucks…</span>
+    </div>
+
+    <div class="empty" *ngIf="!isLoading && (!trucks || trucks.length === 0)">
+      No trucks found. Add a truck first.
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="assign()" [disabled]="isLoading || !form.valid">
+    Assign
+  </button>
+</mat-dialog-actions>

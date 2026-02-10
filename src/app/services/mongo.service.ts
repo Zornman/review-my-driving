@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -233,6 +233,62 @@ export class MongoService {
     updateSampleMapper(data: any): Observable<any> {
         const url = this.getFunctionUrl("updateSampleMapper");
         return this.http.post(url, data);
+    }
+
+    /**
+     * Insert business QR codes into the database
+     * @param businessQRCodes - Array of business QR code entries
+     * @returns Observable with the insertion result
+     */
+    insertBusinessQRCodes(businessQRCodes: Array<any>): Observable<any> {
+      const endpoint = this.getFunctionUrl("insertBusinessQRCodes");
+      // Send as array directly, not wrapped
+      return this.http.post(endpoint, businessQRCodes).pipe(
+        catchError((error) => {
+          console.error('Error inserting business QR codes:', error);
+          return throwError(() => new Error('Failed to insert business QR codes'));
+        })
+      );
+    }
+
+    getAllBusinessUsers(): Observable<any> {
+        const url = this.getFunctionUrl("getAllBusinessUsers");
+        return this.http.get(url);
+    }
+
+    // ---------------------------------------------------------------------
+    // Business QR codes
+    // ---------------------------------------------------------------------
+
+    /**
+     * Validates a business QR (businessId + assetId) and returns association context.
+     * assetId is the QR unique id embedded in the URL.
+     */
+    getBusinessQrContext(businessId: string, assetId: string): Observable<any> {
+        const url = this.getFunctionUrl("getBusinessQrContext");
+        const params = new HttpParams()
+            .set('businessId', businessId ? businessId : '')
+            .set('assetId', assetId ? assetId : '');
+        return this.http.get(url, { params });
+    }
+
+    getBusinessQRCodesByBusiness(businessId: string, status: 'all' | 'assigned' | 'unassigned' = 'all'): Observable<any> {
+        const url = this.getFunctionUrl("getBusinessQRCodesByBusiness");
+        const params = new HttpParams()
+            .set('businessId', businessId ? businessId : '')
+            .set('status', status);
+        return this.http.get(url, { params });
+    }
+
+    assignBusinessQrToTruck(body: {
+        businessId: string;
+        assetId: string;
+        truckId: string | null;
+        unassign?: boolean;
+        actor?: { userId?: string; name?: string };
+    }): Observable<any> {
+        const url = this.getFunctionUrl("assignBusinessQrToTruck");
+        return this.http.post(url, body);
     }
 
     getFunctionUrl(functionName: string): string {

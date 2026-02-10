@@ -1,207 +1,164 @@
-<div class="container" *ngIf="isQuickMode">
-    <div class="row padding-bottom">
-        <div class="col-12 col-center">
-            <span class="align-middle padding-bottom">
-                Click any of the buttons below to send a review to the driver of the car in question.
-                <br />
-                <br />
-                We will do our best to make sure they are reprimanded.
-            </span>
+<main class="page">
+  <div class="shell">
+    <mat-card class="card">
+      <mat-card-header class="card-header">
+        <div class="header-text">
+          <h1 class="title">Submit Feedback</h1>
+          <p class="subtitle">
+            Send a quick review in one tap, or provide details if needed.
+          </p>
         </div>
-        <div clas="col-12 col-center">
-            <h1 class="align-middle">Bad Driving Review</h1>
-            <div class="align-middle">
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Aggressive Driving')">
-                    Aggressive Driving
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Cut Me Off')">
-                    Cut me Off
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Driving Slow')">
-                    Driving Slow
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Not Paying Attention')">
-                    Not Paying Attention
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('You suck at driving')">
-                    You suck at driving
-                </button>
-            </div>
-        </div>
-        <div clas="col-12 col-center">
-            <h1 class="align-middle">Good Driving Review</h1>
-            <div class="align-middle">
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Courteous Driver')">
-                    Courteous Driver
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Used Turn Signals')">
-                    Used Turn Signals
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Excellent Park Job')">
-                    Excellent Park Job
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Let me Merge')">
-                    Let me Merge
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('You are a great driver, keep it up!')">
-                    You are a great driver, keep it up!
-                </button>
-            </div>
-        </div>
-        <div clas="col-12 col-center">
-            <h1 class="align-middle">Car Review</h1>
-            <div class="align-middle">
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Looks Brand New')">
-                    Looks Brand New
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Cool Color/Wrap')">
-                    Cool Color/Wrap
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Nice Rims/Wheels')">
-                    Nice Rims/Wheels
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('Unique & Eye-Catching')">
-                    Unique & Eye-Catching
-                </button>
-                <button matButton="outlined" class="quick-review-button" [disabled]="isProcessing"
-                (click)="submitQuickReview('our car is awesome, I love it!')">
-                    Your car is awesome, I love it!
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 col-center">
-            <span class="align-middle padding-bottom">
-                <h1><b>OR</b></h1>
-                <br />
-                If you would like to provide more information, <a (click)="isQuickMode = !isQuickMode">click here</a>.
-            </span>
-        </div>
-    </div>
-</div>
+      </mat-card-header>
 
-<form (ngSubmit)="submit(form)" #form="ngForm" *ngIf="!isQuickMode">
-    <div class="container grid-container-padding" style="padding-top: 1vh;">
-        <div class="row">
-            <div class="col-12 col-center">
-                <span class="align-middle padding-bottom">
-                    Please provide some basic information about yourself, the car in question, and the event that took place.
-                    <br />
-                    We will do our best to make sure they are reprimanded.
-                </span>
+      <mat-divider></mat-divider>
+
+      <mat-card-content class="card-content">
+        <!-- Quick Mode -->
+        <ng-container *ngIf="isQuickMode; else detailedForm">
+          <p class="body-text">
+            Tap a button to submit a review. If you’d like to add more context, switch to the detailed form.
+          </p>
+
+          <section class="quick-sections">
+            <div class="quick-section" *ngFor="let group of quickReviewGroups">
+              <h2 class="quick-review-title">{{ group.title }}</h2>
+
+              <div class="quick-grid" role="group" [attr.aria-label]="group.title">
+                <button
+                  *ngFor="let opt of group.options"
+                  mat-stroked-button
+                  class="quick-review-button"
+                  [disabled]="isProcessing || !isSubmissionEnabled"
+                  (click)="submitQuickReview(opt.value)"
+                >
+                  {{ opt.label }}
+                </button>
+              </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <span>
-                    <a (click)="isQuickMode = !isQuickMode">‹ Back</a>
-                </span>
+          </section>
+
+          <div class="footer-actions">
+            <button mat-button type="button" (click)="isQuickMode = false" [disabled]="isProcessing">
+              Switch to detailed form
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Detailed Form -->
+        <ng-template #detailedForm>
+          <form (ngSubmit)="submit(form)" #form="ngForm" class="form">
+            <div class="form-row two-col">
+              <mat-form-field appearance="outline">
+                <mat-label>First name</mat-label>
+                <input matInput [(ngModel)]="formData.firstName" name="firstName" required [disabled]="isProcessing || !isSubmissionEnabled" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Last initial</mat-label>
+                <input matInput [(ngModel)]="formData.lastName" name="lastName" maxlength="1" required [disabled]="isProcessing || !isSubmissionEnabled" />
+              </mat-form-field>
             </div>
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>First Name</mat-label>
-                    <input matInput [(ngModel)]="formData.firstName" name="firstName" required>
-                </mat-form-field>
+
+            <div class="form-row two-col" *ngIf="showVehicleFields">
+              <mat-form-field appearance="outline">
+                <mat-label>License plate</mat-label>
+                <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" required [disabled]="isProcessing || !isSubmissionEnabled" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Registration state</mat-label>
+                <mat-select [(ngModel)]="formData.state" name="state" required [disabled]="isProcessing || !isSubmissionEnabled">
+                  <mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>Last Initial</mat-label>
-                    <input matInput [(ngModel)]="formData.lastName" name="lastName" maxlength="1" required>
-                </mat-form-field>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Reason</mat-label>
+                <mat-select [(ngModel)]="formData.reasonForContacting" name="reasonForContacting" required [disabled]="isProcessing || !isSubmissionEnabled">
+                  <mat-optgroup label="Bad Driving Review">
+                    <mat-option value="Aggressive_Driving">Aggressive Driving</mat-option>
+                    <mat-option value="Cut_Me_Off">Cut me Off</mat-option>
+                    <mat-option value="Driving_Slow">Driving Slow</mat-option>
+                    <mat-option value="Not_Paying_Attention">Not Paying Attention</mat-option>
+                    <mat-option value="Bad_Other">Bad Other</mat-option>
+                  </mat-optgroup>
+
+                  <mat-optgroup label="Good Driving Review">
+                    <mat-option value="Courteous_Driver">Courteous Driver</mat-option>
+                    <mat-option value="Used_Turn_Signals">Used Turn Signals</mat-option>
+                    <mat-option value="Good_Parking_Job">Excellent Park Job</mat-option>
+                    <mat-option value="Let_Me_Merge">Let me Merge</mat-option>
+                    <mat-option value="Good_Other">Good Other</mat-option>
+                  </mat-optgroup>
+
+                  <mat-optgroup label="Car Review">
+                    <mat-option value="Looks_New">Looks Brand New</mat-option>
+                    <mat-option value="Cool_Color">Cool Color/Wrap</mat-option>
+                    <mat-option value="Nice_Wheels">Nice Rims/Wheels</mat-option>
+                    <mat-option value="Unique_Eye_Catching">Unique &amp; Eye-Catching</mat-option>
+                    <mat-option value="Other">Other</mat-option>
+                  </mat-optgroup>
+                </mat-select>
+              </mat-form-field>
             </div>
-        </div>
-        <!-- <div class="grid-row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>E-Mail</mat-label>
-                    <input matInput [(ngModel)]="formData.email" name="email" autocomplete="new-password" required>
-                </mat-form-field>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea
+                  matInput
+                  [(ngModel)]="formData.description"
+                  name="description"
+                  randomizeInput
+                  required
+                  rows="5"
+                  [disabled]="isProcessing || !isSubmissionEnabled"
+                ></textarea>
+              </mat-form-field>
             </div>
-        </div> -->
-        <div class="row" *ngIf="!user_id">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>License plate of Driver</mat-label>
-                    <input matInput [(ngModel)]="formData.licensePlate" name="licensePlate" required>
-                </mat-form-field>
+
+            <div class="footer-actions split">
+              <button mat-button type="button" (click)="isQuickMode = true" [disabled]="isProcessing">
+                Back to quick review
+              </button>
+
+              <button
+                mat-flat-button
+                color="primary"
+                type="submit"
+                class="submit"
+                [disabled]="form.invalid || isProcessing || !isSubmissionEnabled"
+              >
+                Submit
+              </button>
             </div>
-        </div>
-        <div class="row" *ngIf="!user_id">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>Lincense Registration State</mat-label>
-                    <mat-select [(ngModel)]="formData.state" name="state" required>
-                        <mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>Reason for Contacting us</mat-label>
-                    <mat-select [(ngModel)]="formData.reasonForContacting" name="reasonForContacting" required>
-                        <mat-optgroup label="Bad Driving Review">
-                            <mat-option value="Aggressive_Driving">Aggressive Driving</mat-option>
-                            <mat-option value="Cut_Me_Off">Cut me Off</mat-option>
-                            <mat-option value="Driving_Slow">Driving Slow</mat-option>
-                            <mat-option value="Not_Paying_Attention">Not Paying Attention</mat-option>
-                            <mat-option value="Bad_Other">Bad Other</mat-option>
-                        </mat-optgroup>
-                        <mat-optgroup label="Good Driving Review">
-                            <mat-option value="Courteous_Driver">Courteous Driver</mat-option>
-                            <mat-option value="Used_Turn_Signals">Used Turn Signals</mat-option>
-                            <mat-option value="Good_Parking_Job">Excellent Park Job</mat-option>
-                            <mat-option value="Let_Me_Merge">Let me Merge</mat-option>
-                            <mat-option value="Good_Other">Good Other</mat-option>
-                        </mat-optgroup>
-                        <mat-optgroup label="Car Review">
-                            <mat-option value="Looks_New">Looks Brand New</mat-option>
-                            <mat-option value="Cool_Color">Cool Color/Wrap</mat-option>
-                            <mat-option value="Nice_Wheels">Nice Rims/Wheels</mat-option>
-                            <mat-option value="Unique_Eye_Catching">Unique & Eye-Catching</mat-option>
-                            <mat-option value="Other">Other</mat-option>
-                        </mat-optgroup>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>Description of event</mat-label>
-                    <textarea matInput [(ngModel)]="formData.description" name="description" randomizeInput required></textarea>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center padding-bottom">
-                <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid || isProcessing" matTooltip="Are you sure?" [matTooltipPosition]="'above'">Submit</button>
-            </div>
-        </div>
+          </form>
+        </ng-template>
+      </mat-card-content>
+
+      <mat-divider></mat-divider>
+
+      <mat-card-actions class="bottom-links">
+        <a class="shop-link" href="/shop">Want your own bumper sticker?</a>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="overlay" *ngIf="isSubmitting" aria-live="polite" aria-busy="true">
+    <div class="overlay-card">
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+      <div class="overlay-text">Submitting…</div>
     </div>
-</form>
-<div class="container">
-    <div class="row">
-        <div class="col-12 col-center">
-            <span class="pull-right"><a href="/shop">Want your own bumper sticker?</a></span>
-        </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="overlay" *ngIf="isProcessing" aria-live="polite" aria-busy="true">
+    <div class="overlay-card">
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+      <div class="overlay-text">Processing…</div>
     </div>
-</div>
+  </div>
+</main>

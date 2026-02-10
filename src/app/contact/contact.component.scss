@@ -1,0 +1,228 @@
+@import '../../styles/variables';
+
+.contact-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  transition: background 0.3s ease;
+}
+
+.contact-hero {
+  padding: 60px 20px 40px;
+  text-align: center;
+
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    opacity: 0.95;
+    margin: 0;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+}
+
+.form-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+.form-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  margin-bottom: 40px;
+  transition: background-color 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-field {
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  mat-form-field {
+    padding-left: 0px !important;
+    width: 100%;
+  }
+}
+
+.submit-section {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.submit-button {
+  min-width: 200px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 24px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  background-color: var(--primary-color);
+  color: white;
+
+  mat-icon {
+    margin-right: 8px;
+  }
+
+  mat-spinner {
+    display: inline-block;
+    margin-right: 8px;
+
+    ::ng-deep circle {
+      stroke: white;
+    }
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--primary-color-rgb), 0.4);
+    background-color: var(--primary-dark);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.contact-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 40px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  .info-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0 0 10px;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  }
+}
+
+// Mat-select panel styling for dark mode
+::ng-deep {
+  .mat-mdc-select-panel {
+    background-color: var(--card-bg);
+  }
+
+  .mat-mdc-option {
+    color: var(--text-primary);
+
+    &:hover {
+      background-color: var(--hover-bg);
+    }
+
+    &.mat-mdc-option-active {
+      background-color: var(--hover-bg);
+    }
+
+    .mat-icon {
+      color: var(--primary-color);
+      margin-right: 12px;
+      vertical-align: middle;
+    }
+  }
+
+  .mat-mdc-option-pseudo-checkbox {
+    display: none;
+  }
+}
+
+// Custom snackbar styling
+::ng-deep {
+  .success-snackbar {
+    --mdc-snackbar-container-color: #4caf50 !important;
+    --mat-snack-bar-button-color: white !important;
+    
+    .mat-mdc-snack-bar-label {
+      color: white !important;
+    }
+  }
+
+  .error-snackbar {
+    --mdc-snackbar-container-color: #f44336 !important;
+    --mat-snack-bar-button-color: white !important;
+    
+    .mat-mdc-snack-bar-label {
+      color: white !important;
+    }
+  }
+}
+
+// Animation for form submission
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

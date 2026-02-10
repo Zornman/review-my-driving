@@ -1,50 +1,52 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CartService } from '../services/shopping_cart.service';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatIconModule } from '@angular/material/icon';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule } from '@angular/material/menu';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth.service';
-import { User } from 'firebase/auth';
-import { ThemeService } from '../services/theme.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { Subject, Subscription, takeUntil } from 'rxjs';
+import { User } from 'firebase/auth';
+
 import { environment } from '../../environments/environment';
+import { AuthService } from '../services/auth.service';
+import { CartService } from '../services/shopping_cart.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-header',
-  imports: [ 
+  imports: [
     CommonModule,
     FormsModule,
-    MatBadgeModule, 
+    MatBadgeModule,
     MatCheckboxModule,
-    MatIconModule, 
-    MatButtonModule, 
-    RouterModule, 
+    MatIconModule,
+    MatButtonModule,
+    RouterModule,
     MatMenuModule
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  cartQuantity!: number;
+  cartQuantity = 0;
+  isDarkMode = false;
   private cartSubscription!: Subscription;
-  user!: User | null;
-  isAdmin: boolean = false;
-  isDarkMode!: boolean;
 
-  constructor(private cartService: CartService, private router: Router, private authService: AuthService, private themeService: ThemeService) {
-    this.authService.getUser().subscribe((user) => {
-      this.user = user;
+  readonly adminUserId = environment.adminUserId;
+  readonly user$: ReturnType<typeof this.authService.getUser>;
 
-      if (this.user?.uid === environment.adminUserId) 
-        this.isAdmin = true;
-    });
+  private readonly destroy$ = new Subject<void>();
 
+  constructor(
+    private readonly cartService: CartService,
+    private readonly authService: AuthService,
+    private readonly themeService: ThemeService
+  ) {
     this.isDarkMode = this.themeService.getIsDarkMode();
+    this.user$ = this.authService.getUser(); // Observable<User | null>
   }
 
   ngOnInit(): void {
@@ -52,14 +54,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.cartSubscription = this.cartService.cart$.subscribe((cart) => {
       this.cartQuantity = cart.reduce((total, item) => total + item.quantity, 0);
     });
-
   }
 
   ngOnDestroy(): void {
-    // Unsubscribe to avoid memory leaks
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
     }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onToggleDarkMode(event: MatCheckboxChange) {
@@ -74,45 +76,5 @@ export class HeaderComponent implements OnInit, OnDestroy {
   signOut() {
     this.authService.signOut();
     this.cartService.clearCart();
-  }
-
-  openHome() {
-    this.router.navigateByUrl('/index')
-  }
-
-  openShop() {
-    this.router.navigateByUrl('/shop');
-  }
-
-  viewAccount() {
-    this.router.navigateByUrl('/account');
-  }
-
-  viewSettings() {
-    this.router.navigateByUrl('/settings');
-  }
-
-  reviewCart() {
-    this.router.navigateByUrl('/cart');
-  }
-
-  registerationPage() {
-    this.router.navigateByUrl('/register');
-  }
-
-  loginPage() {
-    this.router.navigateByUrl('/login');
-  }
-
-  aboutPage() {
-    this.router.navigateByUrl('/about');
-  }
-
-  contactPage() {
-    this.router.navigateByUrl('/contact');
-  }
-
-  adminFunctionsPage() {
-    this.router.navigateByUrl('/admin-functions');
   }
 }

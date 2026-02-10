@@ -44,6 +44,41 @@ html {
     padding: 0 !important;
 }
 
+/* Theme the header menus (Angular Material overlay) */
+.header-menu.mat-mdc-menu-panel {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.light-mode {
+    .header-menu.mat-mdc-menu-panel {
+        background: #ffffff;
+        color: $color-text-dark;
+        border: 1px solid $color-border-light;
+    }
+
+    .header-menu .mat-mdc-menu-item:hover {
+        background: rgba($color-primary, 0.08);
+    }
+}
+
+.dark-mode {
+    .header-menu.mat-mdc-menu-panel {
+        background: $color-table-dark;
+        color: $color-text-light;
+        border: 1px solid $color-border-dark;
+    }
+
+    .header-menu .mat-mdc-menu-item:hover {
+        background: rgba(#ffffff, 0.06);
+    }
+}
+
+.header-menu .mat-mdc-menu-item,
+.header-menu .mat-mdc-menu-item mat-icon {
+    color: inherit;
+}
+
 .header-branding {
     display: flex;
     align-items: center;
