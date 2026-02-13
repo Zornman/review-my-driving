@@ -1,47 +1,83 @@
-<div class="container">
-    <div class="row">
-        <div class="col-12 col-center">
-            <h1>About Us</h1>
-        </div>
-        <div class="col-12">
-            <h3>How We Started</h3>
-            <span>
-                It all started with a vacation, a car, and a random name slapped on the back. 
-                Seeing that got me thinking—what if there was a better way to "review" someone's 
-                driving? Not just a phone number you’ll never call, but something quick, digital, 
-                and (most importantly) kind of ridiculous. Thus, Review My Driving was born. 
-                But I didn’t just want to make another boring feedback form... I wanted to get
-                the last word in. A customizable "confirmation" message. A way to say "F you"
-                or "Have a great day!" depending on how you feel.
-            </span>
-        </div>
-        <div class="col-12">
-            <h3>Our Background</h3>
-            <span>
-                I’ve been a software engineer my whole life. From a young age, I knew I wanted to 
-                build things, and this project lets me combine that passion with a little 
-                creative chaos. There’s something truly exciting about taking a simple 
-                concept and turning it into an experience, one that’s equal parts frustrating 
-                and hilarious.
-            </span>
-        </div>
-        <div class="col-12">
-            <h3>What We Do</h3>
-            <span>
-                At the end of the day, we all have thoughts about the way people drive, but 
-                there hasn’t really been a good way to share them—until now. Calling a number 
-                on the back of a truck? Not happening. But scanning a QR code and 
-                submitting a review? Much better. Review My Driving makes it easier 
-                (and slightly more entertaining) to give and get feedback. 
-                Whether you're here to rant, reflect, or just experience the worst 
-                form UI imaginable, welcome aboard.
-            </span>
-        </div>
-        <div class="col-12 col-center">
-            <h4>Thank you for reading, <br />- Alec Z. (Founder)</h4>
-        </div>
-        <div class="col-12" *ngIf="isAdmin">
-            <button mat-button (click)="updateOrderDetails()">Test UpdateOrderStatus function</button>
-        </div>
+<section class="about-page">
+  <header class="about-hero">
+    <div class="about-hero__content">
+      <p class="eyebrow">About Review My Driving</p>
+      <h1>Helping drivers grow with clarity and confidence</h1>
+      <p class="lead">
+        We turn real-world drive data into actionable feedback, so learners, parents, and instructors can focus on progress—not guesswork.
+      </p>
+      <div class="about-hero__actions">
+        <a class="btn btn-primary" (click)="navigateToUrl('/services')">Explore Services</a>
+        <a class="btn btn-secondary" (click)="navigateToUrl('/contact')">Contact Us</a>
+      </div>
     </div>
-</div>
+    <div class="about-hero__panel">
+      <div class="panel-card">
+        <h3>Our Focus</h3>
+        <p>Safety, skill-building, and consistency for every driver journey.</p>
+      </div>
+      <div class="panel-card accent">
+        <h3>Our Promise</h3>
+        <p>Clear insights. Actionable feedback. Measurable progress.</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="about-section about-section--split">
+    <div>
+      <h2>Our Mission</h2>
+      <p>
+        We empower drivers to build lifelong safe-driving habits through thoughtful feedback, modern tools, and a supportive approach.
+      </p>
+      <ul class="checklist">
+        <li>Personalized coaching insights</li>
+        <li>Parent and instructor visibility</li>
+        <li>Progress tracking over time</li>
+      </ul>
+    </div>
+    <div class="stats-grid">
+      <div class="stat">
+        <span class="stat__value">1,200+</span>
+        <span class="stat__label">Drive reviews completed</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">4.9★</span>
+        <span class="stat__label">Average rating</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">98%</span>
+        <span class="stat__label">Recommendation rate</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">24/7</span>
+        <span class="stat__label">Digital access</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <h2>What makes us different</h2>
+    <div class="feature-grid">
+      <article class="feature">
+        <h3>Clarity first</h3>
+        <p>We explain feedback in plain language so you know exactly what to improve.</p>
+      </article>
+      <article class="feature">
+        <h3>Progress you can see</h3>
+        <p>Track growth over time with consistent, structured review sessions.</p>
+      </article>
+      <article class="feature">
+        <h3>Built for support</h3>
+        <p>Parents and instructors get the tools to guide effectively.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="about-section about-section--cta">
+    <div>
+      <h2>Ready to start your journey?</h2>
+      <p>Get a personalized review and build safe driving habits that last.</p>
+    </div>
+    <a class="btn btn-primary" (click)="navigateToUrl('/contact')">Book a Review</a>
+  </section>
+</section>

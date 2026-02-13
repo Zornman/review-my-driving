@@ -1,0 +1,43 @@
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  
+    // Prevent header content from causing horizontal overflow
+    max-width: 100%;
+    overflow-x: hidden;
+  
+    // mat-dialog-title adds margins; this keeps spacing consistent with the close button
+    h2[mat-dialog-title] {
+      margin: 0;
+    }
+}
+  
+.modal-close {
+    margin-left: 8px;
+    background-color: transparent;
+    border: none;
+  
+    // Make the close button/icon black and easy to see
+    color: #000;
+
+    mat-icon {
+        color: inherit;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+  
+// Prevent horizontal scrolling inside the dialog content area
+:host ::ng-deep mat-dialog-content {
+    overflow-x: hidden;
+}
+  
+// Ensure all "full-width" fields don't exceed the container width
+:host ::ng-deep .full-width {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}

@@ -1,0 +1,183 @@
+@use '../../styles/variables' as *;
+
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  /* Theme tokens (defaults = light) */
+  --hdr-bg: #{$header-background};
+  --hdr-border: #{$header-border};
+  --hdr-text: #{$header-color};
+
+  --hdr-brand: #{$color-primary};
+  --hdr-hover-bg: #{rgba($color-primary, 0.08)};
+  --hdr-active-bg: #{rgba($color-primary, 0.12)};
+  --hdr-active-text: #{$color-primary};
+
+  /* "Glass" effect */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Explicit light-mode (optional, but makes intent clear) */
+:host-context(.light-mode) {
+  --hdr-bg: #{$header-background};
+  --hdr-border: #{$header-border};
+  --hdr-text: #{$header-color};
+
+  --hdr-brand: #{$color-primary};
+  --hdr-hover-bg: #{rgba($color-primary, 0.08)};
+  --hdr-active-bg: #{rgba($color-primary, 0.12)};
+  --hdr-active-text: #{$color-primary};
+}
+
+:host-context(.dark-mode) {
+  --hdr-bg: #{rgba($color-header-dark, 0.72)};
+  --hdr-border: #{rgba(#ffffff, 0.10)};
+  --hdr-text: #{$color-text-light};
+
+  --hdr-brand: #{$color-secondary};
+  --hdr-hover-bg: #{rgba(#ffffff, 0.08)};
+  --hdr-active-bg: #{rgba($color-secondary, 0.18)};
+  --hdr-active-text: #{$color-secondary};
+}
+
+.app-header {
+  background: var(--hdr-bg);
+  border-bottom: 1px solid var(--hdr-border);
+  padding: 0;
+}
+
+.app-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+
+  text-decoration: none;
+  color: var(--hdr-text);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+
+  &:focus-visible {
+    outline: 2px solid var(--hdr-brand);
+    outline-offset: 3px;
+    border-radius: 10px;
+  }
+}
+
+.brand__primary,
+.brand__secondary {
+  font-size: 1.05rem;
+}
+
+.brand__primary {
+  font-weight: 700;
+}
+
+.brand__secondary {
+  font-weight: 850;
+  color: var(--hdr-brand);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.nav__link {
+  text-decoration: none;
+  color: var(--hdr-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
+
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
+
+  &:hover {
+    background: var(--hdr-hover-bg);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--hdr-brand);
+    outline-offset: 3px;
+  }
+
+  &.is-active {
+    background: var(--hdr-active-bg);
+    color: var(--hdr-active-text);
+  }
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Make icons follow theme text color (mat-icon uses currentColor) */
+.actions__icon {
+  color: var(--hdr-text);
+  border-radius: 12px;
+
+  &:focus-visible {
+    outline: 2px solid var(--hdr-brand);
+    outline-offset: 3px;
+  }
+}
+
+/* Responsive visibility helpers */
+.desktop-view {
+  display: none;
+}
+
+.mobile-view {
+  display: inline-flex;
+}
+
+/* Header-specific responsive visibility helpers (avoid conflicts with global .mobile-view/.desktop-view) */
+.header-desktop {
+  display: none;
+}
+
+.header-mobile {
+  display: inline-flex;
+}
+
+/* Raise this breakpoint so the hamburger shows sooner (at a larger width) */
+@media (min-width: 900px) {
+  .desktop-view {
+    display: flex;
+  }
+
+  .mobile-view {
+    display: none;
+  }
+
+  .header-desktop {
+    display: flex;
+  }
+
+  .header-mobile {
+    display: none;
+  }
+}

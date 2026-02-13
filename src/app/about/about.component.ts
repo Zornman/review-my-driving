@@ -5,6 +5,7 @@ import { User } from 'firebase/auth';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-about',
@@ -20,7 +21,7 @@ export class AboutComponent {
   user!: User | null;
   isAdmin: boolean = false;
 
-  constructor(private authService: AuthService, private bgService: BackgroundService) {
+  constructor(private authService: AuthService, private bgService: BackgroundService, private router: Router) {
     this.authService.getUser().subscribe((user) => {
       if (!user) return;
 
@@ -40,5 +41,9 @@ export class AboutComponent {
         console.error(error);
       }
     })
+  }
+
+  navigateToUrl(url: string): void {
+    this.router.navigateByUrl(url);
   }
 }

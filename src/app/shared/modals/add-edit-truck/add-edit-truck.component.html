@@ -1,4 +1,15 @@
-<h2 mat-dialog-title>{{ truck ? 'Edit' : 'Add' }} Truck</h2>
+<div class="modal-header">
+    <h2 mat-dialog-title>{{ truck ? 'Edit' : 'Add' }} Truck</h2>
+  
+    <button
+      type="button"
+      mat-icon-button
+      class="modal-close"
+      aria-label="Close dialog"
+      (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+</div>
 <mat-dialog-content>
     <form [formGroup]="truckForm">
         <mat-form-field appearance="fill" class="full-width" *ngIf="truck">
@@ -57,5 +68,6 @@
     </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
+    <button mat-button color="secondary" (click)="onCancel()">Cancel</button>
     <button mat-button color="primary" [disabled]="truckForm.invalid || (truck && truckForm.pristine)" (click)="onSubmit()">{{ truck ? 'Edit' : 'Add' }} Truck</button>
 </mat-dialog-actions>

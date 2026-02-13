@@ -33,10 +33,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class AdminFunctionsComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);
   showBulkCreateForm: boolean = false;
+  showBusinessQRForm: boolean = false;
   bulkCreateForm!: FormGroup;
-  products: Product[] = []; // Replace with actual product type if available
+  businessQRForm!: FormGroup;
+  products: Product[] = [];
+  businessUsers: any[] = [];
   userId: string | undefined = undefined;
   showSampleBatches: boolean = false;
+  isGeneratingBusinessQRCodes: boolean = false;
 
   isInitDailyReportIndexesLoading = false;
   isRunDailyReportSchedulerLoading = false;
@@ -53,7 +57,7 @@ export class AdminFunctionsComponent implements OnInit {
 
   ngOnInit(): void {
     this.bulkCreateForm = this.fb.group({
-      numberOfCodes: ['', [Validators.required, Validators.pattern('^[1-9][0-9]*$')]], // Ensure it's a positive integer]
+      numberOfCodes: ['', [Validators.required, Validators.pattern('^[1-9][0-9]*$')]], // Ensure it's a positive integer
       productList: ['', Validators.required],
       batchNumber: ['', Validators.required],
       campaignId: ['', Validators.required],
@@ -61,7 +65,14 @@ export class AdminFunctionsComponent implements OnInit {
       notes: ['', Validators.required]
     });
 
+    this.businessQRForm = this.fb.group({
+      businessId: ['', Validators.required],
+      numberOfCodes: ['', [Validators.required, Validators.pattern('^[1-9][0-9]*$')]],
+      productList: ['', Validators.required],
+    });
+
     this.loadProducts();
+    this.loadBusinessUsers();
   }
 
   loadProducts(): void {
@@ -80,7 +91,7 @@ export class AdminFunctionsComponent implements OnInit {
           }
         },
         error: (error) => {
-          
+          console.error('Error loading products:', error);
         },
       });
     } else {
@@ -88,10 +99,29 @@ export class AdminFunctionsComponent implements OnInit {
     }
   }
 
+  loadBusinessUsers(): void {
+    this.mongoService.getAllBusinessUsers().subscribe({
+      next: (response: any) => {
+        this.businessUsers = response.result || [];
+      },
+      error: (error) => {
+        console.error('Error loading business users:', error);
+        this._snackBar.open('Error loading business users.', 'Close', { duration: 3000 });
+      },
+    });
+  }
+
   toggleBulkCreateForm(): void {
     this.showBulkCreateForm = !this.showBulkCreateForm;
     if (this.showBulkCreateForm) {
       this.bulkCreateForm.reset();
+    }
+  }
+
+  toggleBusinessQRForm(): void {
+    this.showBusinessQRForm = !this.showBusinessQRForm;
+    if (this.showBusinessQRForm) {
+      this.businessQRForm.reset();
     }
   }
 
@@ -132,6 +162,94 @@ export class AdminFunctionsComponent implements OnInit {
         this.isRunDailyReportSchedulerLoading = false;
         this._snackBar.open(err?.error?.message ?? 'Error running scheduler.', 'Ok', { duration: 5000 });
       }
+    });
+  }
+
+  onGenerateBusinessQRCodes(): void {
+    this.isGeneratingBusinessQRCodes = true;
+    this._snackBar.open('Processing your request, please wait...', 'Close', { duration: 3000 });
+
+    if (this.businessQRForm.invalid) {
+      this.isGeneratingBusinessQRCodes = false;
+      this._snackBar.open('Please enter valid data.', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const numberOfCodes = Number(this.businessQRForm.value.numberOfCodes);
+    const businessId = (this.businessQRForm.value.businessId ?? '').toString();
+    const productId = this.businessQRForm.value.productList;
+    const productType = this.products.find(p => p.id === productId)?.title || 'Unknown Product';
+    this.authService.getUser().subscribe((user) => this.userId = user?.uid) || 'admin';
+
+    const selectedBusiness = this.businessUsers.find((b: any) => {
+      const id = (b?._id?.$oid ?? b?._id ?? b?.businessId ?? b?.userId ?? '').toString();
+      return id === businessId;
+    });
+
+    const businessName = selectedBusiness?.businessName ?? 'Business';
+    const businessUserId = selectedBusiness?.userId ?? null;
+
+    this._snackBar.open('Generating business QR codes...', 'Close', { duration: 3000 });
+
+    // Call QRCodeService to generate QR codes with business info embedded
+    // NOTE: `businessId` is the Mongo business _id (string) so QR→truck matching works.
+    this.qrCodeService.generateBusinessQRCodes(numberOfCodes, businessId).then((qrCodeData) => {
+      console.log('Business QR codes created successfully:', qrCodeData);
+
+      this._snackBar.open('QR Codes generated, creating custom Printify orders...', 'Close', { duration: 3000 });
+
+      // Map QR codes to Printify product creation requests and MongoDB entries
+      const createRequests = qrCodeData.map(async ({ assetId, qrCode }, index) => {
+        try {
+          const cleanQRCodeBase64 = qrCode.substring(22); // Remove the data URL prefix
+
+          // Create the Printify product with business context
+          await this.printifyService.createCustomBusinessPrintifyProduct({
+            base64QRCode: cleanQRCodeBase64,
+            originalProductId: productId,
+            userID: `${businessName}_QRCode_${index + 1}`,
+            assetId: assetId,
+          }).toPromise();
+
+          // Insert the database entry
+          const dbEntry = {
+            assetId: assetId,
+            businessId: businessId,
+            status: 'unassigned',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            assignedAt: null,
+            truckId: null,
+            metadata: {
+              productType: productType,
+              businessId: businessId,
+              businessName,
+              businessUserId,
+              qrCodeIndex: index + 1
+            }
+          };
+
+          await this.mongoService.insertBusinessQRCodes([dbEntry]).toPromise();
+        } catch (error) {
+          console.error(`Error processing QR code ${assetId}:`, error);
+          throw error;
+        }
+      });
+
+      // Wait for all Printify requests and database entries to complete
+      return Promise.all(createRequests);
+    }).then(() => {
+      console.log('All business QR codes and Printify products created successfully.');
+      this.isGeneratingBusinessQRCodes = false;
+      this._snackBar.open(`Generated ${numberOfCodes} QR codes for ${businessName}!`, 'Close', { duration: 3000 });
+
+      // Reset the form and hide
+      this.businessQRForm.reset();
+      this.showBusinessQRForm = false;
+    }).catch((error) => {
+      console.error('Error during business QR code generation:', error);
+      this.isGeneratingBusinessQRCodes = false;
+      this._snackBar.open('An error occurred during QR code generation. Please try again.', 'Close', { duration: 3000 });
     });
   }
 
@@ -195,8 +313,8 @@ export class AdminFunctionsComponent implements OnInit {
             claimedAt: null,
             metadata: {
               productType: this.products.find(p => p.id === productId)?.title || 'Unknown Product',
-              batchNumber: batchNumber, // Replace with dynamic batch number if needed
-              campaignId: campaignId, // Replace with dynamic campaign ID if needed
+              batchNumber: batchNumber,
+              campaignId: campaignId,
             },
           };
 
@@ -211,7 +329,7 @@ export class AdminFunctionsComponent implements OnInit {
           await this.mongoService.insertSampleMapper(dbEntry).toPromise();
         } catch (error) {
           console.error(`Error processing QR code ${uniqueId}:`, error);
-          throw error; // Propagate the error to Promise.all
+          throw error;
         }
       });
 

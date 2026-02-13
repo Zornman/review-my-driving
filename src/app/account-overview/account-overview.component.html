@@ -121,6 +121,9 @@
     <mat-tab label="Trucks & Drivers" *ngIf="isBusinessUser">
       <app-truck-and-driver-management></app-truck-and-driver-management>
     </mat-tab>
+    <mat-tab label="QR Codes" *ngIf="isBusinessUser">
+      <app-manage-qr-codes></app-manage-qr-codes>
+    </mat-tab>
     <mat-tab label="Daily Report Summary" *ngIf="isBusinessUser">
       <app-daily-reports-summary *ngIf="businessUserInfo" [businessUserInfo]="businessUserInfo"></app-daily-reports-summary>
     </mat-tab>

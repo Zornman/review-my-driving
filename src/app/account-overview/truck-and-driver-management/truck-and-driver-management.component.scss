@@ -1,176 +1,521 @@
+@use '../../../styles/variables' as v;
+
+/* =========================
+   Theme tokens (3-color system)
+   ========================= */
+:host {
+  /* Core theme (comes from styles.scss, light/dark mode aware) */
+  --tdm-surface: var(--mdc-theme-surface);
+  --tdm-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
+
+  /* Optional: make subtitle consistently readable */
+  --tdm-subtitle: color-mix(in srgb, var(--tdm-on-surface) 82%, transparent);
+
+  /* Required: primary / secondary from your app theme vars */
+  --tdm-primary: var(--mdc-theme-primary);
+  --tdm-secondary: var(--mdc-theme-secondary);
+
+  /* Tertiary: a neutral “ink” tint derived from on-surface */
+  --tdm-tertiary: color-mix(in srgb, var(--tdm-on-surface) 12%, transparent);
+
+  /* Derived neutrals (no hard-coded black/white) */
+  --tdm-border: color-mix(in srgb, var(--tdm-on-surface) 14%, transparent);
+  --tdm-muted: color-mix(in srgb, var(--tdm-on-surface) 72%, transparent);
+  --tdm-muted-2: color-mix(in srgb, var(--tdm-on-surface) 58%, transparent);
+
+  /* Surfaces */
+  --tdm-surface-2: color-mix(in srgb, var(--tdm-tertiary) 55%, var(--tdm-surface)); /* subtle */
+  --tdm-hover: color-mix(in srgb, var(--tdm-secondary) 14%, transparent);
+  --tdm-selected: color-mix(in srgb, var(--tdm-primary) 10%, transparent);
+
+  /* If globals are fighting you, having an explicit “panel” surface helps */
+  --tdm-panel: var(--tdm-surface);
+}
+
+:host-context(body.dark-mode) {
+  /* Dark mode often needs slightly stronger borders */
+  --tdm-border: color-mix(in srgb, var(--tdm-on-surface) 18%, transparent);
+  --tdm-hover: color-mix(in srgb, var(--tdm-secondary) 18%, transparent);
+  --tdm-selected: color-mix(in srgb, var(--tdm-primary) 14%, transparent);
+  background: var(--tdm-panel) !important;
+  color: var(--tdm-on-surface) !important;
+}
+
+/* The actual cell that spans across the table */
+.tdm-detail-row .mat-mdc-cell,
+.tdm-detail-row .mat-cell {
+  background: var(--tdm-panel) !important;
+  color: var(--tdm-on-surface) !important;
+
+  width: 100% !important;
+  flex: 1 1 100% !important;
+  display: block !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Expanded cell */
+.tdm-expanded-cell {
+  background: var(--tdm-panel) !important;
+  color: var(--tdm-on-surface) !important;
+
+  padding: 0 !important;
+  border-bottom: none !important;
+  width: 100% !important;
+  flex: 1 1 100% !important;
+}
+
+/* Expanded content (remove duplicate background declarations) */
+.tdm-expanded {
+  padding: 14px 16px; /* horizontal padding prevents edge clipping */
+  border-top: 1px solid var(--tdm-border);
+  background: var(--tdm-panel) !important;
+  color: var(--tdm-on-surface) !important;
+
+  @media (max-width: 576px) {
+    padding: 12px;
+  }
+}
+
+mat-row.tdm-detail-row,
+tr.tdm-detail-row,
+.tdm-detail-row.mat-mdc-row,
+.tdm-detail-row.mdc-data-table__row {
+  background-color: var(--tdm-panel) !important;
+  color: var(--tdm-on-surface) !important;
+}
+
+.tdm-detail-row .mat-mdc-cell,
+.tdm-detail-row .mat-mdc-cell.mdc-data-table__cell,
+.tdm-detail-row .mdc-data-table__cell,
+.tdm-detail-row .mat-cell {
+  background-color: var(--tdm-panel) !important;
+  color: var(--tdm-on-surface) !important;
+}
+
+/* The inner expanded container must also be panel-colored */
+.tdm-expanded-cell,
+.tdm-expanded {
+  background-color: var(--tdm-panel) !important;
+  color: var(--tdm-on-surface) !important;
+}
+
+:host-context(body.light-mode) {
+  /* Ensure light mode always uses a light surface, even if globals set odd values */
+  --tdm-panel: #ffffff;
+}
+
+/* =========================
+   Layout
+   ========================= */
+.tdm-page {
+    padding: 8px 20px 20px; /* add left/right padding */
+    color: var(--tdm-on-surface);
+  
+    @media (max-width: 768px) {
+      padding: 8px 12px 16px; /* slightly tighter on mobile */
+    }
+}
+
+.tdm-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 768px) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+.tdm-title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tdm-on-surface);
+}
+
+.tdm-subtitle {
+  margin: 6px 0 0 0;
+  color: color-mix(in srgb, var(--tdm-subtitle) 72%, transparent);
+  max-width: 70ch;
+}
+
+.tdm-header__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+  }
+}
+
+.tdm-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.tdm-card {
+  border-radius: 14px;
+  background: var(--tdm-surface);
+  overflow: hidden;
+  border: 1px solid var(--tdm-border);
+}
+
+/* Header: remove the always-light background token to avoid dark-mode mismatch */
+.tdm-card__header {
+  display: grid;
+  grid-template-columns: 1fr minmax(220px, 320px);
+  gap: 12px;
+  align-items: center;
+  padding: 14px 14px 10px 14px;
+  border-bottom: 1px solid var(--tdm-border);
+  background: var(--tdm-surface-2); /* mode-aware and subtle */
+
+  /* safe-area for outlined field */
+  padding-right: 18px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    padding-right: 14px;
+  }
+}
+
+.tdm-card__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--tdm-on-surface);
+}
+
+.tdm-card__hint {
+  margin: 4px 0 0 0;
+  color: var(--tdm-muted);
+  font-size: 0.95rem;
+}
+
+/* Search: override your global mat-form-field padding */
+.tdm-search {
+  width: 100%;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-right: 4px;
+}
+
+.tdm-search :is(.mat-mdc-form-field-subscript-wrapper, .mat-mdc-form-field-hint-wrapper) {
+  display: none;
+}
+
+/* =========================
+   Table
+   ========================= */
+.tdm-table-wrap {
+  width: 100%;
+  overflow: auto;
+  background: transparent;
+}
+
+.tdm-table {
+  width: 100%;
+  background: transparent;
+}
+
+.tdm-header-row {
+  background: var(--tdm-surface-2);
+  border-bottom: 1px solid var(--tdm-border);
+}
+
+/* Make sure header + cell text always follows the theme */
+.tdm-table .mat-mdc-header-cell,
+.tdm-table .mat-header-cell,
+.tdm-table .mat-mdc-cell,
+.tdm-table .mat-cell {
+  color: var(--tdm-on-surface);
+}
+
+.tdm-row {
+  cursor: pointer;
+  transition: background-color 120ms ease;
+
+  &:hover {
+    background: var(--tdm-hover);
+  }
+
+  &.is-expanded {
+    background: var(--tdm-selected);
+  }
+}
+
+/* Expanded row width fixes */
+.tdm-detail-row {
+    background: var(--tdm-panel) !important;
+    color: var(--tdm-on-surface) !important;
+}
+  
+/* The actual cell that spans across the table */
+.tdm-detail-row .mat-mdc-cell,
+.tdm-detail-row .mat-cell {
+    background: var(--tdm-panel) !important;
+    color: var(--tdm-on-surface) !important;
+  
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    display: block !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+  
+/* Expanded cell */
+.tdm-expanded-cell {
+    background: var(--tdm-panel) !important;
+    color: var(--tdm-on-surface) !important;
+  
+    padding: 0 !important;
+    border-bottom: none !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+}
+  
+  /* Expanded content (remove duplicate background declarations) */
+.tdm-expanded {
+    padding: 14px 16px; /* horizontal padding prevents edge clipping */
+    border-top: 1px solid var(--tdm-border);
+    background: var(--tdm-panel) !important;
+    color: var(--tdm-on-surface) !important;
+
+    @media (max-width: 576px) {
+        padding: 12px;
+    }
+}
+
+/* Details */
+.tdm-details {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 16px;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tdm-detail {
+  min-width: 0;
+}
+
+.tdm-detail--span-2 {
+  grid-column: span 2;
+
+  @media (max-width: 900px) {
+    grid-column: auto;
+  }
+}
+
+.tdm-detail__label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tdm-muted-2);
+  margin-bottom: 4px;
+
+  color: var(--tdm-muted-2) !important;
+}
+
+.tdm-detail__value {
+  font-size: 0.95rem;
+  color: var(--tdm-on-surface);
+  overflow-wrap: anywhere;
+
+  color: var(--tdm-on-surface) !important;
+}
+
+/* Actions: centered on desktop; responsive on mobile */
+.tdm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 14px;
+
+  padding: 0 4px; /* tiny inset so wrapped buttons don't clip */
+  box-sizing: border-box;
+  max-width: 100%;
+
+  @media (max-width: 576px) {
+    justify-content: stretch;
+
+    button {
+      flex: 1 1 calc(50% - 10px);
+    }
+  }
+
+  @media (max-width: 380px) {
+    button {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+.tdm-actions > button {
+  max-width: 100%;
+  min-width: 0; /* overrides global min-width that can cause overflow */
+  white-space: nowrap;
+}
+
+/* On smaller phones, stack buttons neatly */
+@media (max-width: 420px) {
+  .tdm-actions {
+    gap: 8px;
+  }
+
+  .tdm-actions > button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+/* Expand button */
+.tdm-expand-btn {
+  width: 40px;
+  height: 40px;
+}
+
+.tdm-expand-icon {
+  transition: transform 140ms ease;
+  transform: rotate(0deg);
+  color: var(--tdm-primary);
+
+  &.is-expanded {
+    transform: rotate(180deg);
+  }
+}
+
+/* Status/chip: only uses secondary/tertiary; keep success as semantic accent */
+.tdm-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  background: var(--tdm-tertiary);
+  color: var(--tdm-on-surface);
+
+  &.tdm-status--active {
+    background: color-mix(in srgb, #{v.$success-color} 18%, transparent);
+    color: color-mix(in srgb, #{v.$success-color} 85%, black);
+  }
+}
+
+.tdm-chip {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--tdm-secondary) 18%, transparent);
+  color: var(--tdm-on-surface);
+}
+
+.tdm-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95em;
+}
+
+/* Empty state */
+.tdm-empty {
+  padding: 14px 6px;
+  color: var(--tdm-on-surface);
+}
+
+.tdm-empty__title {
+  font-weight: 700;
+}
+
+.tdm-empty__hint {
+  color: var(--tdm-muted);
+}
+
+/* Responsive hide rules (keep once) */
 .expand-column {
-    max-width: 60px !important; /* Set a smaller width for the expand column */
-    text-align: center; /* Center-align the content */
+  max-width: 60px !important;
+  text-align: center;
 }
 
-.truck-id-column {
-    max-width: 100px !important;
-}
-
-.assigned-driver-column {
-    @media screen and (max-width: 767px) {
-        display: none; /* Hide on small screens */;
-    }
-}
-
-.odometer-column {
-    @media screen and (max-width: 550px) {
-        display: none; /* Hide on small screens */;
-    }
-}
-
-.phone-column {
-    @media screen and (max-width: 500px) {
-        display: none; /* Hide on small screens */;
-    }
-}
-
+.truck-id-column,
 .driver-id-column {
-    max-width: 120px !important; /* Set a smaller width for the driver ID column */
+  max-width: 150px !important;
 }
 
 .status-column {
-    max-width: fit-content !important; /* Set a larger width for the status column */
+  max-width: fit-content !important;
 }
 
-.stack-section {
-    display: block; /* Add spacing between sections */
-}
-
-.expanded-detail {
-    width: 100%;
-}
-
-.detail-item {
-    text-align: right;
-    justify-content: right;
-}
-
-.driver-expanded-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    align-items: start;
-}
-
-/* Keep section headings aligned with their content */
-.driver-expanded-grid .stack-section > h4 {
-    margin: 0 0 8px 0;
-    text-align: left;
-}
-
-/* Address usually has more lines, so let it span full width on larger screens */
-.driver-address-section {
-    grid-column: 1 / -1;
-}
-
-.detail-kv {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.detail-kv-row {
-    display: grid;
-    /* Let the label be only as wide as it needs; value takes the rest */
-    grid-template-columns: max-content minmax(0, 1fr);
-    gap: 12px;
-    align-items: start;
-}
-
-.detail-kv-label {
-    text-align: right;
-    white-space: nowrap;
-}
-
-.detail-kv-value {
-    overflow-wrap: anywhere;
-}
-
-.actions-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 6px;
-}
-
-/* Default: let buttons wrap naturally but keep consistent sizing */
-.actions-buttons > button {
-    flex: 0 1 auto;
-    white-space: nowrap;
-}
-
-/* Small screens: switch to a controlled 2-column layout */
-@media screen and (max-width: 576px) {
-    .actions-buttons > button {
-        flex: 1 1 calc(50% - 8px);
-        min-width: 140px;
-    }
-}
-
-/* Extra small: single column for best tap targets */
-@media screen and (max-width: 380px) {
-    .actions-buttons > button {
-        flex: 1 1 100%;
-        min-width: 0;
-    }
-}
-
-/*
-  Expanded truck details should include values that are hidden in the table at smaller widths.
-  Match the exact breakpoints used by the table column CSS.
-*/
-.truck-detail-show-when-assigned-driver-hidden {
+.assigned-driver-column {
+  @media screen and (max-width: 767px) {
     display: none;
+  }
+}
 
-    @media screen and (max-width: 767px) {
-        display: block;
-    }
+.odometer-column {
+  @media screen and (max-width: 550px) {
+    display: none;
+  }
+}
+
+.phone-column {
+  @media screen and (max-width: 500px) {
+    display: none;
+  }
+}
+
+.truck-detail-show-when-assigned-driver-hidden {
+  display: none;
+
+  @media screen and (max-width: 767px) {
+    display: block;
+  }
 }
 
 .truck-detail-show-when-odometer-hidden {
-    display: none;
+  display: none;
 
-    @media screen and (max-width: 550px) {
-        display: block;
-    }
+  @media screen and (max-width: 550px) {
+    display: block;
+  }
 }
 
-/* Drivers: show Phone in expanded detail when the table column is hidden */
 .driver-phone-detail-show-when-phone-hidden {
-    display: none;
+  display: none;
 
-    @media screen and (max-width: 500px) {
-        display: grid;
-    }
+  @media screen and (max-width: 500px) {
+    display: block;
+  }
 }
 
-/* Make expanded detail readable on small screens */
-@media screen and (max-width: 576px) {
-    .expanded-detail {
-        .detail-item {
-            text-align: left;
-            justify-content: left;
-        }
-
-        .stack-section {
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
-    }
-
-    .driver-expanded-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .detail-kv-row {
-        grid-template-columns: 1fr;
-        gap: 4px;
-    }
-
-    .detail-kv-label {
-        text-align: left;
-    }
+/* =========================
+   Legacy/duplicate cleanup
+   =========================
+   The rules below were causing theme conflicts (hard right-alignment, duplicate columns,
+   expanded-detail styles etc). If you still use these classes in the template, migrate
+   them to the .tdm-* styles instead of keeping both.
+*/
+.stack-section,
+.expanded-detail,
+.detail-item,
+.driver-expanded-grid,
+.driver-address-section,
+.detail-kv,
+.detail-kv-row,
+.detail-kv-label,
+.detail-kv-value,
+.actions-buttons {
+  all: unset;
 }

@@ -1,4 +1,15 @@
-<h2 mat-dialog-title>Add New Driver</h2>
+<div class="modal-header">
+    <h2 mat-dialog-title>Add New Driver</h2>
+  
+    <button
+      type="button"
+      mat-icon-button
+      class="modal-close"
+      aria-label="Close dialog"
+      (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+</div>
 <mat-dialog-content>
 	<mat-stepper linear class="always-light-stepper">
 		<mat-step [stepControl]="licenseForm">

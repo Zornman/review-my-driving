@@ -83,6 +83,34 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
         this.initializeBusinessContext();
         void this.refreshAll();
       });
+
+    // Make table filtering behave nicely (lowercase, trimmed)
+    this.trucksDataSource.filterPredicate = (data: any, filter: string) => {
+      const f = filter.trim().toLowerCase();
+      const haystack = [
+        data?.truckId,
+        data?.licensePlate,
+        data?.assignedDriver,
+        data?.status,
+        data?.make,
+        data?.model,
+        data?.vin
+      ].join(' ').toLowerCase();
+      return haystack.includes(f);
+    };
+
+    this.driversDataSource.filterPredicate = (data: any, filter: string) => {
+      const f = filter.trim().toLowerCase();
+      const haystack = [
+        data?.driverId,
+        data?.name,
+        data?.phone,
+        data?.email,
+        data?.status,
+        data?.license?.[0]?.licenseNumber
+      ].join(' ').toLowerCase();
+      return haystack.includes(f);
+    };
   }
 
   ngAfterViewInit(): void {
@@ -171,6 +199,7 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
   openAddTruckDialog(): void {
     this.dialog.open(AddEditTruckComponent, {
       width: '400px',
+      disableClose: false,
       data: {
         truck: null,
         drivers: this.driversDataSource.data
@@ -231,7 +260,7 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
   openAddDriverDialog(): void {
     this.dialog.open(AddNewDriverComponent, {
       width: '600px',
-      disableClose: true
+      disableClose: false
     }).afterClosed().subscribe((result: any) => {
       if (!result || !result.driverId || !this.businessId) return;
 
@@ -256,6 +285,7 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
   editTruck(truck: any): void {
     this.dialog.open(AddEditTruckComponent, {
       width: '400px',
+      disableClose: false,
       data: {
         truck: truck,
         drivers: this.driversDataSource.data
@@ -328,18 +358,35 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
 
     const nextStatus = truck.status === 'Active' ? 'Inactive' : 'Active';
 
-    this.dbService.updateTruck({
-      businessId: this.businessId,
-      businessIdAsObjectId: this.businessIdAsObjectId,
-      actor: this.actor(),
-      truckObjectId,
-      update: { status: nextStatus }
-    }).subscribe({
-      next: () => {
-        void this.refreshAll();
-        this.expandedTruck = null;
-      },
-      error: (error: any) => console.error('Error updating truck status:', error)
+    const title = nextStatus === 'Inactive' ? 'Deactivate Truck?' : 'Activate Truck?';
+    const message =
+      nextStatus === 'Inactive'
+        ? 'Are you sure you want to deactivate this truck? It will still remain in your list.'
+        : 'Are you sure you want to activate this truck?';
+
+    const confirmText = nextStatus === 'Inactive' ? 'Yes, deactivate' : 'Yes, activate';
+    const cancelText = 'Cancel';
+
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      disableClose: false,
+      data: { title, message, confirmText, cancelText }
+    }).afterClosed().subscribe((result: boolean) => {
+      if (result !== true) return;
+
+      this.dbService.updateTruck({
+        businessId: this.businessId,
+        businessIdAsObjectId: this.businessIdAsObjectId,
+        actor: this.actor(),
+        truckObjectId,
+        update: { status: nextStatus }
+      }).subscribe({
+        next: () => {
+          void this.refreshAll();
+          this.expandedTruck = null;
+        },
+        error: (error: any) => console.error('Error updating truck status:', error)
+      });
     });
   }
 
@@ -350,25 +397,42 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
 
     const nextStatus = driver.status === 'Active' ? 'Inactive' : 'Active';
 
-    this.dbService.updateDriver({
-      businessId: this.businessId,
-      businessIdAsObjectId: this.businessIdAsObjectId,
-      actor: this.actor(),
-      driverObjectId,
-      update: { status: nextStatus }
-    }).subscribe({
-      next: () => {
-        void this.refreshAll();
-        this.expandedDriver = null;
-      },
-      error: (error: any) => console.error('Error updating driver status:', error)
+    const title = nextStatus === 'Inactive' ? 'Deactivate Driver?' : 'Activate Driver?';
+    const message =
+      nextStatus === 'Inactive'
+        ? 'Are you sure you want to deactivate this driver? They will still remain in your list.'
+        : 'Are you sure you want to activate this driver?';
+
+    const confirmText = nextStatus === 'Inactive' ? 'Yes, deactivate' : 'Yes, activate';
+    const cancelText = 'Cancel';
+
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      disableClose: false,
+      data: { title, message, confirmText, cancelText }
+    }).afterClosed().subscribe((result: boolean) => {
+      if (result !== true) return;
+
+      this.dbService.updateDriver({
+        businessId: this.businessId,
+        businessIdAsObjectId: this.businessIdAsObjectId,
+        actor: this.actor(),
+        driverObjectId,
+        update: { status: nextStatus }
+      }).subscribe({
+        next: () => {
+          void this.refreshAll();
+          this.expandedDriver = null;
+        },
+        error: (error: any) => console.error('Error updating driver status:', error)
+      });
     });
   }
 
   deleteTruck(): void {
     this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
-      disableClose: true,
+      disableClose: false,
       data: {
         title: 'Delete Truck?',
         message: 'Are you sure you want to delete this truck?',
@@ -400,7 +464,7 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
   deleteDriver(): void {
     this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
-      disableClose: true,
+      disableClose: false,
       data: {
         title: 'Delete Driver?',
         message: 'Are you sure you want to delete this driver?',
@@ -441,7 +505,7 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
 
     this.dialog.open(AssignDriverDialogComponent, {
       width: '400px',
-      disableClose: true,
+      disableClose: false,
       data: {
         drivers: this.driversDataSource.data,
         currentDriver
@@ -471,7 +535,7 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
   editLicenseInfo(driver: any): void {
     this.dialog.open(EditLicenseInfoComponent, {
       width: '400px',
-      disableClose: true,
+      disableClose: false,
       data: { driver }
     }).afterClosed().subscribe((result: any) => {
       if (!result || !this.businessId) return;
@@ -499,7 +563,7 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
   editAddressInfo(driver: any): void {
     this.dialog.open(EditAddressInfoComponent, {
       width: '400px',
-      disableClose: true,
+      disableClose: false,
       data: { driver }
     }).afterClosed().subscribe((result: any) => {
       if (!result || !this.businessId) return;
@@ -532,5 +596,15 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
   toggleDriverRow(row: any, event: Event): void {
     event.stopPropagation();
     this.expandedDriver = this.expandedDriver === row ? null : row;
+  }
+
+  applyTruckFilter(value: string): void {
+    this.trucksDataSource.filter = (value ?? '').trim().toLowerCase();
+    if (this.trucksDataSource.paginator) this.trucksDataSource.paginator.firstPage();
+  }
+
+  applyDriverFilter(value: string): void {
+    this.driversDataSource.filter = (value ?? '').trim().toLowerCase();
+    if (this.driversDataSource.paginator) this.driversDataSource.paginator.firstPage();
   }
 }

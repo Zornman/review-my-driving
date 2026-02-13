@@ -6,10 +6,12 @@
     <div class="row">
         <div class="col-12">
             <button type="submit" class="btn btn-primary" (click)="toggleBulkCreateForm()">Bulk Create QR Codes</button>
+            <button type="submit" class="btn btn-primary" (click)="toggleBusinessQRForm()">Generate Business QR Codes</button>
             <button type="submit" class="btn btn-primary" (click)="toggleSampleBatches()">View Sample Batches</button>
         </div>
     </div>
 
+    <!-- Daily Reports Section -->
     <div class="row" style="margin-top: 15px;">
         <div class="col-12">
             <h2>Daily Reports - Admin Tools</h2>
@@ -33,6 +35,8 @@
             <pre style="white-space: pre-wrap; background:#f6f6f6; padding:10px; border-radius:8px;">{{ lastDailyReportSchedulerResult | json }}</pre>
         </div>
     </div>
+
+    <!-- Bulk Create Sample QR Codes Form -->
     <div class="row" *ngIf="showBulkCreateForm">
         <div class="col-12">
             <div class="col-12 padding-bottom">
@@ -104,6 +108,61 @@
             </form>
         </div>
     </div>
+
+    <!-- Generate Business QR Codes Form -->
+    <div class="row" *ngIf="showBusinessQRForm">
+        <div class="col-12">
+            <div class="col-12 padding-bottom">
+                <span>Generate QR codes for a specific business</span>
+            </div>
+            <form [formGroup]="businessQRForm" (ngSubmit)="onGenerateBusinessQRCodes()">
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Select Business:</mat-label>
+                        <mat-select name="businessId" formControlName="businessId">
+                            <mat-option *ngFor="let business of businessUsers" [value]="business?._id?.$oid ?? business?._id ?? business?.businessId ?? business?.userId">
+                                {{ business.businessName }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="businessQRForm.get('businessId')?.hasError('required')">
+                            Business Name is required.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Number of QR Codes:</mat-label>
+                        <input matInput type="text" name="numberOfCodes" formControlName="numberOfCodes" />
+                        <mat-error *ngIf="businessQRForm.get('numberOfCodes')?.hasError('required')">
+                            Number of Codes is required.
+                        </mat-error>
+                        <mat-error *ngIf="businessQRForm.get('numberOfCodes')?.hasError('pattern')">
+                            Please enter a valid positive number.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <div class="col-12 padding-bottom">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Select Product to Sample</mat-label>
+                        <mat-select name="productList" formControlName="productList">
+                            <mat-option *ngFor="let product of products" [value]="product.id">
+                                {{ product.title }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="businessQRForm.get('productList')?.hasError('required')">
+                            Sample Product is required.
+                        </mat-error>
+                      </mat-form-field>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="businessQRForm.invalid || isGeneratingBusinessQRCodes">
+                    Generate QR Codes
+                    <mat-progress-spinner *ngIf="isGeneratingBusinessQRCodes" mode="indeterminate" diameter="18" style="margin-left: 10px;"></mat-progress-spinner>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sample Batches Section -->
     <div class="row" *ngIf="showSampleBatches">
         <div class="col-12">
             <h2>Sample Batches</h2>

@@ -42,6 +42,30 @@ export class QRCodeService {
         return qrCodes; // Return an array of objects containing uniqueId and QR code
     }
 
+    /**
+     * Generate QR codes with business information embedded in the URL
+     * @param numberOfCodes - Number of QR codes to generate
+     * @param businessId - ID of the business
+     * @returns Promise with array of QR code data including uniqueId and base64 encoded QR code
+     */
+    async generateBusinessQRCodes(numberOfCodes: number, businessId: string): Promise<Array<{ assetId: string; qrCode: string }>> {
+    try {
+        const qrCodesData: Array<{ assetId: string; qrCode: string }> = [];
+
+        for (let i = 0; i < numberOfCodes; i++) {
+            const assetId = `QR${Date.now()}${i + 1}`; // Generate a unique ID for each QR code
+            const businessQRUrl = `${this.baseURL}home?businessId=${encodeURIComponent(businessId)}&assetId=${encodeURIComponent(assetId)}`; // Embed businessId and assetId in the URL
+            const qrCode = await this.createQRCode(businessQRUrl); // Generate the QR code
+            qrCodesData.push({ assetId, qrCode });
+        }
+
+        return qrCodesData;
+    } catch (error) {
+        console.error('Error generating business QR codes:', error);
+        throw error;
+    }
+    }
+
     private async createQRCode(url: string): Promise<string> {
         try {
             const options: QRCodeToDataURLOptions = {

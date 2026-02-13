@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { US_STATES } from '../../classes/states';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-edit-license-info',
@@ -20,7 +21,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatIconModule
   ],
   templateUrl: './edit-license-info.component.html',
   styleUrl: './edit-license-info.component.scss'

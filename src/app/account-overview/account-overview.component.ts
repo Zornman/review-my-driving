@@ -24,6 +24,7 @@ import { FormatPhoneDirective } from '../shared/directives/format-phone.directiv
 import { TruckAndDriverManagementComponent } from './truck-and-driver-management/truck-and-driver-management.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DailyReportsSummaryComponent } from './daily-reports-summary/daily-reports-summary.component';
+import { ManageQrCodesComponent } from './manage-qr-codes/manage-qr-codes.component';
 
 @Component({
   selector: 'app-account-overview',
@@ -44,7 +45,8 @@ import { DailyReportsSummaryComponent } from './daily-reports-summary/daily-repo
     BusinessFunctionsComponent,
     TruckAndDriverManagementComponent,
     FormatPhoneDirective,
-    DailyReportsSummaryComponent
+    DailyReportsSummaryComponent,
+    ManageQrCodesComponent
    ],
   templateUrl: './account-overview.component.html',
   styleUrl: './account-overview.component.scss',

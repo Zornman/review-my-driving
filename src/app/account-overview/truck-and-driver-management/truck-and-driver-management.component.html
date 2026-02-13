@@ -1,301 +1,355 @@
-<h3 class="align-middle">Trucks & Drivers</h3>
-<p class="align-middle">
-    Manage your trucks and drivers here. You can add, edit, or remove trucks and drivers associated with your business account.
-</p>
-
-<div class="container">
-    <div class="row">
-        <div class="col-12 col-center">
-            <button mat-raised-button color="primary" (click)="openAddTruckDialog()">
-                Add New Truck
-            </button>
-            <div class="spacer" style="margin: 0px 10px;"></div>
-            <button mat-raised-button color="primary" (click)="openAddDriverDialog()">
-                Add New Driver
-            </button>
-        </div>
+<section class="tdm-page">
+  <header class="tdm-header">
+    <div class="tdm-header__text">
+      <h2 class="tdm-title">Trucks & Drivers</h2>
+      <p class="tdm-subtitle">
+        Manage trucks and drivers for your business. Add, edit, assign, and keep details up to date.
+      </p>
     </div>
 
-    <div class="row">
-            <div class="col-12">
-                <h4 class="align-middle" style="margin-top: 20px;">Trucks</h4>
-                <mat-table [dataSource]="trucksDataSource" multiTemplateDataRows class="mat-elevation-z8">
-                    <!-- Define columns -->
-                    <ng-container matColumnDef="truckId">
-                        <mat-header-cell *matHeaderCellDef class="truck-id-column"> Truck ID </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="truck-id-column"> {{ element.truckId }} </mat-cell>
-                    </ng-container>
-    
-                    <ng-container matColumnDef="licensePlate">
-                        <mat-header-cell *matHeaderCellDef class="license-plate-column"> Plate # </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="license-plate-column"> {{ element.licensePlate }} </mat-cell>
-                    </ng-container>
-    
-                    <ng-container matColumnDef="assignedDriver">
-                        <mat-header-cell *matHeaderCellDef class="assigned-driver-column"> Assigned Driver </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="assigned-driver-column"> {{ element.assignedDriver }} </mat-cell>
-                    </ng-container>
-    
-                    <ng-container matColumnDef="odometer">
-                        <mat-header-cell *matHeaderCellDef class="odometer-column"> Odometer </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="odometer-column"> {{ element.odometer | number }} </mat-cell>
-                    </ng-container>
-    
-                    <ng-container matColumnDef="status">
-                        <mat-header-cell *matHeaderCellDef class="status-column"> Status </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="status-column"> {{ element.status }} </mat-cell>
-                    </ng-container>
-
-                    <!-- Expand/Collapse Column -->
-                    <ng-container matColumnDef="expand">
-                        <mat-header-cell *matHeaderCellDef class="expand-column"></mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="expand-column">
-                        <button mat-icon-button>
-                            <mat-icon>{{ expandedTruck === element ? 'expand_less' : 'expand_more' }}</mat-icon>
-                        </button>
-                        </mat-cell>
-                    </ng-container>
-    
-                    <ng-container matColumnDef="expandedDetail">
-                        <mat-cell *matCellDef="let element" [attr.colspan]="trucksColumnsToDisplay.length" [@detailExpand]="element == expandedTruck ? 'expanded' : 'collapsed'">
-                            <div class="expanded-detail">
-                                <div class="row">
-                                    <div class="col-6 col-md-3 col-center stack-section">
-                                        <p><strong>State:</strong></p>
-                                        <p>{{ element.state }}</p>
-                                    </div>
-                                    <div class="col-6 col-md-3 col-center stack-section">
-                                        <p><strong>Make:</strong></p>
-                                        <p>{{ element.make }}</p>
-                                    </div>
-                                    <div class="col-6 col-md-3 col-center stack-section">
-                                        <p><strong>Model:</strong></p>
-                                        <p>{{ element.model }}</p>
-                                    </div>
-                                    <div class="col-6 col-md-3 col-center stack-section">
-                                        <p><strong>Year:</strong></p>
-                                        <p>{{ element.year }}</p>
-                                    </div>
-
-                                    <!-- Shown only when Assigned Driver column is hidden (< 767px) -->
-                                    <div class="col-12 col-sm-6 col-center stack-section truck-detail-show-when-assigned-driver-hidden">
-                                        <p><strong>Assigned Driver:</strong></p>
-                                        <p>{{ element.assignedDriver }}</p>
-                                    </div>
-
-                                    <!-- Shown only when Odometer column is hidden (< 550px) -->
-                                    <div class="col-12 col-sm-6 col-center stack-section truck-detail-show-when-odometer-hidden">
-                                        <p><strong>Odometer:</strong></p>
-                                        <p>{{ element.odometer | number }}</p>
-                                    </div>
-
-                                    <div class="col-12 col-md-6 col-center stack-section">
-                                        <p><strong>Vin:</strong></p>
-                                        <p>{{ element.vin }}</p>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-center stack-section">
-                                        <p><strong>Registration Expiration Date:</strong></p>
-                                        <p>{{ element.registrationExpiration | date }}</p>
-                                    </div>
-                                </div>
-                                <div class="row" style="text-align: center;">
-                                    <div class="col-12">
-                                        <h4 class="align-middle">Actions</h4>
-                                        <div class="actions-buttons">
-                                            <button mat-raised-button color="primary" (click)="editTruck(element); $event.stopPropagation()">
-                                                Edit Truck
-                                            </button>
-                                            <button mat-raised-button color="primary" (click)="reassignDriver(); $event.stopPropagation()">
-                                                Assign Driver
-                                            </button>
-                                            <button mat-raised-button color="primary" (click)="updateTruckStatus(element); $event.stopPropagation()">
-                                                Update Status
-                                            </button>
-                                            <button mat-raised-button color="primary" (click)="deleteTruck(); $event.stopPropagation()">
-                                                Delete Truck
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-cell>
-                    </ng-container>
-    
-                    <!-- Header Row -->
-                    <mat-header-row *matHeaderRowDef="trucksColumnsToDisplay"></mat-header-row>
-                    
-                    <!-- Data Row -->
-                    <mat-row 
-                        class="submission-row"
-                        *matRowDef="let element; columns: trucksColumnsToDisplay;" 
-                        (click)="toggleTruckRow(element, $event)">
-                    </mat-row>
-
-                    <!-- Expanded Detail Row -->
-                    <mat-row *matRowDef="let element; columns: ['expandedDetail']" class="detail-row" [@detailExpand]="element == expandedTruck ? 'expanded' : 'collapsed'"></mat-row>
-                    
-                    <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
-                    <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell" colspan="4">
-                            <p>No trucks added yet, add a truck to get started!</p>
-                        </td>
-                    </tr>
-                </mat-table>
-                <mat-paginator
-                    #trucksPaginator
-                    [pageSize]="5"
-                    [pageSizeOptions]="[5, 10, 25]"
-                    showFirstLastButtons>
-                </mat-paginator>
-            </div>
-            <div class="col-12">
-                <h4 class="align-middle" style="margin-top: 20px;">Drivers</h4>
-                <mat-table [dataSource]="driversDataSource" multiTemplateDataRows class="mat-elevation-z8">
-                    <!-- Define columns -->
-                    <ng-container matColumnDef="driverId">
-                        <mat-header-cell *matHeaderCellDef class="driver-id-column"> Driver ID </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="driver-id-column"> {{ element.driverId }} </mat-cell>
-                    </ng-container>
-    
-                    <ng-container matColumnDef="name">
-                        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{ element.name }} </mat-cell>
-                    </ng-container>
-    
-                    <ng-container matColumnDef="phone">
-                        <mat-header-cell *matHeaderCellDef class="phone-column"> Phone </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="phone-column"> {{ element.phone }} </mat-cell>
-                    </ng-container>
-    
-                    <ng-container matColumnDef="status">
-                        <mat-header-cell *matHeaderCellDef class="status-column"> Status </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="status-column"> {{ element.status }} </mat-cell>
-                    </ng-container>
-
-                    <!-- Expand/Collapse Column -->
-                    <ng-container matColumnDef="expand">
-                        <mat-header-cell *matHeaderCellDef class="expand-column"></mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="expand-column">
-                        <button mat-icon-button>
-                            <mat-icon>{{ expandedDriver === element ? 'expand_less' : 'expand_more' }}</mat-icon>
-                        </button>
-                        </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="expandedDetail">
-                        <mat-cell *matCellDef="let element" [attr.colspan]="driversColumnsToDisplay.length" [@detailExpand]="element == expandedDriver ? 'expanded' : 'collapsed'">
-                            <div class="expanded-detail">
-                                <div class="driver-expanded-grid">
-                                    <div class="stack-section">
-                                        <h4 class="align-middle"><u>Contact</u></h4>
-                                        <div class="detail-kv">
-                                            <!-- Shown only when Phone column is hidden (<= 500px) -->
-                                            <div class="detail-kv-row driver-phone-detail-show-when-phone-hidden">
-                                                <div class="detail-kv-label"><strong>Phone:</strong></div>
-                                                <div class="detail-kv-value">{{ element.phone }}</div>
-                                            </div>
-                                            <div class="detail-kv-row" *ngIf="element.email">
-                                                <div class="detail-kv-label"><strong>Email:</strong></div>
-                                                <div class="detail-kv-value">{{ element.email }}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="stack-section">
-                                        <h4 class="align-middle"><u>License Info</u></h4>
-                                        <div class="detail-kv">
-                                            <div class="detail-kv-row">
-                                                <div class="detail-kv-label"><strong>License Number:</strong></div>
-                                                <div class="detail-kv-value">{{ element.license[0]?.licenseNumber }}</div>
-                                            </div>
-                                            <div class="detail-kv-row">
-                                                <div class="detail-kv-label"><strong>License State:</strong></div>
-                                                <div class="detail-kv-value">{{ element.license[0]?.state }}</div>
-                                            </div>
-                                            <div class="detail-kv-row">
-                                                <div class="detail-kv-label"><strong>License Expiration:</strong></div>
-                                                <div class="detail-kv-value">{{ element.license[0]?.expiration | date }}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="stack-section driver-address-section">
-                                        <h4 class="align-middle"><u>Address</u></h4>
-                                        <div class="detail-kv">
-                                            <div class="detail-kv-row">
-                                                <div class="detail-kv-label"><strong>Address 1:</strong></div>
-                                                <div class="detail-kv-value">{{ element.address[0]?.address1 }}</div>
-                                            </div>
-                                            <div class="detail-kv-row" *ngIf="element.address[0]?.address2">
-                                                <div class="detail-kv-label"><strong>Address 2:</strong></div>
-                                                <div class="detail-kv-value">{{ element.address[0]?.address2 }}</div>
-                                            </div>
-                                            <div class="detail-kv-row">
-                                                <div class="detail-kv-label"><strong>City:</strong></div>
-                                                <div class="detail-kv-value">{{ element.address[0]?.city }}</div>
-                                            </div>
-                                            <div class="detail-kv-row">
-                                                <div class="detail-kv-label"><strong>State:</strong></div>
-                                                <div class="detail-kv-value">{{ element.address[0]?.state }}</div>
-                                            </div>
-                                            <div class="detail-kv-row">
-                                                <div class="detail-kv-label"><strong>Zip:</strong></div>
-                                                <div class="detail-kv-value">{{ element.address[0]?.zip }}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row" style="text-align: center;">
-                                    <div class="col-12">
-                                        <h4 class="align-middle">Actions</h4>
-                                        <div class="actions-buttons">
-                                            <button mat-raised-button color="primary" (click)="editLicenseInfo(element); $event.stopPropagation()">
-                                                Edit License Info
-                                            </button>
-                                            <button mat-raised-button color="primary" (click)="editAddressInfo(element); $event.stopPropagation()">
-                                                Edit Address Info
-                                            </button>
-                                            <button mat-raised-button color="primary" (click)="updateDriverStatus(element); $event.stopPropagation()">
-                                                Update Status
-                                            </button>
-                                            <button mat-raised-button color="primary" (click)="deleteDriver(); $event.stopPropagation()">
-                                                Delete Driver
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-cell>
-                    </ng-container>
-    
-                    <!-- Header Row -->
-                    <mat-header-row *matHeaderRowDef="driversColumnsToDisplay"></mat-header-row>
-                    
-                    <!-- Data Row -->
-                    <mat-row 
-                        class="submission-row"
-                        *matRowDef="let element; columns: driversColumnsToDisplay;" 
-                        (click)="toggleDriverRow(element, $event)">
-                    </mat-row>
-
-                    <!-- Expanded Detail Row -->
-                    <mat-row *matRowDef="let element; columns: ['expandedDetail']" class="detail-row" [@detailExpand]="element == expandedDriver ? 'expanded' : 'collapsed'"></mat-row>
-                    
-                    <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
-                    <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell" colspan="4">
-                            <p>No drivers added yet, add a driver to get started!</p>
-                        </td>
-                    </tr>
-                </mat-table>
-
-                <mat-paginator
-                    #driversPaginator
-                    [pageSize]="5"
-                    [pageSizeOptions]="[5, 10, 25]"
-                    showFirstLastButtons>
-                </mat-paginator>
-            </div>
-        </div>
+    <div class="tdm-header__actions">
+      <button mat-flat-button color="primary" (click)="openAddTruckDialog()">
+        Add Truck
+      </button>
+      <button mat-stroked-button color="primary" (click)="openAddDriverDialog()">
+        Add Driver
+      </button>
     </div>
+  </header>
+
+  <div class="tdm-grid">
+    <!-- Trucks card -->
+    <section class="tdm-card table-view mat-elevation-z2">
+      <div class="tdm-card__header">
+        <div>
+          <h3 class="tdm-card__title">Trucks</h3>
+          <p class="tdm-card__hint">Track registration, assignment, and status.</p>
+        </div>
+
+        <mat-form-field appearance="outline" class="tdm-search">
+          <mat-label>Search trucks</mat-label>
+          <input
+            matInput
+            type="text"
+            (keyup)="applyTruckFilter($any($event.target).value)"
+            placeholder="Truck ID, plate, driver..."
+            autocomplete="off" />
+        </mat-form-field>
+      </div>
+
+      <div class="tdm-table-wrap">
+        <mat-table [dataSource]="trucksDataSource" multiTemplateDataRows class="tdm-table">
+          <ng-container matColumnDef="truckId">
+            <mat-header-cell *matHeaderCellDef class="truck-id-column">Truck ID</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="truck-id-column">
+              <span class="tdm-mono">{{ element.truckId }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="licensePlate">
+            <mat-header-cell *matHeaderCellDef class="license-plate-column">Plate #</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="license-plate-column">
+              <span class="tdm-chip">{{ element.licensePlate }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="assignedDriver">
+            <mat-header-cell *matHeaderCellDef class="assigned-driver-column">Assigned Driver</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="assigned-driver-column">
+              {{ element.assignedDriver || '—' }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="odometer">
+            <mat-header-cell *matHeaderCellDef class="odometer-column">Odometer</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="odometer-column">
+              {{ element.odometer | number }} mi
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="status-column">Status</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="status-column">
+              <span class="tdm-status" [class.tdm-status--active]="element.status === 'Active'">
+                {{ element.status }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="expand">
+            <mat-header-cell *matHeaderCellDef class="expand-column"></mat-header-cell>
+            <mat-cell *matCellDef="let element" class="expand-column">
+              <button
+                mat-icon-button
+                class="tdm-expand-btn"
+                (click)="toggleTruckRow(element, $event)"
+                [attr.aria-label]="expandedTruck === element ? 'Collapse details' : 'Expand details'">
+                <mat-icon class="tdm-expand-icon" [class.is-expanded]="expandedTruck === element">
+                  expand_more
+                </mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="expandedDetail">
+            <mat-cell
+              *matCellDef="let element"
+              class="tdm-expanded-cell"
+              [attr.colspan]="trucksColumnsToDisplay.length"
+              [@detailExpand]="element == expandedTruck ? 'expanded' : 'collapsed'">
+
+              <div class="tdm-expanded">
+                <div class="tdm-details">
+                  <div class="tdm-detail">
+                    <div class="tdm-detail__label">State</div>
+                    <div class="tdm-detail__value">{{ element.state || '—' }}</div>
+                  </div>
+                  <div class="tdm-detail">
+                    <div class="tdm-detail__label">Make</div>
+                    <div class="tdm-detail__value">{{ element.make || '—' }}</div>
+                  </div>
+                  <div class="tdm-detail">
+                    <div class="tdm-detail__label">Model</div>
+                    <div class="tdm-detail__value">{{ element.model || '—' }}</div>
+                  </div>
+                  <div class="tdm-detail">
+                    <div class="tdm-detail__label">Year</div>
+                    <div class="tdm-detail__value">{{ element.year || '—' }}</div>
+                  </div>
+
+                  <div class="tdm-detail truck-detail-show-when-assigned-driver-hidden">
+                    <div class="tdm-detail__label">Assigned Driver</div>
+                    <div class="tdm-detail__value">{{ element.assignedDriver || '—' }}</div>
+                  </div>
+
+                  <div class="tdm-detail truck-detail-show-when-odometer-hidden">
+                    <div class="tdm-detail__label">Odometer</div>
+                    <div class="tdm-detail__value">{{ element.odometer | number }} mi</div>
+                  </div>
+
+                  <div class="tdm-detail tdm-detail--span-2">
+                    <div class="tdm-detail__label">VIN</div>
+                    <div class="tdm-detail__value tdm-mono">{{ element.vin || '—' }}</div>
+                  </div>
+
+                  <div class="tdm-detail tdm-detail--span-2">
+                    <div class="tdm-detail__label">Registration Expiration</div>
+                    <div class="tdm-detail__value">{{ element.registrationExpiration | date }}</div>
+                  </div>
+                </div>
+
+                <div class="tdm-actions">
+                  <button mat-flat-button color="primary" (click)="editTruck(element); $event.stopPropagation()">
+                    Edit
+                  </button>
+                  <button mat-stroked-button color="primary" (click)="reassignDriver(); $event.stopPropagation()">
+                    Assign Driver
+                  </button>
+                  <button mat-stroked-button color="primary" (click)="updateTruckStatus(element); $event.stopPropagation()">
+                    Toggle Status
+                  </button>
+                  <button mat-stroked-button color="warn" (click)="deleteTruck(); $event.stopPropagation()">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="trucksColumnsToDisplay" class="tdm-header-row"></mat-header-row>
+
+          <mat-row
+            *matRowDef="let element; columns: trucksColumnsToDisplay;"
+            class="tdm-row"
+            [class.is-expanded]="expandedTruck === element"
+            (click)="toggleTruckRow(element, $event)">
+          </mat-row>
+
+          <mat-row
+            *matRowDef="let element; columns: ['expandedDetail']"
+            class="tdm-detail-row"
+            [@detailExpand]="element == expandedTruck ? 'expanded' : 'collapsed'">
+          </mat-row>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="6">
+              <div class="tdm-empty">
+                <div class="tdm-empty__title">No trucks yet</div>
+                <div class="tdm-empty__hint">Add a truck to get started.</div>
+              </div>
+            </td>
+          </tr>
+        </mat-table>
+      </div>
+
+      <mat-paginator
+        #trucksPaginator
+        [pageSize]="5"
+        [pageSizeOptions]="[5, 10, 25]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </section>
+
+    <!-- Drivers card -->
+    <section class="tdm-card table-view mat-elevation-z2">
+      <div class="tdm-card__header">
+        <div>
+          <h3 class="tdm-card__title">Drivers</h3>
+          <p class="tdm-card__hint">Contact, license, and address details.</p>
+        </div>
+
+        <mat-form-field appearance="outline" class="tdm-search">
+          <mat-label>Search drivers</mat-label>
+          <input
+            matInput
+            type="text"
+            (keyup)="applyDriverFilter($any($event.target).value)"
+            placeholder="Driver ID, name, phone..."
+            autocomplete="off" />
+        </mat-form-field>
+      </div>
+
+      <div class="tdm-table-wrap">
+        <mat-table [dataSource]="driversDataSource" multiTemplateDataRows class="tdm-table">
+          <ng-container matColumnDef="driverId">
+            <mat-header-cell *matHeaderCellDef class="driver-id-column">Driver ID</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="driver-id-column">
+              <span class="tdm-mono">{{ element.driverId }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="phone">
+            <mat-header-cell *matHeaderCellDef class="phone-column">Phone</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="phone-column">{{ element.phone }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="status-column">Status</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="status-column">
+              <span class="tdm-status" [class.tdm-status--active]="element.status === 'Active'">
+                {{ element.status }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="expand">
+            <mat-header-cell *matHeaderCellDef class="expand-column"></mat-header-cell>
+            <mat-cell *matCellDef="let element" class="expand-column">
+              <button
+                mat-icon-button
+                class="tdm-expand-btn"
+                (click)="toggleDriverRow(element, $event)"
+                [attr.aria-label]="expandedDriver === element ? 'Collapse details' : 'Expand details'">
+                <mat-icon class="tdm-expand-icon" [class.is-expanded]="expandedDriver === element">
+                  expand_more
+                </mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="expandedDetail">
+            <mat-cell
+              *matCellDef="let element"
+              class="tdm-expanded-cell"
+              [attr.colspan]="driversColumnsToDisplay.length"
+              [@detailExpand]="element == expandedDriver ? 'expanded' : 'collapsed'">
+
+              <div class="tdm-expanded">
+                <div class="tdm-details">
+                  <div class="tdm-detail driver-phone-detail-show-when-phone-hidden">
+                    <div class="tdm-detail__label">Phone</div>
+                    <div class="tdm-detail__value">{{ element.phone || '—' }}</div>
+                  </div>
+
+                  <div class="tdm-detail" *ngIf="element.email">
+                    <div class="tdm-detail__label">Email</div>
+                    <div class="tdm-detail__value">{{ element.email }}</div>
+                  </div>
+
+                  <div class="tdm-detail">
+                    <div class="tdm-detail__label">License #</div>
+                    <div class="tdm-detail__value tdm-mono">{{ element.license[0]?.licenseNumber || '—' }}</div>
+                  </div>
+
+                  <div class="tdm-detail">
+                    <div class="tdm-detail__label">License State</div>
+                    <div class="tdm-detail__value">{{ element.license[0]?.state || '—' }}</div>
+                  </div>
+
+                  <div class="tdm-detail">
+                    <div class="tdm-detail__label">License Exp.</div>
+                    <div class="tdm-detail__value">{{ element.license[0]?.expiration | date }}</div>
+                  </div>
+
+                  <div class="tdm-detail tdm-detail--span-2">
+                    <div class="tdm-detail__label">Address</div>
+                    <div class="tdm-detail__value">
+                      <div>{{ element.address[0]?.address1 || '—' }}</div>
+                      <div *ngIf="element.address[0]?.address2">{{ element.address[0]?.address2 }}</div>
+                      <div>
+                        {{ element.address[0]?.city || '—' }},
+                        {{ element.address[0]?.state || '—' }}
+                        {{ element.address[0]?.zip || '' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tdm-actions">
+                  <button mat-flat-button color="primary" (click)="editLicenseInfo(element); $event.stopPropagation()">
+                    Edit License
+                  </button>
+                  <button mat-stroked-button color="primary" (click)="editAddressInfo(element); $event.stopPropagation()">
+                    Edit Address
+                  </button>
+                  <button mat-stroked-button color="primary" (click)="updateDriverStatus(element); $event.stopPropagation()">
+                    Toggle Status
+                  </button>
+                  <button mat-stroked-button color="warn" (click)="deleteDriver(); $event.stopPropagation()">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="driversColumnsToDisplay" class="tdm-header-row"></mat-header-row>
+
+          <mat-row
+            *matRowDef="let element; columns: driversColumnsToDisplay;"
+            class="tdm-row"
+            [class.is-expanded]="expandedDriver === element"
+            (click)="toggleDriverRow(element, $event)">
+          </mat-row>
+
+          <mat-row
+            *matRowDef="let element; columns: ['expandedDetail']"
+            class="tdm-detail-row"
+            [@detailExpand]="element == expandedDriver ? 'expanded' : 'collapsed'">
+          </mat-row>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="5">
+              <div class="tdm-empty">
+                <div class="tdm-empty__title">No drivers yet</div>
+                <div class="tdm-empty__hint">Add a driver to get started.</div>
+              </div>
+            </td>
+          </tr>
+        </mat-table>
+      </div>
+
+      <mat-paginator
+        #driversPaginator
+        [pageSize]="5"
+        [pageSizeOptions]="[5, 10, 25]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </section>
+  </div>
+</section>

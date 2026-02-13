@@ -1,4 +1,11 @@
 
+$error-color: #e53935; /* Red for errors */
+$success-color: #43a047; /* Green for success */
+
+$header-background: rgba(255, 255, 255, 0.50); /* Semi-transparent white for header */
+$header-color: #111827; /* Dark gray for header text */
+$header-border: rgba(0, 0, 0, 0.08); /* Light border for header */
+
 // Base colors
 $color-primary: #4B0082; // Deep Dark Purple (Accent, Buttons)
 $color-secondary: #C3B1E1; // Lavender (Hover/Highlights)

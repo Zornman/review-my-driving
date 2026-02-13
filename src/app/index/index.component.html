@@ -1,195 +1,445 @@
-<div class="container">
-    <div class="row padding-bottom">
-        <div class="col-xs-12">
-            <mat-card appearance="outlined" class="index-header align-middle" *ngIf="!user">
-                <mat-card-header>
-                    <mat-card-title>
-                        <h1>{{ 'Review My Driving' }}</h1>
-                    </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>Unlock Your Road Potential – <a routerLink="/register">Register</a> now for personalized driving reviews and "expert" insights!</p>
-                </mat-card-content>
-            </mat-card>
-            <mat-card appearance="outlined" class="index-header align-middle" *ngIf="user">
-                <mat-card-header>
-                    <mat-card-title>
-                        <h1>{{ 'Welcome back, ' + user.displayName }}</h1>
-                    </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>{{ 'Last login time: ' + user.metadata.lastSignInTime }}</p>
-                </mat-card-content>
-            </mat-card>
-        </div>
+<!-- LOGGED OUT VIEW - Landing Page -->
+<div *ngIf="!user" class="home-container">
+  <!-- Hero Section -->
+  <section class="hero-section" @fadeIn>
+    <div class="hero-content">
+      <h1 class="hero-title">Streamline Your Fleet Operations</h1>
+      <p class="hero-subtitle">Collect valuable driver feedback instantly with QR codes, automate daily reports, and gain actionable insights to improve your fleet performance.</p>
+      <div class="hero-cta">
+        <button mat-raised-button color="primary" class="cta-button primary-cta" (click)="navigateTo('/register')">
+          <mat-icon>person_add</mat-icon>
+          Get Started Free
+        </button>
+        <button mat-raised-button class="cta-button secondary-cta" (click)="navigateTo('/services')">
+          <mat-icon>info</mat-icon>
+          Learn More
+        </button>
+      </div>
+      <p class="hero-trust-text">Join leading fleet managers who trust Review My Driving</p>
     </div>
-    <div class="row padding-bottom">
-        <div class="col-xs-12 col-sm-6">
-            <mat-card appearance="outlined" class="index-header align-middle" *ngIf="user">
-                <mat-card-header>
-                    <mat-card-title>
-                        <div *ngIf="lastWeekSubmissions >= 0; else loading"></div>
-                        <span class="index-large-font">{{ lastWeekSubmissions }}</span>
-                    </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>{{ 'Submissions over last 7 days' }}</p>
-                </mat-card-content>
-            </mat-card>
-            <mat-card *ngIf="!user">
-                <img mat-card-image src="assets/images/Context_Magnet.jpg" />
-            </mat-card>
-        </div>
-        <div class="col-xs-12 col-sm-6">
-            <mat-card appearance="outlined" class="index-header align-middle" *ngIf="user">
-                <mat-card-header>
-                    <mat-card-title>
-                        <div *ngIf="totalSubmissions >= 0; else loading"></div>
-                        <span class="index-large-font">{{ totalSubmissions }}</span>
-                    </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>{{ 'Total Submissions ' }}</p>
-                </mat-card-content>
-            </mat-card>
-            <mat-card *ngIf="!user">
-                <img mat-card-image src="assets/images/Context_Sticker.jpg" />
-            </mat-card>
-        </div>
+    <div class="hero-visual">
+      <div class="hero-graphic">
+        <mat-icon class="hero-icon">directions_car</mat-icon>
+      </div>
     </div>
-    <div class="row padding-bottom">
-        <div class="col-xs-12">
-            <mat-card appearance="outlined" *ngIf="user">
-                <mat-card-content>
-                    <h3>Most Recent Submissions:</h3>
-                    <br />
-                    <mat-table [dataSource]="submissionsDataSource" multiTemplateDataRows class="mat-elevation-z8">
-                        <!-- Define columns -->
-                        <ng-container matColumnDef="name">
-                            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{ element.firstName + ' ' + element.lastName + '.' }} </mat-cell>
-                        </ng-container>
-                        
-                        <ng-container matColumnDef="dateSubmitted">
-                            <mat-header-cell *matHeaderCellDef> Date Submitted </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{ element.dateSubmitted | date }} </mat-cell>
-                        </ng-container>
-                        
-                        <ng-container matColumnDef="reasonForContacting">
-                            <mat-header-cell *matHeaderCellDef> Reason </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{ element.reasonForContacting.replaceAll('_', ' ') }} </mat-cell>
-                        </ng-container>
-                        
-                        <!-- Expand/Collapse Column -->
-                        <ng-container matColumnDef="expand">
-                            <mat-header-cell *matHeaderCellDef></mat-header-cell>
-                            <mat-cell *matCellDef="let element">
-                            <button mat-icon-button>
-                                <mat-icon>{{ expandedElement === element ? 'expand_less' : 'expand_more' }}</mat-icon>
-                            </button>
-                            </mat-cell>
-                        </ng-container>
-        
-                        <ng-container matColumnDef="expandedDetail">
-                            <mat-cell *matCellDef="let element" [attr.colspan]="submissionsColumnsToDisplay.length" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-                                <div class="expanded-detail">
-                                <p><strong>Comment:</strong> {{ element.description }}</p>
-                                </div>
-                            </mat-cell>
-                        </ng-container>
-                        
-                        <!-- Header Row -->
-                        <mat-header-row *matHeaderRowDef="submissionsColumnsToDisplay"></mat-header-row>
-                        
-                        <!-- Data Row -->
-                        <mat-row 
-                            class="submission-row"
-                            *matRowDef="let element; columns: submissionsColumnsToDisplay;" 
-                            (click)="toggleRow(element, $event)">
-                        </mat-row>
-                        
-                        <!-- Expanded Detail Row -->
-                        <mat-row *matRowDef="let element; columns: ['expandedDetail']" class="detail-row" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"></mat-row>
-        
-                        <!-- Row shown when there is no matching data that will be provided to the wrapper table. -->
-                        <tr class="mat-row" *ngIf="totalSubmissions <= 0">
-                            <td class="mat-cell" colspan="4">No submissions yet, you're driving too well!</td>
-                        </tr>
-                    </mat-table>
-                </mat-card-content>
-            </mat-card>
-        </div>
-    </div>
-    <div class="row padding-bottom" *ngIf="!user">
-        <div class="col-xs-12">
-            <mat-card appearance="outlined">
-                <mat-card-content>
-                    <h2 class="align-middle">Features & Benefits:</h2>
-                    <br />
-                    <ul>
-                        <li><b>Fast Lane Feedback:</b> Get immediate email confirmation on every submission!</li>
-                        <li><b>Analytics with Attitude:</b> Dive into your driving data with insights that are as fun as they are informative</li>
-                        <li><b>Custom Confirmation Messages:</b> Choose between a snackbar, modal, or browser alert for a personalized form submission experience</li>
-                    </ul>
-                </mat-card-content>
-            </mat-card>
-        </div>
-    </div>
-    <div class="row padding-bottom" *ngIf="!user">
-        <div class="col-xs-12">
-            <mat-card appearance="outlined">
-                <mat-card-content>
-                    <h3 class="align-middle">FAQs</h3>
-                    <mat-accordion>
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                              <mat-panel-title> What is Review My Driving all about? </mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <p>Review My Driving lets you submit and view user-generated driving behavior reviews, as well as browse and shop our products.</p>
-                        </mat-expansion-panel>
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                              <mat-panel-title> How does the driving review system work? </mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <p>Each product is uniquely linked to you. When someone scans your QR code, our system automatically routes their review directly to your profile, ensuring that feedback is personalized and relevant.</p>
-                        </mat-expansion-panel>
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                              <mat-panel-title> Do I need to create an account to submit a review? </mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <p>No - Reviews are submitted with just your first name and last initial, no other information is collecting when you are reviewing someone's driving.</p>
-                        </mat-expansion-panel>
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                              <mat-panel-title> How long does shipping take? </mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <p>Because each product is made to order, shipping may take longer than standard retail stores. Our printing partner needs time to produce your item before it’s shipped out. We appreciate your patience and promise it’s worth the wait! While we’re not Amazon-fast, we’re focused on delivering high-quality, custom-crafted products just for you.</p>
-                        </mat-expansion-panel>
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                              <mat-panel-title> Have a question that's not listed here? </mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <p>Head over to the <a routerLink="/contact">contact</a> page to reach out to us with any questions or concerns you may have!</p>
-                        </mat-expansion-panel>
-                    </mat-accordion>
-                </mat-card-content>
-            </mat-card>
-        </div>
-    </div>
-    <!-- <div class="row" *ngIf="!user">
-        <div class="col-xs-12">
-            <mat-card appearance="outlined">
-                <mat-card-content>
-                    <h3 class="align-middle">Recent Submissions</h3>
+  </section>
 
-                </mat-card-content>
-            </mat-card>
+  <!-- Quick Stats -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card" @scaleIn *ngFor="let stat of [
+          {icon: 'qr_code_2', value: 'Unlimited', label: 'QR Codes'},
+          {icon: 'assignment', value: 'Automated', label: 'Daily Reports'},
+          {icon: 'trending_up', value: 'Real-Time', label: 'Analytics'},
+          {icon: 'security', value: 'Enterprise', label: 'Security'}
+        ]">
+          <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
+          <h3>{{ stat.value }}</h3>
+          <p>{{ stat.label }}</p>
         </div>
-    </div> -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Everything You Need to Manage Your Fleet</h2>
+        <p>Powerful tools designed for modern fleet operations</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" @scaleIn *ngFor="let feature of [
+          {
+            icon: 'qr_code_2',
+            title: 'Custom QR Code Solutions',
+            description: 'Generate unlimited branded QR codes for any fleet size. Each code is uniquely linked to your vehicles for automatic feedback routing.',
+            points: ['Unlimited generation', 'Scalable for any size', 'Automatic tracking']
+          },
+          {
+            icon: 'assignment',
+            title: 'Automated Daily Reports',
+            description: 'Streamline end-of-day reporting with magic-link emails, photo verification, and automated scheduling.',
+            points: ['Magic link delivery', 'Photo verification', 'Smart scheduling']
+          },
+          {
+            icon: 'analytics',
+            title: 'Driver Analytics',
+            description: 'Aggregate and analyze feedback to identify trends and improve fleet performance with actionable insights.',
+            points: ['Real-time tracking', 'Performance insights', 'Historical analysis']
+          },
+          {
+            icon: 'directions_car',
+            title: 'Fleet Management',
+            description: 'Comprehensive dashboard for managing trucks, drivers, and assignments with full audit trails.',
+            points: ['Truck tracking', 'Driver management', 'Status monitoring']
+          },
+          {
+            icon: 'settings',
+            title: 'Business Customization',
+            description: 'Flexible configuration to tailor the platform to your business needs and workflow.',
+            points: ['Timezone management', 'Custom preferences', 'Multi-user support']
+          },
+          {
+            icon: 'support_agent',
+            title: 'Dedicated Support',
+            description: 'Expert guidance and support to help you maximize your fleet operations.',
+            points: ['Setup assistance', 'Training resources', 'Technical support']
+          }
+        ]; let i = index" [style.animation-delay]="(i * 80) + 'ms'">
+          <div class="feature-icon">
+            <mat-icon>{{ feature.icon }}</mat-icon>
+          </div>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+          <ul class="feature-points">
+            <li *ngFor="let point of feature.points">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ point }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us Section -->
+  <section class="benefits-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Why Choose Review My Driving?</h2>
+        <p>Industry-leading features trusted by fleet managers</p>
+      </div>
+
+      <div class="benefits-grid">
+        <div class="benefit-card" @scaleIn *ngFor="let benefit of [
+          {icon: 'security', title: 'Enterprise Security', description: 'Token-based authentication and encrypted data storage'},
+          {icon: 'speed', title: 'Lightning Fast', description: 'Cloud-powered infrastructure with instant delivery'},
+          {icon: 'trending_up', title: 'Data-Driven', description: 'Comprehensive analytics and detailed reporting'},
+          {icon: 'people', title: 'Easy Collaboration', description: 'Multi-user support for your entire team'},
+          {icon: 'devices', title: 'Mobile Optimized', description: 'Works perfectly on phones, tablets, and desktops'},
+          {icon: 'auto_awesome', title: 'Automated Workflows', description: 'Save time with scheduled reports and email delivery'}
+        ]; let i = index" [style.animation-delay]="(i * 80) + 'ms'">
+          <mat-icon class="benefit-icon">{{ benefit.icon }}</mat-icon>
+          <h3>{{ benefit.title }}</h3>
+          <p>{{ benefit.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Choose the plan that fits your fleet size</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="pricing-card" @fadeIn *ngFor="let tier of [
+          {
+            name: 'Starter',
+            price: '$99',
+            description: 'For small fleets',
+            features: ['Up to 5 trucks', 'Up to 10 drivers', 'Daily reports', 'Basic QR codes', 'Email support']
+          },
+          {
+            name: 'Professional',
+            price: '$299',
+            description: 'For growing fleets',
+            features: ['Up to 50 trucks', 'Up to 100 drivers', 'Advanced reports', 'Custom QR branding', 'Priority support', 'Real-time analytics'],
+            highlighted: true
+          },
+          {
+            name: 'Enterprise',
+            price: 'Custom',
+            description: 'For large operations',
+            features: ['Unlimited trucks & drivers', 'Full customization', 'Dedicated manager', 'Phone & email support', 'Advanced analytics', 'Custom integrations']
+          }
+        ]; let i = index" [class.featured]="tier.highlighted" [style.animation-delay]="(i * 150) + 'ms'">
+          <div class="pricing-header">
+            <h3>{{ tier.name }}</h3>
+            <p>{{ tier.description }}</p>
+          </div>
+          <div class="pricing-amount">
+            <span class="price">{{ tier.price }}</span>
+            <span class="period" *ngIf="tier.name !== 'Enterprise'">/month</span>
+          </div>
+          <button mat-raised-button [color]="tier.highlighted ? 'primary' : ''" class="pricing-cta" routerLink="/register">
+            Get Started
+          </button>
+          <mat-divider></mat-divider>
+          <ul class="pricing-features">
+            <li *ngFor="let feature of tier.features">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ feature }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pricing-note">
+        <p>All plans include a 14-day free trial. No credit card required.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Frequently Asked Questions</h2>
+        <p>Have questions? We have answers.</p>
+      </div>
+
+      <div class="faq-grid">
+        <mat-expansion-panel class="faq-item" *ngFor="let faq of [
+          {q: 'What if my fleet grows?', a: 'Our plans scale with your business. Upgrade anytime to add more trucks and drivers.'},
+          {q: 'Is there a setup fee?', a: 'No setup fees! We handle all configuration during onboarding.'},
+          {q: 'How secure is the data?', a: 'We use enterprise-grade security with encrypted storage and token-based authentication.'},
+          {q: 'Can drivers use mobile devices?', a: 'Yes! Our platform is fully mobile-optimized for phones, tablets, and desktops.'},
+          {q: 'What support is included?', a: 'All plans include email support. Professional and Enterprise include priority support and training.'},
+          {q: 'Do you offer custom integrations?', a: 'Yes! Enterprise customers can request custom integrations with existing systems.'}
+        ]">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>help_outline</mat-icon>
+              {{ faq.q }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <p>{{ faq.a }}</p>
+        </mat-expansion-panel>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final-cta-section">
+    <div class="container">
+      <div class="final-cta-content" @fadeIn>
+        <h2>Ready to Transform Your Fleet Operations?</h2>
+        <p>Start your free 14-day trial today. No credit card required.</p>
+        <div class="final-cta-buttons">
+          <button mat-raised-button color="primary" class="cta-button large" routerLink="/register">
+            <mat-icon>person_add</mat-icon>
+            Create Free Account
+          </button>
+          <button mat-raised-button class="cta-button large outlined" routerLink="/contact">
+            <mat-icon>message</mat-icon>
+            Contact Sales
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
-<ng-template #loading>
-    <div class="spinner">
-        <img src="assets/images/spinner.gif" alt="Loading..." height="100" width="100" />
+<!-- LOGGED IN VIEW - Dashboard -->
+<div *ngIf="user" class="dashboard-container" @fadeIn>
+  <!-- Welcome Header -->
+  <section class="dashboard-header">
+    <div class="container">
+      <div class="welcome-section">
+        <h1>Welcome back, <span class="user-name">{{ user.displayName }}</span></h1>
+        <p class="last-login">Last login: {{ user.metadata.lastSignInTime | date:'short' }}</p>
+      </div>
     </div>
-</ng-template>
+  </section>
+
+  <!-- Quick Stats -->
+  <section class="dashboard-stats">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card" @scaleIn>
+          <mat-icon class="stat-icon">assignment</mat-icon>
+          <div class="stat-content">
+            <h3>{{ totalSubmissions }}</h3>
+            <p>Total Submissions</p>
+          </div>
+        </div>
+        <div class="stat-card" @scaleIn>
+          <mat-icon class="stat-icon">trending_up</mat-icon>
+          <div class="stat-content">
+            <h3>{{ lastWeekSubmissions }}</h3>
+            <p>This Week</p>
+          </div>
+        </div>
+        <div class="stat-card" @scaleIn>
+          <mat-icon class="stat-icon">qr_code_2</mat-icon>
+          <div class="stat-content">
+            <h3>Active</h3>
+            <p>QR Codes</p>
+          </div>
+        </div>
+        <div class="stat-card" @scaleIn>
+          <mat-icon class="stat-icon">directions_car</mat-icon>
+          <div class="stat-content">
+            <h3>Monitored</h3>
+            <p>Vehicles</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions">
+    <div class="container">
+      <div class="actions-grid">
+        <button mat-raised-button color="primary" class="action-button" routerLink="/account-overview">
+          <mat-icon>dashboard</mat-icon>
+          <span>Dashboard</span>
+        </button>
+        <button mat-raised-button class="action-button" routerLink="/products-and-services">
+          <mat-icon>qr_code_2</mat-icon>
+          <span>QR Codes</span>
+        </button>
+        <button mat-raised-button class="action-button" routerLink="/account-settings">
+          <mat-icon>settings</mat-icon>
+          <span>Settings</span>
+        </button>
+        <button mat-raised-button class="action-button" routerLink="/contact">
+          <mat-icon>support_agent</mat-icon>
+          <span>Support</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Submissions -->
+  <section class="recent-submissions">
+    <div class="container">
+      <div class="section-title">
+        <h2>Recent Submissions</h2>
+        <button mat-button color="primary" routerLink="/account-overview">View All</button>
+      </div>
+
+      <mat-card appearance="outlined" *ngIf="totalSubmissions > 0; else noSubmissions" @fadeIn>
+        <div class="submissions-table-wrapper">
+          <mat-table [dataSource]="submissionsDataSource" multiTemplateDataRows class="submissions-table">
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+              <mat-cell *matCellDef="let element">{{ element.firstName }} {{ element.lastName }}</mat-cell>
+            </ng-container>
+            
+            <!-- Date Column -->
+            <ng-container matColumnDef="dateSubmitted">
+              <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
+              <mat-cell *matCellDef="let element">{{ element.dateSubmitted | date:'short' }}</mat-cell>
+            </ng-container>
+            
+            <!-- Reason Column -->
+            <ng-container matColumnDef="reasonForContacting">
+              <mat-header-cell *matHeaderCellDef>Reason</mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                <span class="reason-badge">{{ element.reasonForContacting.replaceAll('_', ' ') }}</span>
+              </mat-cell>
+            </ng-container>
+            
+            <!-- Expand Column -->
+            <ng-container matColumnDef="expand">
+              <mat-header-cell *matHeaderCellDef></mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                <button mat-icon-button (click)="toggleRow(element, $event)" class="expand-button">
+                  <mat-icon>{{ expandedElement === element ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Expanded Detail Column -->
+            <ng-container matColumnDef="expandedDetail">
+              <mat-cell
+                *matCellDef="let element"
+                [attr.colspan]="submissionsColumnsToDisplay.length"
+                class="detail-cell"
+              >
+                <div
+                  class="expanded-detail"
+                  [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'"
+                >
+                  <div class="detail-content">
+                    <h4>Comment</h4>
+                    <p>{{ element.description }}</p>
+                  </div>
+                </div>
+              </mat-cell>
+            </ng-container>
+            
+            <!-- Header Row -->
+            <mat-header-row *matHeaderRowDef="submissionsColumnsToDisplay"></mat-header-row>
+            
+            <!-- Data Row -->
+            <mat-row 
+              class="submission-row"
+              *matRowDef="let element; columns: submissionsColumnsToDisplay;" 
+              (click)="toggleRow(element, $event)">
+            </mat-row>
+            
+            <!-- Expanded Detail Row -->
+            <mat-row
+              *matRowDef="let element; columns: ['expandedDetail']"
+              class="detail-row"
+              [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+            </mat-row>
+          </mat-table>
+        </div>
+      </mat-card>
+
+      <ng-template #noSubmissions>
+        <mat-card appearance="outlined" class="no-submissions">
+          <mat-card-content>
+            <div class="empty-state">
+              <mat-icon class="empty-icon">inbox</mat-icon>
+              <h3>No Submissions Yet</h3>
+              <p>You're driving too well! Check back once you've received some feedback.</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- Help Section -->
+  <section class="help-section">
+    <div class="container">
+      <div class="help-grid">
+        <mat-card class="help-card" @fadeIn>
+          <mat-card-header>
+            <mat-icon class="help-icon">ondemand_video</mat-icon>
+            <mat-card-title>Getting Started</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Learn how to set up your fleet, generate QR codes, and start collecting feedback.</p>
+            <button mat-button color="primary">Watch Tutorial</button>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="help-card" @fadeIn>
+          <mat-card-header>
+            <mat-icon class="help-icon">help_center</mat-icon>
+            <mat-card-title>Documentation</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Comprehensive guides and documentation for all features and settings.</p>
+            <button mat-button color="primary">Read Docs</button>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="help-card" @fadeIn>
+          <mat-card-header>
+            <mat-icon class="help-icon">support_agent</mat-icon>
+            <mat-card-title>Need Help?</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Our support team is here to help. Reach out with any questions or concerns.</p>
+            <button mat-button color="primary" routerLink="/contact">Contact Us</button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+</div>

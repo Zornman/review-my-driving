@@ -1,0 +1,399 @@
+<div class="products-services-container">
+  <!-- Hero Section -->
+  <section class="hero-section" @fadeIn>
+    <div class="hero-content">
+      <h1 class="hero-title">Powerful Fleet Management Solutions</h1>
+      <p class="hero-subtitle">Streamline your fleet operations with integrated QR-based feedback, automated daily reports, and comprehensive driver management.</p>
+      <div class="hero-cta">
+        <button mat-raised-button color="primary" class="cta-button primary-cta" (click)="contactSales()">
+          <mat-icon>email</mat-icon>
+          Get Started Today
+        </button>
+        <button mat-raised-button class="cta-button secondary-cta" (click)="scrollToSection('features')">
+          <mat-icon>info</mat-icon>
+          Learn More
+        </button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-graphic">
+        <mat-icon class="hero-icon">directions_car</mat-icon>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Stats -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card" @scaleIn *ngFor="let stat of [
+          {icon: 'qr_code_2', label: 'Custom QR Codes', value: 'Unlimited'},
+          {icon: 'assignment', label: 'Daily Reports', value: 'Automated'},
+          {icon: 'directions_car', label: 'Fleet Size', value: 'Any Size'},
+          {icon: 'security', label: 'Security', value: 'Enterprise'}
+        ]">
+          <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
+          <h3>{{ stat.value }}</h3>
+          <p>{{ stat.label }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation Tabs -->
+  <section class="tabs-navigation">
+    <div class="container">
+      <div class="tab-buttons">
+        <button 
+          class="tab-button" 
+          [class.active]="activeTab === 'features'"
+          (click)="activeTab = 'features'; scrollToSection('features')">
+          <mat-icon>featured_play_list</mat-icon>
+          Our Services
+        </button>
+        <button 
+          class="tab-button" 
+          [class.active]="activeTab === 'benefits'"
+          (click)="activeTab = 'benefits'; scrollToSection('benefits')">
+          <mat-icon>thumb_up</mat-icon>
+          Why Choose Us
+        </button>
+        <button 
+          class="tab-button" 
+          [class.active]="activeTab === 'pricing'"
+          (click)="activeTab = 'pricing'; scrollToSection('pricing')">
+          <mat-icon>attach_money</mat-icon>
+          Pricing
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="features" class="services-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Comprehensive Services</h2>
+        <p>Everything you need to manage your fleet and collect valuable feedback</p>
+      </div>
+
+      <div class="services-grid">
+        <div 
+          class="service-card" 
+          *ngFor="let service of services; let i = index"
+          [class.expanded]="isServiceExpanded(service.id)"
+          [style.--service-color]="service.color"
+          @fadeIn
+          [style.animation-delay]="(i * 100) + 'ms'">
+          
+          <div class="service-header" (click)="toggleService(service.id)">
+            <div class="service-icon-wrapper">
+              <mat-icon class="service-icon" [style.color]="service.color">{{ service.icon }}</mat-icon>
+            </div>
+            <div class="service-header-content">
+              <h3>{{ service.title }}</h3>
+              <p>{{ service.description }}</p>
+            </div>
+            <mat-icon class="expand-icon">{{ isServiceExpanded(service.id) ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </div>
+
+          <div class="service-details" *ngIf="isServiceExpanded(service.id)">
+            <mat-divider></mat-divider>
+            <div class="features-list">
+              <h4>Key Features:</h4>
+              <ul>
+                <li *ngFor="let feature of service.features">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>{{ feature }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Highlight Section: QR Codes -->
+  <section class="highlight-section qr-highlight">
+    <div class="container">
+      <div class="highlight-content" @fadeIn>
+        <div class="highlight-text">
+          <h2>Custom QR Code Solutions for Every Fleet</h2>
+          <p>Whether you're managing 5 trucks or 500, our custom QR code system scales with your business. Each code is uniquely linked to your fleet, enabling instant feedback collection and automated routing to driver profiles.</p>
+          <div class="highlight-features">
+            <div class="feature-item">
+              <mat-icon>check</mat-icon>
+              <div>
+                <h4>Unlimited Generation</h4>
+                <p>Create as many QR codes as needed for any fleet size</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <mat-icon>check</mat-icon>
+              <div>
+                <h4>Branded Integration</h4>
+                <p>Seamlessly integrate into your existing Printify products</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <mat-icon>check</mat-icon>
+              <div>
+                <h4>Automatic Tracking</h4>
+                <p>Real-time feedback collection and routing to the right driver</p>
+              </div>
+            </div>
+          </div>
+          <button mat-raised-button color="primary" (click)="contactSales()">
+            <mat-icon>qr_code_2</mat-icon>
+            Learn About QR Solutions
+          </button>
+        </div>
+        <div class="highlight-visual">
+          <div class="qr-code-demo">
+            <mat-icon class="qr-demo-icon">qr_code_2</mat-icon>
+            <p>Custom QR Codes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Highlight Section: Daily Reports -->
+  <section class="highlight-section reports-highlight">
+    <div class="container">
+      <div class="highlight-content reverse">
+        <div class="highlight-visual">
+          <div class="reports-demo">
+            <mat-icon class="reports-demo-icon">assignment</mat-icon>
+            <p>Daily Reports</p>
+          </div>
+        </div>
+        <div class="highlight-text">
+          <h2>Automated Daily Driver Reports</h2>
+          <p>Keep your fleet compliant and organized with our automated daily reporting system. Magic-link emails deliver secure tokens to drivers, streamlining end-of-day documentation with built-in photo verification and issue tracking.</p>
+          <div class="highlight-features">
+            <div class="feature-item">
+              <mat-icon>check</mat-icon>
+              <div>
+                <h4>Magic Link Delivery</h4>
+                <p>Automated emails with secure tokens sent to drivers</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <mat-icon>check</mat-icon>
+              <div>
+                <h4>Photo Verification</h4>
+                <p>4-slot photo uploads for vehicle and condition documentation</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <mat-icon>check</mat-icon>
+              <div>
+                <h4>Smart Scheduling</h4>
+                <p>Configurable daily windows with timezone-aware scheduling</p>
+              </div>
+            </div>
+          </div>
+          <button mat-raised-button color="primary" (click)="contactSales()">
+            <mat-icon>assignment</mat-icon>
+            Explore Daily Reports
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section id="benefits" class="benefits-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Why Choose Review My Driving?</h2>
+        <p>Industry-leading features designed for modern fleet operations</p>
+      </div>
+
+      <div class="benefits-grid">
+        <div 
+          class="benefit-card" 
+          *ngFor="let benefit of benefits; let i = index"
+          @scaleIn
+          [style.animation-delay]="(i * 80) + 'ms'">
+          <mat-icon class="benefit-icon">{{ benefit.icon }}</mat-icon>
+          <h3>{{ benefit.title }}</h3>
+          <p>{{ benefit.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>How It Works</h2>
+        <p>Simple setup, powerful results</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card" *ngFor="let step of [
+          {number: '01', title: 'Set Up Your Fleet', description: 'Add your trucks and drivers to the platform'},
+          {number: '02', title: 'Generate QR Codes', description: 'Create branded QR codes for your vehicles'},
+          {number: '03', title: 'Configure Reports', description: 'Set up daily report schedules and preferences'},
+          {number: '04', title: 'Track & Analyze', description: 'Monitor feedback and optimize operations'}
+        ]; let last = last">
+          <div class="step-number">{{ step.number }}</div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.description }}</p>
+          <mat-icon *ngIf="!last" class="step-arrow">arrow_forward</mat-icon>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Choose the plan that fits your fleet size and needs</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div 
+          class="pricing-card" 
+          *ngFor="let tier of pricingTiers; let i = index"
+          [class.featured]="tier.highlighted"
+          @fadeIn
+          [style.animation-delay]="(i * 150) + 'ms'">
+          
+          <div class="pricing-header">
+            <h3>{{ tier.name }}</h3>
+            <p class="pricing-description">{{ tier.description }}</p>
+          </div>
+
+          <div class="pricing-amount">
+            <span class="price">{{ tier.price }}</span>
+            <span class="period">{{ tier.period }}</span>
+          </div>
+
+          <button 
+            mat-raised-button 
+            [color]="tier.highlighted ? 'primary' : ''"
+            class="pricing-cta"
+            (click)="contactSales()">
+            {{ tier.cta }}
+          </button>
+
+          <mat-divider></mat-divider>
+
+          <div class="pricing-features">
+            <h4>Includes:</h4>
+            <ul>
+              <li *ngFor="let feature of tier.features">
+                <mat-icon>check_circle</mat-icon>
+                <span>{{ feature }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pricing-note">
+        <p>All plans include a 14-day free trial. No credit card required.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Comparison Section -->
+  <section class="comparison-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Complete Feature Comparison</h2>
+        <p>See what's included in each plan</p>
+      </div>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Starter</th>
+              <th>Professional</th>
+              <th>Enterprise</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let feature of [
+              {name: 'Fleet Management', starter: true, pro: true, enterprise: true},
+              {name: 'QR Code Generation', starter: true, pro: true, enterprise: true},
+              {name: 'Custom QR Branding', starter: false, pro: true, enterprise: true},
+              {name: 'Daily Reports', starter: true, pro: true, enterprise: true},
+              {name: 'Driver Analytics', starter: false, pro: true, enterprise: true},
+              {name: 'Real-time Analytics', starter: false, pro: true, enterprise: true},
+              {name: 'Multi-user Support', starter: true, pro: true, enterprise: true},
+              {name: 'Priority Support', starter: false, pro: true, enterprise: true},
+              {name: 'Dedicated Account Manager', starter: false, pro: false, enterprise: true},
+              {name: 'Custom Integrations', starter: false, pro: false, enterprise: true},
+              {name: 'SLA Guarantee', starter: false, pro: false, enterprise: true},
+              {name: 'Training & Onboarding', starter: false, pro: false, enterprise: true}
+            ]">
+              <td class="feature-name">{{ feature.name }}</td>
+              <td><mat-icon *ngIf="feature.starter" class="check">check_circle</mat-icon></td>
+              <td><mat-icon *ngIf="feature.pro" class="check">check_circle</mat-icon></td>
+              <td><mat-icon *ngIf="feature.enterprise" class="check">check_circle</mat-icon></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="final-cta-section">
+    <div class="container">
+      <div class="final-cta-content" @fadeIn>
+        <h2>Ready to Transform Your Fleet Operations?</h2>
+        <p>Join leading fleet managers who trust Review My Driving for feedback collection, compliance, and driver management.</p>
+        <div class="final-cta-buttons">
+          <button mat-raised-button color="primary" class="cta-button large" (click)="contactSales()">
+            <mat-icon>email</mat-icon>
+            Contact Us Today
+          </button>
+          <button mat-raised-button class="cta-button large outlined" (click)="contactSales()">
+            <mat-icon>message</mat-icon>
+            Send a Message
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2>Frequently Asked Questions</h2>
+        <p>Have questions? We have answers.</p>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item" *ngFor="let faq of [
+          {q: 'What if my fleet grows?', a: 'Our plans scale with your business. Upgrade anytime to add more trucks and drivers.'},
+          {q: 'Is there a setup fee?', a: 'No setup fees! We handle the configuration for you during onboarding.'},
+          {q: 'How secure is the data?', a: 'We use enterprise-grade security with encrypted data storage and token-based authentication.'},
+          {q: 'Can drivers access reports from mobile?', a: 'Yes! Our platform is fully mobile-optimized for phones, tablets, and desktops.'},
+          {q: 'What kind of support do you offer?', a: 'All plans include email support. Professional and Enterprise tiers include priority support and training.'},
+          {q: 'Do you offer custom integrations?', a: 'Yes! Enterprise customers can request custom integrations with their existing systems.'}
+        ]">
+          <div class="faq-item-content">
+            <h4>
+              <mat-icon>help_outline</mat-icon>
+              {{ faq.q }}
+            </h4>
+            <p>{{ faq.a }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

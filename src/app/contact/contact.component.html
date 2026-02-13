@@ -1,87 +1,149 @@
-<form [formGroup]="contactForm" (submit)="sendFeedback()">
-    <div class="container grid-container-padding" style="padding-top: 1vh;">
-        <div class="row">
-            <div class="col-12 col-center">
-                <span class="align-middle padding-bottom">
-                    Fill out the information and we will do our best to either get back to you or take your
-                    comments into consideration. Thank you for your time.
-                </span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>E-Mail</mat-label>
-                    <input matInput formControlName="email" name="email" required>
-                    <mat-error *ngIf="contactForm.get('email')?.hasError('required')">
-                        Email is required.
-                    </mat-error>
-                    <mat-error *ngIf="contactForm.get('email')?.hasError('email')">
-                        Enter a valid email address.
-                    </mat-error>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>First Name</mat-label>
-                    <input matInput formControlName="firstName" name="firstName" required>
-                    <mat-error *ngIf="contactForm.get('firstName')?.hasError('required')">
-                        First Name is required.
-                    </mat-error>
-                    <mat-error *ngIf="contactForm.get('firstName')?.hasError('pattern')">
-                        Enter a valid first name.
-                    </mat-error>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>Last Name</mat-label>
-                    <input matInput formControlName="lastName" name="lastName" required>
-                    <mat-error *ngIf="contactForm.get('lastName')?.hasError('required')">
-                        Last Name is required.
-                    </mat-error>
-                    <mat-error *ngIf="contactForm.get('lastName')?.hasError('pattern')">
-                        Enter a valid last name.
-                    </mat-error>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>Reason for Contacting</mat-label>
-                    <mat-select formControlName="reasonForContacting" name="reasonForContacting" required>
-                        <mat-option value="bug">Report a Bug</mat-option>
-                        <mat-option value="feedback">Submit Feedback/Suggestion</mat-option>
-                        <mat-option value="business">Business/Partnership Inquiry</mat-option>
-                        <mat-option value="support">Help! I Need Support</mat-option>
-                        <mat-option value="other">Other</mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="contactForm.get('reasonForContacting')?.hasError('required')">
-                        Reason is required.
-                    </mat-error>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>Please explain</mat-label>
-                    <textarea matInput formControlName="description" name="description" required></textarea>
-                    <mat-error *ngIf="contactForm.get('description')?.hasError('required')">
-                        An explanation for contacting is required.
-                    </mat-error>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-center">
-                <button mat-stroked-button color="primary" type="submit" [disabled]="contactForm.invalid">Submit</button>
-            </div>
-        </div>
+<div class="contact-container">
+  <div class="contact-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Get in Touch</h1>
+      <p class="hero-subtitle">
+        We'd love to hear from you. Fill out the form below and we'll get back to you as soon as possible.
+      </p>
     </div>
-</form>
+  </div>
+
+  <div class="form-wrapper">
+    <div class="form-card">
+      <form [formGroup]="contactForm" (ngSubmit)="sendFeedback()">
+        <div class="form-grid">
+          <!-- Email Field -->
+          <div class="form-field full-width">
+            <mat-form-field appearance="outline">
+              <mat-label>Email Address</mat-label>
+              <input 
+                matInput 
+                formControlName="email" 
+                type="email"
+                autocomplete="email">
+              <mat-icon matPrefix>email</mat-icon>
+              <mat-error *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
+                {{ getErrorMessage('email') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- First Name Field -->
+          <div class="form-field">
+            <mat-form-field appearance="outline">
+              <mat-label>First Name</mat-label>
+              <input 
+                matInput 
+                formControlName="firstName"
+                autocomplete="given-name">
+              <mat-icon matPrefix>person</mat-icon>
+              <mat-error *ngIf="contactForm.get('firstName')?.invalid && contactForm.get('firstName')?.touched">
+                {{ getErrorMessage('firstName') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Last Name Field -->
+          <div class="form-field">
+            <mat-form-field appearance="outline">
+              <mat-label>Last Name</mat-label>
+              <input 
+                matInput 
+                formControlName="lastName"
+                autocomplete="family-name">
+              <mat-icon matPrefix>person_outline</mat-icon>
+              <mat-error *ngIf="contactForm.get('lastName')?.invalid && contactForm.get('lastName')?.touched">
+                {{ getErrorMessage('lastName') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Reason for Contacting -->
+          <div class="form-field full-width">
+            <mat-form-field appearance="outline">
+              <mat-label>How can we help you?</mat-label>
+              <mat-select formControlName="reasonForContacting">
+                <mat-option value="bug">
+                  <mat-icon>bug_report</mat-icon>
+                  Report a Bug
+                </mat-option>
+                <mat-option value="feedback">
+                  <mat-icon>feedback</mat-icon>
+                  Submit Feedback/Suggestion
+                </mat-option>
+                <mat-option value="business">
+                  <mat-icon>business</mat-icon>
+                  Business/Partnership Inquiry
+                </mat-option>
+                <mat-option value="support">
+                  <mat-icon>support_agent</mat-icon>
+                  Help! I Need Support
+                </mat-option>
+                <mat-option value="other">
+                  <mat-icon>help_outline</mat-icon>
+                  Other
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>category</mat-icon>
+              <mat-error *ngIf="contactForm.get('reasonForContacting')?.invalid && contactForm.get('reasonForContacting')?.touched">
+                {{ getErrorMessage('reasonForContacting') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Description Field -->
+          <div class="form-field full-width">
+            <mat-form-field appearance="outline">
+              <mat-label>Tell us more</mat-label>
+              <textarea 
+                matInput 
+                formControlName="description"
+                rows="6"
+                maxlength="1000"></textarea>
+              <mat-icon matPrefix class="textarea-icon">description</mat-icon>
+              <mat-hint align="end">
+                {{ contactForm.get('description')?.value?.length || 0 }} / 1000
+              </mat-hint>
+              <mat-error *ngIf="contactForm.get('description')?.invalid && contactForm.get('description')?.touched">
+                {{ getErrorMessage('description') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-field full-width submit-section">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="contactForm.invalid || isSubmitting"
+              class="submit-button">
+              <mat-icon *ngIf="!isSubmitting">send</mat-icon>
+              <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+              {{ isSubmitting ? 'Sending...' : 'Send Message' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Contact Info Section -->
+    <div class="contact-info">
+      <div class="info-card">
+        <mat-icon>schedule</mat-icon>
+        <h3>Response Time</h3>
+        <p>We typically respond within 24-48 hours</p>
+      </div>
+      <div class="info-card">
+        <mat-icon>security</mat-icon>
+        <h3>Your Privacy</h3>
+        <p>Your information is secure and never shared</p>
+      </div>
+      <div class="info-card">
+        <mat-icon>support</mat-icon>
+        <h3>24/7 Support</h3>
+        <p>We're here to help around the clock</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -9,19 +9,21 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { SharedService } from '../../../services/shared.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-add-edit-truck',
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDialogModule, 
-    MatFormFieldModule, 
-    MatSelectModule, 
+    MatDialogModule,
+    MatFormFieldModule,
+    MatSelectModule,
     MatButtonModule,
     MatInputModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatIconModule
   ],
   templateUrl: './add-edit-truck.component.html',
   styleUrl: './add-edit-truck.component.scss'
@@ -71,6 +73,10 @@ export class AddEditTruckComponent implements OnInit {
       registrationExpiration: [this.truck ? this.truck.registrationExpiration : '', Validators.required],
       status: [this.truck ? this.truck.status : '', Validators.required],
     });
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
   }
 
   onSubmit(): void {

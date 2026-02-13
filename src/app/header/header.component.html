@@ -1,92 +1,115 @@
-<div class="grid-container">
-  <div class="grid-row">
-    <div class="col-12 header-branding">
-      <span class="header-title"><a (click)="openHome()">Review My <wbr>Driving</a></span>
-      <div class="header-navigation desktop-view">
-        <div class="header-link">
-          <span><a routerLink="/index">Home</a></span>
-        </div>
-        <div class="header-link">
-          <span><a routerLink="/shop">Shop</a></span>
-        </div>
-        <div class="header-link">
-          <span><a routerLink="/about">About</a></span>
-        </div>
-        <div class="header-link">
-          <span><a routerLink="/contact">Contact</a></span>
-        </div>
-        <div class="header-link" *ngIf="isAdmin">
-          <span><a routerLink="/admin-functions">Admin Functions</a></span>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button mat-icon-button [matMenuTriggerFor]="navMenu" class="mobile-view"><mat-icon>menu</mat-icon></button>
-        <button mat-icon-button *ngIf="cartQuantity !== 0" (click)="reviewCart()">
-          <mat-icon>shopping_cart</mat-icon>
-          <span
-            matBadge="{{ cartQuantity }}"
-            matBadgeHidden="{{ cartQuantity === 0 }}"
-            matBadgeOverlap="false">
-          </span>
+<header class="app-header" role="banner">
+  <div class="app-header__inner">
+    <a class="brand" routerLink="/index" aria-label="Review My Driving - Home">
+      <span class="brand__primary">Review My</span>
+      <span class="brand__secondary">Driving</span>
+    </a>
+
+    <nav class="nav header-desktop" aria-label="Primary navigation">
+      <a class="nav__link" routerLink="/index" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a class="nav__link" routerLink="/services" routerLinkActive="is-active">Services</a>
+      <a class="nav__link" routerLink="/about" routerLinkActive="is-active">About</a>
+      <a class="nav__link" routerLink="/contact" routerLinkActive="is-active">Contact</a>
+
+      <a
+        class="nav__link nav__link--admin"
+        *ngIf="(user$ | async)?.uid === adminUserId"
+        routerLink="/admin-functions"
+        routerLinkActive="is-active">
+        Admin
+      </a>
+    </nav>
+
+    <div class="actions">
+      <button
+        mat-icon-button
+        class="actions__icon header-mobile"
+        [matMenuTriggerFor]="navMenu"
+        aria-label="Open navigation menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <button
+        *ngIf="cartQuantity > 0"
+        mat-icon-button
+        class="actions__icon"
+        routerLink="/cart"
+        aria-label="View cart"
+        [matBadge]="cartQuantity"
+        [matBadgeHidden]="cartQuantity === 0"
+        [matBadgeOverlap]="false">
+        <mat-icon>shopping_cart</mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        class="actions__icon"
+        [matMenuTriggerFor]="accountMenu"
+        aria-label="Account menu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+
+      <!-- panelClass is required to theme overlay menus -->
+      <mat-menu #navMenu="matMenu" panelClass="header-menu">
+        <button mat-menu-item routerLink="/index">Home</button>
+        <button mat-menu-item routerLink="/services">Services</button>
+        <button mat-menu-item routerLink="/about">About</button>
+        <button mat-menu-item routerLink="/contact">Contact</button>
+        <button mat-menu-item *ngIf="(user$ | async)?.uid === adminUserId" routerLink="/admin-functions">
+          Admin Functions
         </button>
-        <button mat-icon-button [matMenuTriggerFor]="accountMenu">
-          <mat-icon>account_circle</mat-icon>
-        </button>
-        <mat-menu #navMenu="matMenu">
-          <button mat-menu-item (click)="openHome()">
-            <span>Home</span>
+      </mat-menu>
+
+      <mat-menu #accountMenu="matMenu" panelClass="header-menu">
+        <ng-container *ngIf="user$ | async as user; else guest">
+          <button mat-menu-item routerLink="/account">
+            <mat-icon>manage_accounts</mat-icon>
+            <span>Account</span>
           </button>
-          <button mat-menu-item (click)="openShop()">
-            <span>Shop</span>
+
+          <button mat-menu-item routerLink="/settings">
+            <mat-icon>settings</mat-icon>
+            <span>Settings</span>
           </button>
-          <button mat-menu-item (click)="aboutPage()">
-            <span>About</span>
+
+          <button mat-menu-item (click)="$event.stopPropagation()">
+            <mat-icon>dark_mode</mat-icon>
+            <mat-checkbox
+              [checked]="isDarkMode"
+              (change)="onToggleDarkMode($event)"
+              labelPosition="before">
+              Dark Mode
+            </mat-checkbox>
           </button>
-          <button mat-menu-item (click)="contactPage()">
-            <span>Contact</span>
+
+          <button mat-menu-item (click)="signOut()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
           </button>
-          <button mat-menu-item (click)="adminFunctionsPage()" *ngIf="isAdmin">
-            <span>Admin Functions</span>
+        </ng-container>
+
+        <ng-template #guest>
+          <button mat-menu-item routerLink="/register">
+            <mat-icon>person_add</mat-icon>
+            <span>Create Account</span>
           </button>
-        </mat-menu>
-        <mat-menu #accountMenu="matMenu">
-          <div *ngIf="user">
-            <button mat-menu-item (click)="viewAccount()">
-              <mat-icon>manage_accounts</mat-icon>
-              <span>Account</span>
-            </button>
-            <button mat-menu-item (click)="viewSettings()">
-              <mat-icon>settings</mat-icon>
-              <span>Settings</span>
-            </button>
-            <button mat-menu-item (click)="$event.stopPropagation();">
-              <mat-icon>dark_mode</mat-icon>
-              <mat-checkbox [checked]="isDarkMode" (change)="onToggleDarkMode($event)" labelPosition="before">Dark Mode</mat-checkbox>
-            </button>
-            <button mat-menu-item (click)="signOut()">
-              <mat-icon>logout</mat-icon>
-              <span>Logout</span>
-            </button>
-          </div>
-          <div *ngIf="!user">
-            <button mat-menu-item (click)="registerationPage()">
-              <mat-icon>person_add</mat-icon>
-              <span>Create Account</span>
-            </button>
-            <button mat-menu-item (click)="loginPage()">
-              <mat-icon>login</mat-icon>
-              <span>Login</span>
-            </button>
-            <button mat-menu-item (click)="$event.stopPropagation();">
-              <mat-icon>dark_mode</mat-icon>
-              <mat-checkbox [checked]="isDarkMode" (change)="onToggleDarkMode($event)" labelPosition="before">Dark Mode</mat-checkbox>
-            </button>
-          </div>
-        </mat-menu>
-      </div>
-    </div>
-    <div class="col-12 col-center">
-      
+
+          <button mat-menu-item routerLink="/login">
+            <mat-icon>login</mat-icon>
+            <span>Login</span>
+          </button>
+
+          <button mat-menu-item (click)="$event.stopPropagation()">
+            <mat-icon>dark_mode</mat-icon>
+            <mat-checkbox
+              [checked]="isDarkMode"
+              (change)="onToggleDarkMode($event)"
+              labelPosition="before">
+              Dark Mode
+            </mat-checkbox>
+          </button>
+        </ng-template>
+      </mat-menu>
     </div>
   </div>
-</div>
+</header>

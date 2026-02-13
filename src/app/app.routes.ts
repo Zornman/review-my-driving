@@ -13,12 +13,15 @@ import { ContactComponent } from './contact/contact.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { AdminFunctionsComponent } from './admin/admin-functions/admin-functions.component';
 import { DailyReportComponent } from './daily-report/daily-report.component';
+import { ProductsAndServicesComponent } from './products-and-services/products-and-services.component';
 
 export const routes: Routes = [
     { path: '', component: IndexComponent },
     { path: 'index', component: IndexComponent },
     { path: 'home', component: HomeComponent },
     { path: 'shop', component: ShopComponent },
+    { path: 'services', component: ProductsAndServicesComponent },
+    { path: 'register', component: RegisterComponent },
     { path: 'register/:uniqueId', component: RegisterComponent },
     { path: 'product/:id', loadComponent: () => import('./shop/product-page/product-page.component').then(m => m.ProductPageComponent) },
     { path: 'cart', component: CartOverviewComponent },

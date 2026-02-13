@@ -1,218 +1,480 @@
-import { Component, inject } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { RandomizeInputDirective } from '../shared/directives/randomize-input.directive';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { US_STATES } from '../shared/classes/states';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MongoService } from '../services/mongo.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Observable, forkJoin, of } from 'rxjs';
+import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
+
 import { EmailService } from '../services/email.service';
 import { FirebaseService } from '../services/firebase.service';
+import { MongoService } from '../services/mongo.service';
+import { US_STATES } from '../shared/classes/states';
+import { RandomizeInputDirective } from '../shared/directives/randomize-input.directive';
 import { MessageDialogComponent } from '../shared/modals/message-dialog/message-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
 import { SampleNotRegisteredDialogComponent } from '../shared/modals/sample-not-registered-dialog/sample-not-registered-dialog.component';
-import { forkJoin } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+type EntryMode = 'user' | 'sample' | 'business' | 'unknown';
+
+type QueryContext = {
+  mode: EntryMode;
+  userId?: string;
+  uniqueId?: string;
+  businessId?: string;
+  assetId?: string;
+
+  // unified "destination" for notification/routing emails (user/sample => user's email, business => business contact email)
+  emailTo?: string | null;
+
+  // business QR validation/association
+  businessQrValid?: boolean;
+  businessQrAssigned?: boolean;
+  truckId?: string | null;
+  settings?: any | null;
+
+  businessUser?: {
+    userId: string;
+    businessName: string;
+    contactEmail: string;
+    phoneNumber: string;
+    role: string;
+    status: string;
+    settings: {
+      notifyOnNewReview: boolean;
+      dailySummaryEmail: boolean;
+      dailyReportsEnabled: boolean;
+      timezone: string;
+      dailyReportEndWindow: string;
+      dailyReportStartWindow: string;
+    };
+    createdAt: { $date: string };
+    updatedAt: { $date: string };
+  } | null;
+};
+
+type SubmissionModel = {
+  // target identifiers (one of these flows will be present)
+  user_id?: string | null;
+  uniqueId?: string | null;
+  businessId?: string | null;
+  assetId?: string | null;
+
+  // form fields
+  firstName: string;
+  lastName: string;
+  state: string;
+  licensePlate: string;
+  reasonForContacting: string;
+  description: string;
+
+  // metadata
+  dateSubmitted: string;
+  emailTo?: string | null;
+};
 
 @Component({
   selector: 'app-home',
-  imports: [ RandomizeInputDirective, CommonModule, FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule, MatTooltipModule, HttpClientModule ],
+  imports: [
+    RandomizeInputDirective,
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    MatTooltipModule,
+    MatCardModule,
+    MatDividerModule,
+    MatProgressSpinnerModule,
+    HttpClientModule,
+  ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  private _snackBar = inject(MatSnackBar);
-  states = US_STATES; // Load the array of states
-  ngForm!: NgForm;
-  user_id!: string | null;
-  user_email!: string | null;
-  user_settings!: any | null;
-  user_phone!: string | null;
-  date!: () => string;
-  isProcessing: boolean = false;
-  isQuickMode: boolean = true; // Flag to toggle quick mode
-  uniqueId!: string;
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly snackBar = inject(MatSnackBar);
 
-  formData = {
-    user_id: this.user_id,
-    firstName: '',
-    lastName: '',
-    state: '',
-    licensePlate: '',
-    reasonForContacting: '',
-    description: '',
-    dateSubmitted: '',
-    emailTo: this.user_email
-  };
+  states = US_STATES;
+
+  // page state
+  isProcessing = false;
+  isSubmitting = false;
+  isQuickMode = true;
+
+  // context
+  mode: EntryMode = 'unknown';
+  user_id: string | null = null;
+  user_email: string | null = null;
+  user_settings: any | null = null;
+
+  uniqueId: string | null = null;
+  businessId: string | null = null;
+  assetId: string | null = null;
+
+  // business QR validation state
+  businessQrValid: boolean | null = null;
+  businessQrAssigned: boolean | null = null;
+  businessTruckId: string | null = null;
+  private hasShownBusinessQrDialog = false;
+
+  ngForm!: NgForm;
+
+  // quick-review groups (drives the template)
+  quickReviewGroups: Array<{ title: string; options: Array<{ label: string; value: string }> }> = [
+    {
+      title: 'Bad Driving Review',
+      options: [
+        { label: 'Aggressive Driving', value: 'Aggressive Driving' },
+        { label: 'Cut me Off', value: 'Cut Me Off' },
+        { label: 'Driving Slow', value: 'Driving Slow' },
+        { label: 'Not Paying Attention', value: 'Not Paying Attention' },
+        { label: 'You suck at driving', value: 'You suck at driving' },
+      ],
+    },
+    {
+      title: 'Good Driving Review',
+      options: [
+        { label: 'Courteous Driver', value: 'Courteous Driver' },
+        { label: 'Used Turn Signals', value: 'Used Turn Signals' },
+        { label: 'Excellent Park Job', value: 'Excellent Park Job' },
+        { label: 'Let me Merge', value: 'Let me Merge' },
+        { label: 'You are a great driver, keep it up!', value: 'You are a great driver, keep it up!' },
+      ],
+    },
+    {
+      title: 'Car Review',
+      options: [
+        { label: 'Looks Brand New', value: 'Looks Brand New' },
+        { label: 'Cool Color/Wrap', value: 'Cool Color/Wrap' },
+        { label: 'Nice Rims/Wheels', value: 'Nice Rims/Wheels' },
+        { label: 'Unique & Eye-Catching', value: 'Unique & Eye-Catching' },
+        { label: 'Your car is awesome, I love it!', value: 'Your car is awesome, I love it!' },
+      ],
+    },
+  ];
+
+  formData: SubmissionModel = this.createEmptyFormData();
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router, 
-    private dbService: MongoService, 
+    private router: Router,
+    private dbService: MongoService,
     private emailService: EmailService,
     private firebaseService: FirebaseService,
     private dialog: MatDialog
-  ) 
-  { 
-    this.date = () => new Date().toISOString();
+  ) {}
+
+  get isBusinessFlow(): boolean {
+    return this.mode === 'business' && !!this.businessId && !!this.assetId;
   }
 
-  async ngOnInit(): Promise<void> {
-    // Extract the 'id' query parameter
-    this.route.queryParamMap.subscribe(async params => {
-      this.user_id = params.get('id') || ''; // Get the value of 'id'
-      this.uniqueId = params.get('uniqueId') || ''; // Get the value of 'uniqueId' if it exists
-      this.isProcessing = true;
-      if (this.user_id) {
-        forkJoin([
-          this.firebaseService.getUserByUID(this.user_id),
-          this.dbService.getUserSettings(this.user_id)
-        ]).subscribe({
-          next: ([userResponse, settingsResponse]) => {
-            this.user_email = userResponse.email;
-            this.user_settings = (settingsResponse as any).result;
-            this.isProcessing = false;
-          },
-          error: (error) => {
-            console.error('Error fetching data:', error);
+  get isSubmissionEnabled(): boolean {
+    // user/sample flows should always work (existing behavior)
+    if (!this.isBusinessFlow) return true;
+    // business flow must be validated + assigned to a truck
+    return this.businessQrValid === true && this.businessQrAssigned === true;
+  }
+
+  get showVehicleFields(): boolean {
+    // If we already know the target via user_id or businessId, license plate/state are optional noise.
+    return !this.user_id && !this.businessId;
+  }
+
+  ngOnInit(): void {
+    this.route.queryParamMap
+      .pipe(
+        map((params) => ({
+          id: (params.get('id') || '').trim(),
+          uniqueId: (params.get('uniqueId') || '').trim(),
+          businessId: (params.get('businessId') || '').trim(),
+          assetId: (params.get('assetId') || '').trim(),
+        })),
+        tap(() => (this.isProcessing = true)),
+        switchMap((q) =>
+          this.resolveContext$(q).pipe(
+            tap((ctx) => this.applyContext(ctx)),
+            catchError((error) => {
+              console.error('Error resolving context:', error);
+              this.snackBar.open('Unable to load QR context. Please try again.', 'Close', { duration: 4000 });
+
+              this.dbService
+                .insertErrorLog(
+                  JSON.stringify({
+                    fileName: 'home.component.ts',
+                    method: 'ngOnInit()/resolveContext$',
+                    timestamp: new Date().toString(),
+                    error,
+                  })
+                )
+                .subscribe();
+
+              // allow the page to still render the manual form
+              return of<QueryContext>({ mode: 'unknown' });
+            }),
+            finalize(() => (this.isProcessing = false))
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
+  }
+
+  private resolveContext$(q: { id: string; uniqueId: string; businessId: string; assetId: string }): Observable<QueryContext> {
+    console.log('Resolving context for query params:', q);
+  
+    // 1) Direct user id
+    if (q.id) {
+      return forkJoin([this.firebaseService.getUserByUID(q.id), this.dbService.getUserSettings(q.id)]).pipe(
+        map(([userResponse, settingsResponse]) => ({
+          mode: 'user' as const,
+          userId: q.id,
+          emailTo: userResponse?.email ?? null,
+          settings: (settingsResponse as any)?.result ?? null,
+        }))
+      );
+    }
+  
+    // 2) Sample uniqueId -> resolve to userId, or show "unclaimed" dialog
+    if (q.uniqueId) {
+      return this.dbService.getUserByUniqueId(q.uniqueId).pipe(
+        switchMap((response: any) => {
+          const userId = response?.result?.userId as string | undefined;
+          const status = response?.result?.status as string | undefined;
+  
+          if (userId) {
+            return forkJoin([this.firebaseService.getUserByUID(userId), this.dbService.getUserSettings(userId)]).pipe(
+              map(([userResponse, settingsResponse]) => ({
+                mode: 'sample' as const,
+                uniqueId: q.uniqueId,
+                userId,
+                emailTo: userResponse?.email ?? null,
+                settings: (settingsResponse as any)?.result ?? null,
+              }))
+            );
           }
-        });
-      } else if (this.uniqueId) {
-        this.getUserByUniqueId();
-      }
-    });
-  }
-
-  async getUserEmail() {
-    if (!this.user_id) return;
-
-    await this.firebaseService.getUserByUID(this.user_id).subscribe({
-      next: (response: any) => {
-        this.formData.user_id = this.user_id;
-        this.user_email = response.email;
-        this.formData.emailTo = response.email;
-      },
-      error: (error) => {
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'home.component.ts',
-          method: 'getUserEmail()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      },
-    });
-  }
-
-  async getUserPhone() {
-    if (!this.user_id) return;
-
-    await this.dbService.getUserShippingInfo(this.user_id).subscribe({
-      next: (response: any) => {
-        if (response.result) {
-          this.user_phone = response.result.phone;
-        }
-      },
-      error: (error) => {
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'home.component.ts',
-          method: 'getUserPhone()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      },
-    });
-  }
-
-  getUserSettings() {
-    if (!this.user_id) return;
-
-    this.dbService.getUserSettings(this.user_id).subscribe({
-      next: (settings: any) => {
-        this.user_settings = settings.result;
-      },
-      error: (error: any) => {
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'home.component.ts',
-          method: 'getUserSettings()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      }
-    });
-  }
-
-  getUserByUniqueId() {
-    if (!this.uniqueId) return;
-
-    this.dbService.getUserByUniqueId(this.uniqueId).subscribe({
-      next: (response: any) => {
-        if (response && response.result.userId) {
-          this.user_id = response.result.userId;
-          this.getUserEmail();
-          this.getUserSettings();
-          //this.getUserPhone();
-          this.isProcessing = false;
-        } else {
-          if (response && response.result.status === 'unclaimed') {
-            this.isProcessing = false;
+  
+          if (status === 'unclaimed') {
             this.dialog.open(SampleNotRegisteredDialogComponent, {
               width: '400px',
               disableClose: true,
               data: {
-                message: 'This QR Code is unclaimed. Please contact support for assistance. If you are the owner, please register to claim it.',
+                message:
+                  'This QR Code is unclaimed. Please contact support for assistance. If you are the owner, please register to claim it.',
                 action: 'Claim Now',
-                actionCallback: () => {
-                  this.router.navigate(['/register', this.uniqueId]); // Redirect to register page
-                }
-              }
+                actionCallback: () => this.router.navigate(['/register', q.uniqueId]),
+              },
             });
+            return EMPTY;
           }
-        }
+  
+          return of<QueryContext>({ mode: 'unknown' });
+        })
+      );
+    }
+  
+    // 3) Business mode (businessId + assetId)
+    if (q.businessId && q.assetId) {
+      return this.dbService.getBusinessQrContext(q.businessId, q.assetId).pipe(
+        map((response: any) => {
+          const result = response?.result ?? response;
+          const businessUser = result?.businessUser ?? null;
+  
+          return {
+            mode: 'business' as const,
+            businessId: q.businessId,
+            assetId: q.assetId,
+            businessQrValid: !!result?.exists,
+            businessQrAssigned: !!result?.assigned,
+            truckId: (result?.truckId as string | null) ?? null,
+            businessUser,
+            emailTo: businessUser?.contactEmail ?? null,
+          };
+        }),
+        catchError((error) => {
+          console.error('Error validating business QR code:', error);
+          return of<QueryContext>({
+            mode: 'business',
+            businessId: q.businessId,
+            assetId: q.assetId,
+            businessQrValid: false,
+            businessQrAssigned: false,
+            truckId: null,
+            businessUser: null,
+            emailTo: null,
+          });
+        })
+      );
+    }
+  
+    return of<QueryContext>({ mode: 'unknown' });
+  }
+
+  private applyContext(ctx: QueryContext): void {
+    this.mode = ctx.mode;
+
+    this.user_id = ctx.userId ?? null;
+    this.uniqueId = ctx.uniqueId ?? null;
+    this.businessId = ctx.businessId ?? null;
+    this.assetId = ctx.assetId ?? null;
+
+    // IMPORTANT: email can come from user/sample OR business. Use ctx.emailTo, not ctx.businessUser.
+    this.user_email = ctx.emailTo ?? null;
+
+    this.user_settings = ctx.settings ?? null;
+
+    this.businessQrValid = typeof ctx.businessQrValid === 'boolean' ? ctx.businessQrValid : null;
+    this.businessQrAssigned = typeof ctx.businessQrAssigned === 'boolean' ? ctx.businessQrAssigned : null;
+    this.businessTruckId = ctx.truckId ?? null;
+
+    // Ensure outgoing payload always has the right routing fields
+    this.formData.user_id = this.user_id;
+    this.formData.uniqueId = this.uniqueId;
+    this.formData.businessId = this.businessId;
+    this.formData.assetId = this.assetId;
+    this.formData.emailTo = this.user_email;
+
+    // Show one-time dialogs for business QR state
+    if (this.isBusinessFlow && !this.hasShownBusinessQrDialog) {
+      this.hasShownBusinessQrDialog = true;
+
+      if (this.businessQrValid === false) {
+        this.showConfirmationDialog(
+          'Invalid QR Code. This business QR could not be verified. Please contact your fleet manager/support.'
+        );
+      } else if (this.businessQrValid === true && this.businessQrAssigned === false) {
+        this.showConfirmationDialog(
+          'This QR Code is real, but it has not been registered to a truck yet. Please ask your business admin/fleet manager to assign this QR code to a truck before submitting feedback.'
+        );
       }
-    });
+    }
   }
 
   async submit(form: NgForm) {
-    this.isProcessing = true;
+    if (!this.isSubmissionEnabled) {
+      this.snackBar.open('This QR code must be registered to a truck before submitting.', 'Close', { duration: 4000 });
+      return;
+    }
     this.ngForm = form;
-    await this.insertSubmission();
-    await this.sendEmailNotification();
+    this.isSubmitting = true;
+
+    const payload = this.buildSubmissionPayload();
+
+    this.dbService
+      .insertSubmission(JSON.stringify(payload))
+      .pipe(
+        switchMap(() => this.emailService.sendSubmissionEmail(JSON.stringify(payload))),
+        tap(() => {
+          this.openConfirmMessage();
+          this.resetForm();
+        }),
+        catchError((error) => {
+          this.snackBar.open('Error submitting form, try again.', 'Close', { duration: 4000 });
+
+          this.dbService
+            .insertErrorLog(
+              JSON.stringify({
+                fileName: 'home.component.ts',
+                method: 'submit()',
+                timestamp: new Date().toString(),
+                error,
+              })
+            )
+            .subscribe();
+
+          return EMPTY;
+        }),
+        finalize(() => (this.isSubmitting = false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
   }
 
-  async submitQuickReview(reasonForContacting: string) {
-    this.isProcessing = true;
-    this._snackBar.open('Submitting your quick review...', 'Close');
-    // Set the form data with the quick review values
-    this.formData.reasonForContacting = reasonForContacting;
-    this.formData.description = reasonForContacting; // Use the reason as the description
-    this.formData.firstName = 'Anonymous';
-    this.formData.lastName = 'User';
+  submitQuickReview(reasonForContacting: string) {
+    if (!this.isSubmissionEnabled) {
+      this.snackBar.open('This QR code must be registered to a truck before submitting.', 'Close', { duration: 4000 });
+      return;
+    }
+    this.isSubmitting = true;
+    this.snackBar.open('Submitting your quick review...', 'Close', { duration: 2000 });
 
-    await this.insertSubmission();
-    await this.sendEmailNotification();
+    // quick payload (don’t mutate the user’s in-progress long-form fields)
+    const payload: SubmissionModel = {
+      ...this.buildSubmissionPayload(),
+      reasonForContacting,
+      description: reasonForContacting,
+      firstName: 'Anonymous',
+      lastName: 'User',
+    };
+
+    this.dbService
+      .insertSubmission(JSON.stringify(payload))
+      .pipe(
+        switchMap(() => this.emailService.sendSubmissionEmail(JSON.stringify(payload))),
+        tap(() => {
+          this.openConfirmMessage();
+          this.resetForm();
+        }),
+        catchError((error) => {
+          this.snackBar.open('Error submitting quick review, try again.', 'Close', { duration: 4000 });
+
+          this.dbService
+            .insertErrorLog(
+              JSON.stringify({
+                fileName: 'home.component.ts',
+                method: 'submitQuickReview()',
+                timestamp: new Date().toString(),
+                error,
+              })
+            )
+            .subscribe();
+
+          return EMPTY;
+        }),
+        finalize(() => (this.isSubmitting = false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
+  }
+
+  private buildSubmissionPayload(): SubmissionModel {
+    return {
+      ...this.formData,
+      user_id: this.user_id,
+      uniqueId: this.uniqueId,
+      businessId: this.businessId,
+      assetId: this.assetId,
+      emailTo: this.user_email, // may be null in business mode; backend should handle
+      dateSubmitted: new Date().toISOString(),
+    };
+  }
+
+  private createEmptyFormData(): SubmissionModel {
+    return {
+      user_id: null,
+      uniqueId: null,
+      businessId: null,
+      assetId: null,
+      firstName: '',
+      lastName: '',
+      state: '',
+      licensePlate: '',
+      reasonForContacting: '',
+      description: '',
+      dateSubmitted: '',
+      emailTo: null,
+    };
   }
 
   openConfirmMessage() {
@@ -229,120 +491,29 @@ export class HomeComponent {
     } else if (style === 'popup') {
       this.showConfirmationDialog(msg);
     } else if (style === 'snackbar') {
-      this._snackBar.open(msg, 'Close');
+      this.snackBar.open(msg, 'Close', { duration: 4000 });
     } else {
       this.showConfirmationDialog('Thank you for your submission!');
     }
-  }
-
-  async sendEmailNotification() {
-    this.emailService.sendSubmissionEmail(JSON.stringify(this.formData)).subscribe({
-      next: (response: any) => {
-        this.openConfirmMessage();
-        this.resetForm();
-        this.isProcessing = false;
-      },
-      error: (error) => {
-        this._snackBar.open('Error submitting form, try again.', 'Close');
-        this.isProcessing = false;
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'home.component.ts',
-          method: 'sendEmailNotification()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      },
-    });
-  }
-
-  async insertSubmission() {
-    this.formData.user_id = this.user_id;
-    this.formData.dateSubmitted = this.date();
-
-    if (this.user_phone) {
-      this.sendTextAlert(this.formatToE164(this.user_phone), `New submission received from ${this.formData.firstName} ${this.formData.lastName} Reason for Contacting: "${this.formData.reasonForContacting}".`).catch((err: any) => { });
-    }
-
-    this.dbService.insertSubmission(JSON.stringify(this.formData)).subscribe({
-      next: (response: any) => {
-
-      },
-      error: (error) => {
-        this._snackBar.open('Error submitting form, try again.', 'Close');
-        this.isProcessing = false;
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'home.component.ts',
-          method: 'insertSubmission()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      },
-    });
-  }
-
-  async sendTextAlert(phoneNumber: string, message: string) {
-    this.isProcessing = true;
-    // This assumes you’ll have a Firebase Function or API endpoint
-    // that listens for this request and sends the SMS (via Twilio, etc.)
-    this.firebaseService.sendTextMessage(phoneNumber, message).subscribe({
-      next: (response: any) => {
-        this._snackBar.open('Text alert sent successfully!', 'Close', { duration: 3000 });
-      },
-      error: (error) => {
-        this._snackBar.open('Error sending text alert, try again.', 'Close');
-        // Log the error into your mongo errors collection
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'home.component.ts',
-          method: 'sendTextAlert()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe();
-      },
-    });
   }
 
   showConfirmationDialog(msg: string) {
     return this.dialog.open(MessageDialogComponent, {
       width: '400px',
       disableClose: true,
-      data: {
-        message: msg
-      }
+      data: { message: msg },
     });
   }
 
   resetForm() {
-    if (this.ngForm) this.ngForm.resetForm(); // Reset the Angular form state
-    this.formData = {
-      user_id: this.user_id,
-      firstName: '',
-      lastName: '',
-      state: '',
-      licensePlate: '',
-      reasonForContacting: '',
-      description: '',
-      dateSubmitted: new Date().getDate().toString(),
-      emailTo: this.user_email
-    };
-  }
+    if (this.ngForm) this.ngForm.resetForm();
+    this.formData = this.createEmptyFormData();
 
-  formatToE164(phone: string, countryCode = "1"): string {
-    // Remove all non-digit characters
-    const digits = phone.replace(/\D/g, "");
-  
-    // Add the country code at the beginning
-    return `+${countryCode}${digits}`;
+    // re-apply routing fields after reset
+    this.formData.user_id = this.user_id;
+    this.formData.uniqueId = this.uniqueId;
+    this.formData.businessId = this.businessId;
+    this.formData.assetId = this.assetId;
+    this.formData.emailTo = this.user_email;
   }
 }

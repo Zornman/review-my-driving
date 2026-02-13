@@ -1,4 +1,15 @@
-<h2 mat-dialog-title>Edit Address Info</h2>
+<div class="modal-header">
+	<h2 mat-dialog-title>Edit Address Info</h2>
+  
+	<button
+	  type="button"
+	  mat-icon-button
+	  class="modal-close"
+	  aria-label="Close dialog"
+	  (click)="onCancel()">
+	  <mat-icon>close</mat-icon>
+	</button>
+</div>
 <mat-dialog-content>
 	<form [formGroup]="addressForm">
 		<mat-form-field appearance="fill" class="full-width">

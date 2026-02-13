@@ -1,68 +1,108 @@
-<form [formGroup]="form" (ngSubmit)="signIn()">
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12 col-center">
-                <span class="align-middle">
-                    Log in with your account info below or sign in
-                    <br />
-                    with one of our supported 3rd party providers
-                </span>
-            </div>
-            <div class="col-xs-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>E-Mail</mat-label>
-                    <input matInput formControlName="email" name="email" required autocomplete="email">
-                </mat-form-field>
-            </div>
-            <div class="col-xs-12 col-center">
-                <mat-form-field appearance="outline">
-                    <mat-label>Password</mat-label>
-                    <input matInput formControlName="password" name="password" [type]="hidePassword ? 'password' : 'text'" required autocomplete="current-password">
-                    <button
-                        mat-icon-button
-                        matSuffix
-                        type="button"
-                        (click)="hidePassword = !hidePassword"
-                        aria-label="Toggle password visibility"
-                        class="button-suffix-icon"
-                    >
-                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                </mat-form-field>
-            </div>
-            <div class="col-xs-12 col-center">
-                <span>{{ this.errorMessage }}</span>
-            </div>
-            <div class="col-xs-12 col-center">
-                <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid">Log in</button>
-            </div>
-            <div class="col-xs-12 col-center">
-                <span>Don't have any account? <a routerLink='/register'>Create one</a></span>
-            </div>
-            <div class="col-xs-12 col-center">
-                <span><a routerLink='/resetPassword'>Forgot password?</a></span>
-            </div>
-            <div class="col-xs-12 col-center">
-                <div class="col-xs-5 sign-up-divider-left">
-                    <hr />
-                </div>
-                <div class="col-xs-2">
-                    <span class="align-middle">
-                        or
-                    </span>
-                </div>
-                <div class="col-xs-5 sign-up-divider-right">
-                    <hr />
-                </div>
-            </div>
-            <div class="col-xs-12 col-center">
-                <button mat-fab extended class="icon-button" (click)="signUpWithGoogle()">
-                    <img src="assets/images/Google.png" alt="Google Logo" width="24" height="24" />
-                    <span>
-                        Sign in with Google
-                    </span>
-                </button>
-            </div>
-        </div>
+<div class="login-container">
+  <div class="login-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Welcome Back</h1>
+      <p class="hero-subtitle">
+        Log in with your account info below, or continue with Google.
+      </p>
     </div>
-</form>
+  </div>
+
+  <div class="form-wrapper">
+    <div class="form-card">
+      <form [formGroup]="form" (ngSubmit)="signIn()">
+        <div class="form-grid">
+          <!-- Email -->
+          <div class="form-field full-width">
+            <mat-form-field appearance="outline">
+              <mat-label>Email Address</mat-label>
+              <input matInput formControlName="email" type="email" autocomplete="email" required />
+              <mat-icon matPrefix>email</mat-icon>
+              <mat-error *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+                <span *ngIf="form.get('email')?.hasError('required')">Email is required.</span>
+                <span *ngIf="form.get('email')?.hasError('email')">Please enter a valid email.</span>
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Password -->
+          <div class="form-field full-width">
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                formControlName="password"
+                [type]="hidePassword ? 'password' : 'text'"
+                autocomplete="current-password"
+                required
+              />
+              <mat-icon matPrefix>lock</mat-icon>
+
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="hidePassword = !hidePassword"
+                aria-label="Toggle password visibility"
+                class="button-suffix-icon"
+              >
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+
+              <mat-error *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+                Password is required.
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Errors -->
+          <div class="form-field full-width" *ngIf="errorMessage">
+            <div class="auth-error">
+              {{ errorMessage }}
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="form-field full-width submit-section">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              class="submit-button"
+              [disabled]="form.invalid || isSubmitting"
+            >
+              <mat-icon *ngIf="!isSubmitting">login</mat-icon>
+              <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+              {{ isSubmitting ? 'Signing in...' : 'Log in' }}
+            </button>
+          </div>
+
+          <!-- Links -->
+          <div class="form-field full-width link-row">
+            <span>Don’t have an account? <a routerLink="/register">Create one</a></span>
+            <span class="dot">•</span>
+            <a routerLink="/resetPassword">Forgot password?</a>
+          </div>
+
+          <!-- Divider + Google -->
+          <div class="form-field full-width">
+            <div class="auth-divider">
+              <span>or</span>
+            </div>
+
+            <button
+              mat-stroked-button
+              type="button"
+              class="google-button icon-button"
+              (click)="signInWithGoogle()"
+              [disabled]="isSubmitting"
+            >
+              <img src="assets/images/Google.png" alt="Google Logo" width="20" height="20" />
+              <span>{{ isSubmitting ? 'Please wait...' : 'Continue with Google' }}</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
