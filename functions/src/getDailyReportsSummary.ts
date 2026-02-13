@@ -26,6 +26,35 @@ function formatUtcDateToDateLocal(d: Date): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+function parseMaybeDate(value: any): Date | null {
+  // Supports Date, ISO strings, and timestamps. Returns null when missing/invalid.
+  if (!value) return null;
+  if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function isWithinActiveWindowForDateLocal(args: { dateLocal: string; createdAt?: any; deletedAt?: any; inactivatedAt?: any }): boolean {
+  // Includes trucks for a given dateLocal only if:
+  // - createdAt is on/before the end of that day (UTC)
+  // - and deletedAt/inactivatedAt is after the start of that day (UTC)
+  //
+  // This prevents "new" trucks from showing up historically, and keeps inactive/deleted
+  // trucks visible up to the day they were inactivated/deleted.
+  const dayStart = parseDateLocalToUtcMidnight(args.dateLocal);
+  const dayEndExclusive = addDaysUtc(dayStart, 1);
+
+  const createdAt = parseMaybeDate(args.createdAt);
+  const deletedAt = parseMaybeDate(args.deletedAt);
+  const inactivatedAt = parseMaybeDate(args.inactivatedAt);
+
+  if (createdAt && createdAt >= dayEndExclusive) return false; // created after this day
+  const endAt = deletedAt && inactivatedAt ? (deletedAt < inactivatedAt ? deletedAt : inactivatedAt) : (deletedAt ?? inactivatedAt);
+  if (endAt && endAt <= dayStart) return false; // ended before this day started
+
+  return true;
+}
+
 type DailyReportsSummaryRow = {
   reportDateLocal: string;
   truckId: string | null;
@@ -118,10 +147,21 @@ export const getDailyReportsSummary = functions.https.onRequest({ secrets: ["MON
       await client.connect();
       const db = client.db("review_my_driving");
 
+      // Pull *all* trucks for the business, including inactive/deleted ones,
+      // because they should still appear historically up to their end date.
+      // We'll filter per-day using createdAt / inactivatedAt / deletedAt.
       const trucks = await db
         .collection("trucks")
-        .find({ businessId, "audit.deletedAt": null, "assignment.assignedDriverId": { $ne: null } })
-        .project({ truckId: 1, licensePlate: 1, assignment: 1 })
+        .find({ businessId })
+        .project({
+          truckId: 1,
+          licensePlate: 1,
+          assignment: 1,
+          createdAt: 1,
+          audit: 1, // audit.deletedAt lives here in your current schema usage
+          inactivatedAt: 1, // if present
+          deactivatedAt: 1, // if present (edge case)
+        })
         .toArray();
 
       const driverIds = Array.from(
@@ -144,6 +184,8 @@ export const getDailyReportsSummary = functions.https.onRequest({ secrets: ["MON
       const driversById = new Map<string, any>();
       for (const d of drivers as any[]) driversById.set(String(d._id), d);
 
+      // Reports: the canonical record. If a report exists for a truck-date, we include it
+      // even if the truck is currently deleted/inactive (historical correctness).
       const reports = await db
         .collection("daily_reports")
         .find({ businessId, reportDateLocal: { $gte: startDateLocal, $lte: endDateLocal } })
@@ -156,6 +198,7 @@ export const getDailyReportsSummary = functions.https.onRequest({ secrets: ["MON
         reportsByKey.set(key, r);
       }
 
+      // Tokens: likely multiple per day, keep latest by createdAt desc
       const tokens = await db
         .collection("daily_report_tokens")
         .find({ businessId, reportDateLocal: { $gte: startDateLocal, $lte: endDateLocal }, revokedAt: null })
@@ -174,7 +217,27 @@ export const getDailyReportsSummary = functions.https.onRequest({ secrets: ["MON
       for (let i = 0; i < dayCount; i += 1) {
         const dateLocal = formatUtcDateToDateLocal(addDaysUtc(startUtc, i));
 
-        const rows: DailyReportsSummaryRow[] = trucks.map((t: any) => {
+        // Only include trucks that were "active" for this logical date.
+        // Edge cases covered:
+        // - New truck should not appear for dates before its createdAt.
+        // - Deleted/inactivated truck should still appear up to the day before its end timestamp,
+        //   and still appear on the same day if the end happens later that day.
+        const trucksForDay = (trucks as any[]).filter((t: any) => {
+          const createdAt = t.createdAt ?? t.audit?.createdAt ?? null;
+
+          // Support several schemas for "end of life"
+          const deletedAt = t.audit?.deletedAt ?? t.deletedAt ?? null;
+          const inactivatedAt = t.inactivatedAt ?? t.deactivatedAt ?? t.audit?.inactivatedAt ?? null;
+
+          return isWithinActiveWindowForDateLocal({
+            dateLocal,
+            createdAt,
+            deletedAt,
+            inactivatedAt,
+          });
+        });
+
+        const rows: DailyReportsSummaryRow[] = trucksForDay.map((t: any) => {
           const truckId = typeof t.truckId === "string" ? t.truckId : null;
           const driverObjectId = t?.assignment?.assignedDriverId ?? null;
 
@@ -190,6 +253,11 @@ export const getDailyReportsSummary = functions.https.onRequest({ secrets: ["MON
           const report = truckId ? reportsByKey.get(key) : null;
           const token = truckId ? tokensByKey.get(key) : null;
 
+          // Edge cases handled:
+          // - Submitted beats everything.
+          // - Waived beats pending/missing.
+          // - Pending only when token is unexpired & unused (and no submitted/waived report).
+          // - Missing otherwise.
           let status: DailyReportsSummaryRow["status"] = "missing";
           if (report?.status === "waived") status = "waived";
           else if (report?.status === "submitted" || report?.submittedAt) status = "submitted";

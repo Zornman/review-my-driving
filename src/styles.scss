@@ -72,7 +72,7 @@ body {
         font-family: 'DynaPuff', serif;
     }
 
-    button:not(.mdc-icon-button):not(.quick-review-button):not(.mat-calendar-body-cell) {
+    button:not(.mdc-icon-button):not(.quick-review-button):not(.mat-calendar-body-cell):not(.modal-close) {
         background-color: $color-primary !important;
         color: $color-text-light !important;
         border: none;

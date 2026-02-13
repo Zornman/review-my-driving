@@ -204,10 +204,11 @@ export class AdminFunctionsComponent implements OnInit {
           const cleanQRCodeBase64 = qrCode.substring(22); // Remove the data URL prefix
 
           // Create the Printify product with business context
-          await this.printifyService.createCustomPrintifyProduct({
+          await this.printifyService.createCustomBusinessPrintifyProduct({
             base64QRCode: cleanQRCodeBase64,
             originalProductId: productId,
             userID: `${businessName}_QRCode_${index + 1}`,
+            assetId: assetId,
           }).toPromise();
 
           // Insert the database entry

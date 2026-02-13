@@ -34,6 +34,11 @@ export class PrintifyService {
         return this.http.post(url, data);
     }
 
+    createCustomBusinessPrintifyProduct(data: any): Observable<any> {
+        const url = this.getFunctionUrl("createCustomBusinessProduct");
+        return this.http.post(url, data);
+    }
+
     createPrintifyOrder(orderData: any): Observable<any> {
         const url = this.getFunctionUrl("createPrintifyOrder");
         return this.http.post<{ success: boolean; orderId: string }>(url, orderData);

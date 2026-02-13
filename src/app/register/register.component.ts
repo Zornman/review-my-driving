@@ -18,7 +18,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 @Component({
   selector: 'app-register',
   imports: [
-    EmailValidatorDirective,
     ReactiveFormsModule,
     CommonModule,
     FormsModule,

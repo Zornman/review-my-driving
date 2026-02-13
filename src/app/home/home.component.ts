@@ -34,14 +34,33 @@ type QueryContext = {
   businessId?: string;
   assetId?: string;
 
+  // unified "destination" for notification/routing emails (user/sample => user's email, business => business contact email)
+  emailTo?: string | null;
+
   // business QR validation/association
   businessQrValid?: boolean;
   businessQrAssigned?: boolean;
   truckId?: string | null;
-
-  // notification/config
-  emailTo?: string | null;
   settings?: any | null;
+
+  businessUser?: {
+    userId: string;
+    businessName: string;
+    contactEmail: string;
+    phoneNumber: string;
+    role: string;
+    status: string;
+    settings: {
+      notifyOnNewReview: boolean;
+      dailySummaryEmail: boolean;
+      dailyReportsEnabled: boolean;
+      timezone: string;
+      dailyReportEndWindow: string;
+      dailyReportStartWindow: string;
+    };
+    createdAt: { $date: string };
+    updatedAt: { $date: string };
+  } | null;
 };
 
 type SubmissionModel = {
@@ -214,7 +233,7 @@ export class HomeComponent {
 
   private resolveContext$(q: { id: string; uniqueId: string; businessId: string; assetId: string }): Observable<QueryContext> {
     console.log('Resolving context for query params:', q);
-    
+  
     // 1) Direct user id
     if (q.id) {
       return forkJoin([this.firebaseService.getUserByUID(q.id), this.dbService.getUserSettings(q.id)]).pipe(
@@ -226,14 +245,14 @@ export class HomeComponent {
         }))
       );
     }
-
+  
     // 2) Sample uniqueId -> resolve to userId, or show "unclaimed" dialog
     if (q.uniqueId) {
       return this.dbService.getUserByUniqueId(q.uniqueId).pipe(
         switchMap((response: any) => {
           const userId = response?.result?.userId as string | undefined;
           const status = response?.result?.status as string | undefined;
-
+  
           if (userId) {
             return forkJoin([this.firebaseService.getUserByUID(userId), this.dbService.getUserSettings(userId)]).pipe(
               map(([userResponse, settingsResponse]) => ({
@@ -245,7 +264,7 @@ export class HomeComponent {
               }))
             );
           }
-
+  
           if (status === 'unclaimed') {
             this.dialog.open(SampleNotRegisteredDialogComponent, {
               width: '400px',
@@ -257,19 +276,21 @@ export class HomeComponent {
                 actionCallback: () => this.router.navigate(['/register', q.uniqueId]),
               },
             });
-            return EMPTY; // stop the stream; page will remain but context won't apply
+            return EMPTY;
           }
-
+  
           return of<QueryContext>({ mode: 'unknown' });
         })
       );
     }
-
+  
     // 3) Business mode (businessId + assetId)
     if (q.businessId && q.assetId) {
       return this.dbService.getBusinessQrContext(q.businessId, q.assetId).pipe(
         map((response: any) => {
           const result = response?.result ?? response;
+          const businessUser = result?.businessUser ?? null;
+  
           return {
             mode: 'business' as const,
             businessId: q.businessId,
@@ -277,8 +298,8 @@ export class HomeComponent {
             businessQrValid: !!result?.exists,
             businessQrAssigned: !!result?.assigned,
             truckId: (result?.truckId as string | null) ?? null,
-            emailTo: null,
-            settings: null,
+            businessUser,
+            emailTo: businessUser?.contactEmail ?? null,
           };
         }),
         catchError((error) => {
@@ -290,13 +311,13 @@ export class HomeComponent {
             businessQrValid: false,
             businessQrAssigned: false,
             truckId: null,
+            businessUser: null,
             emailTo: null,
-            settings: null,
           });
         })
       );
     }
-
+  
     return of<QueryContext>({ mode: 'unknown' });
   }
 
@@ -308,7 +329,9 @@ export class HomeComponent {
     this.businessId = ctx.businessId ?? null;
     this.assetId = ctx.assetId ?? null;
 
+    // IMPORTANT: email can come from user/sample OR business. Use ctx.emailTo, not ctx.businessUser.
     this.user_email = ctx.emailTo ?? null;
+
     this.user_settings = ctx.settings ?? null;
 
     this.businessQrValid = typeof ctx.businessQrValid === 'boolean' ? ctx.businessQrValid : null;
@@ -320,7 +343,7 @@ export class HomeComponent {
     this.formData.uniqueId = this.uniqueId;
     this.formData.businessId = this.businessId;
     this.formData.assetId = this.assetId;
-    this.formData.emailTo = this.user_email; // business mode can leave null; backend should route by businessId/assetId
+    this.formData.emailTo = this.user_email;
 
     // Show one-time dialogs for business QR state
     if (this.isBusinessFlow && !this.hasShownBusinessQrDialog) {

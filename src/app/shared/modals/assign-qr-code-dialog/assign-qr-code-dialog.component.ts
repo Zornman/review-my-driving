@@ -11,6 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
 
 import { MongoService } from '../../../services/mongo.service';
+import { MatIconModule } from '@angular/material/icon';
 
 export type AssignQrCodeDialogData = {
   businessId: string;
@@ -31,6 +32,7 @@ export type AssignQrCodeDialogData = {
     MatButtonModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
+    MatIconModule
   ],
   templateUrl: './assign-qr-code-dialog.component.html',
   styleUrl: './assign-qr-code-dialog.component.scss',

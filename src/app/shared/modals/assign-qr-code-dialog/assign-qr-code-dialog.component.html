@@ -1,4 +1,15 @@
-<h2 mat-dialog-title>Assign QR Code</h2>
+<div class="modal-header">
+  <h2 mat-dialog-title>Assign QR Code</h2>
+
+  <button
+    type="button"
+    mat-icon-button
+    class="modal-close"
+    aria-label="Close dialog"
+    (click)="cancel()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
 
 <mat-dialog-content>
   <p class="subtext">Select which truck should receive notifications for this QR code.</p>

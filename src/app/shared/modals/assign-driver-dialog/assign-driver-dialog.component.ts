@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
@@ -15,7 +16,8 @@ import { MatSelectModule } from '@angular/material/select';
     MatDialogModule, 
     MatFormFieldModule, 
     MatSelectModule, 
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule
   ],
   templateUrl: './assign-driver-dialog.component.html',
   styleUrl: './assign-driver-dialog.component.scss'
