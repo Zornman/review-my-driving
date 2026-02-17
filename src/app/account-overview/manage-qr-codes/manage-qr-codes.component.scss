@@ -1,6 +1,23 @@
-
 .page {
 	padding: 6px 0 20px;
+}
+
+/* =========================
+   Theme-ish tokens (keep lightweight)
+   ========================= */
+:host {
+	--mq-surface: var(--mdc-theme-surface);
+	--mq-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
+	--mq-border: color-mix(in srgb, var(--mq-on-surface) 14%, transparent);
+	--mq-surface-2: color-mix(in srgb, var(--mq-on-surface) 6%, var(--mq-surface));
+	--mq-hover: color-mix(in srgb, var(--mdc-theme-secondary) 14%, transparent);
+	--mq-selected: color-mix(in srgb, var(--mdc-theme-primary) 10%, transparent);
+}
+
+:host-context(body.dark-mode) {
+	--mq-border: color-mix(in srgb, var(--mq-on-surface) 18%, transparent);
+	--mq-hover: color-mix(in srgb, var(--mdc-theme-secondary) 18%, transparent);
+	--mq-selected: color-mix(in srgb, var(--mdc-theme-primary) 14%, transparent);
 }
 
 .header {
@@ -104,13 +121,235 @@
 	opacity: 0.7;
 }
 
-@media (max-width: 800px) {
-	.filters {
-		grid-template-columns: 1fr;
+/* =========================
+   Expandable rows (TDM-style)
+   ========================= */
+.mq-table {
+	width: 100%;
+	background: transparent;
+}
+
+.mq-header-row {
+	background: var(--mq-surface-2);
+	border-bottom: 1px solid var(--mq-border);
+}
+
+.mq-row {
+	cursor: pointer;
+	transition: background-color 120ms ease;
+
+	&:hover {
+		background: var(--mq-hover);
 	}
 
-	.header {
-		flex-direction: column;
-		align-items: stretch;
+	&.is-expanded {
+		background: var(--mq-selected);
 	}
+}
+
+.mq-expand-col {
+	max-width: 60px !important;
+	text-align: center;
+}
+
+.mq-expand-btn {
+	width: 40px;
+	height: 40px;
+}
+
+.mq-expand-icon {
+	transition: transform 140ms ease;
+	transform: rotate(0deg);
+
+	&.is-expanded {
+		transform: rotate(180deg);
+	}
+}
+
+/* detail row + cell spans full width */
+.mq-detail-row .mat-mdc-cell,
+.mq-detail-row .mat-cell {
+	width: 100% !important;
+	flex: 1 1 100% !important;
+	display: block !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	background: var(--mq-surface) !important;
+	color: var(--mq-on-surface) !important;
+}
+
+.mq-expanded-cell {
+	padding: 0 !important;
+	border-bottom: none !important;
+	background: var(--mq-surface) !important;
+	color: var(--mq-on-surface) !important;
+}
+
+.mq-expanded {
+	padding: 14px 16px;
+	border-top: 1px solid var(--mq-border);
+	background: var(--mq-surface) !important;
+	color: var(--mq-on-surface) !important;
+
+	@media (max-width: 576px) {
+		padding: 12px;
+	}
+}
+
+.mq-details {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 12px 16px;
+	align-items: start;
+
+	@media (max-width: 900px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@media (max-width: 576px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.mq-detail__label {
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	opacity: 0.72;
+	margin-bottom: 4px;
+}
+
+.mq-detail__value {
+	font-size: 0.95rem;
+	overflow-wrap: anywhere;
+}
+
+.mq-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
+	margin-top: 14px;
+
+	@media (max-width: 576px) {
+		justify-content: stretch;
+
+		button {
+			flex: 1 1 calc(50% - 10px);
+		}
+	}
+
+	@media (max-width: 380px) {
+		button {
+			flex: 1 1 100%;
+		}
+	}
+}
+
+/* =========================
+   Responsive: hide columns, show in expanded grid
+   ========================= */
+.truck-column,
+.created-at-column,
+.assigned-at-column {
+	@media screen and (max-width: 720px) {
+		display: none;
+	}
+}
+
+.mq-detail--truck-show-when-hidden,
+.mq-detail--created-show-when-hidden,
+.mq-detail--assigned-show-when-hidden {
+	display: none;
+
+	@media screen and (max-width: 720px) {
+		display: block;
+	}
+}
+
+/* Ensure header never overlays content (protect against global header styles) */
+.mq-header {
+    /* defend against any global `.header` sticky/fixed rules */
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+
+    display: flex; /* ensure layout is controlled here */
+    align-items: center; /* keep button vertically centered */
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 12px 12px; /* top/bottom padding so button isn't touching edges */
+    border-radius: 14px;
+    background: var(--mq-surface-2);
+    border: 1px solid var(--mq-border);
+
+    margin: 6px 0 14px; /* space before the card below */
+    height: auto !important; /* background grows with content */
+    min-height: 0 !important;
+}
+
+.mq-title {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.mq-subtitle {
+    margin: 6px 0 0;
+    opacity: 0.85;
+}
+
+/* Mobile tweaks: stack + full-width button */
+@media (max-width: 800px) {
+    .mq-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .mq-header > button[mat-stroked-button] {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    /* existing mobile rules */
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+	/* keep title/subtitle readable on small screens */
+	.title {
+		line-height: 1.2;
+	}
+
+	.subtitle {
+		margin-top: 6px;
+	}
+
+	/* make the refresh button align nicely on mobile */
+	.header > button[mat-stroked-button] {
+		width: 100%;
+		justify-content: center;
+	}
+
+	/* tighten action column on small screens; expanded row has nicer buttons anyway */
+	.mq-actions-col {
+		@media (max-width: 720px) {
+			display: none;
+		}
+	}
+}
+
+/* If any ancestor sets overflow/position in a way that causes overlap, this helps keep layout stable */
+.mq-page {
+    position: relative;
 }

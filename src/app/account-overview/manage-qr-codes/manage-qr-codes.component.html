@@ -1,114 +1,209 @@
-<div class="page">
-	<div class="header">
-		<div>
-			<h3 class="title">QR Codes</h3>
-			<p class="subtitle">Assign each QR code to the correct truck so feedback routes properly.</p>
-		</div>
+<div class="page mq-page">
+    <div class="header mq-header">
+        <div>
+            <h3 class="title mq-title">QR Codes</h3>
+            <p class="subtitle mq-subtitle">Assign each QR code to the correct truck so feedback routes properly.</p>
+        </div>
 
-		<button mat-stroked-button color="primary" (click)="refresh()" [disabled]="isLoading || !businessId">
-			<mat-icon>refresh</mat-icon>
-			Refresh
-		</button>
-	</div>
+        <button mat-stroked-button color="primary" (click)="refresh()" [disabled]="isLoading || !businessId">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+    </div>
 
-	<mat-card appearance="outlined" class="card">
-		<mat-card-content>
-			<form class="filters" [formGroup]="filtersForm">
-				<mat-form-field appearance="outline" class="filter">
-					<mat-label>Status</mat-label>
-					<mat-select formControlName="status">
-						<mat-option value="all">All</mat-option>
-						<mat-option value="assigned">Assigned</mat-option>
-						<mat-option value="unassigned">Unassigned</mat-option>
-					</mat-select>
-				</mat-form-field>
+    <mat-card appearance="outlined" class="card mq-card">
+        <mat-card-content>
+            <form class="filters mq-filters" [formGroup]="filtersForm">
+                <mat-form-field appearance="outline" class="filter mq-filter">
+                    <mat-label>Status</mat-label>
+                    <mat-select formControlName="status">
+                        <mat-option value="all">All</mat-option>
+                        <mat-option value="assigned">Assigned</mat-option>
+                        <mat-option value="unassigned">Unassigned</mat-option>
+                    </mat-select>
+                </mat-form-field>
 
-				<mat-form-field appearance="outline" class="search">
-					<mat-label>Search</mat-label>
-					<input matInput formControlName="search" placeholder="Asset ID, status, truck id…" />
-					<button
-						mat-icon-button
-						matSuffix
-						type="button"
-						aria-label="Clear"
-						*ngIf="filtersForm.get('search')?.value"
-						(click)="filtersForm.get('search')?.setValue('')"
-					>
-						<mat-icon>close</mat-icon>
-					</button>
-				</mat-form-field>
-			</form>
+                <mat-form-field appearance="outline" class="search mq-search">
+                    <mat-label>Search</mat-label>
+                    <input matInput formControlName="search" placeholder="Asset ID, status, truck id…" />
+                    <button
+                        mat-icon-button
+                        matSuffix
+                        type="button"
+                        aria-label="Clear"
+                        *ngIf="filtersForm.get('search')?.value"
+                        (click)="filtersForm.get('search')?.setValue('')"
+                    >
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </form>
 
-			<div class="table-wrap">
-				<mat-table [dataSource]="dataSource" class="mat-elevation-z0">
-					<ng-container matColumnDef="assetId">
-						<mat-header-cell *matHeaderCellDef>Asset ID</mat-header-cell>
-						<mat-cell *matCellDef="let row" class="mono">{{ row.assetId }}</mat-cell>
-					</ng-container>
+            <div class="table-wrap mq-table-wrap">
+                <mat-table [dataSource]="dataSource" multiTemplateDataRows class="mq-table mat-elevation-z0">
+                    <ng-container matColumnDef="assetId">
+                        <mat-header-cell *matHeaderCellDef>Asset ID</mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="mono">{{ row.assetId }}</mat-cell>
+                    </ng-container>
 
-					<ng-container matColumnDef="status">
-						<mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-						<mat-cell *matCellDef="let row">
-							<span class="pill" [class.assigned]="row.status === 'assigned'" [class.unassigned]="row.status !== 'assigned'">
-								{{ row.status || 'unknown' }}
-							</span>
-						</mat-cell>
-					</ng-container>
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <span class="pill" [class.assigned]="row.status === 'assigned'" [class.unassigned]="row.status !== 'assigned'">
+                                {{ row.status || 'unknown' }}
+                            </span>
+                        </mat-cell>
+                    </ng-container>
 
-					<ng-container matColumnDef="truck">
-						<mat-header-cell *matHeaderCellDef>Truck</mat-header-cell>
-						<mat-cell *matCellDef="let row" class="mono">{{ row.truckId || '—' }}</mat-cell>
-					</ng-container>
+                    <ng-container matColumnDef="truck">
+                        <mat-header-cell *matHeaderCellDef class="truck-column">Truck</mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="mono truck-column">{{ row.truck ? `${row.truck?.truckId} (${row.truck?.licensePlate})` : '—' }}</mat-cell>
+                    </ng-container>
 
-					<ng-container matColumnDef="createdAt">
-						<mat-header-cell *matHeaderCellDef>Created</mat-header-cell>
-						<mat-cell *matCellDef="let row">{{ row.createdAt ? (row.createdAt | date : 'short') : '—' }}</mat-cell>
-					</ng-container>
+                    <ng-container matColumnDef="createdAt">
+                        <mat-header-cell *matHeaderCellDef class="created-at-column">Created</mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="created-at-column">
+                            {{ row.createdAt ? (row.createdAt | date : 'short') : '—' }}
+                        </mat-cell>
+                    </ng-container>
 
-					<ng-container matColumnDef="assignedAt">
-						<mat-header-cell *matHeaderCellDef>Assigned</mat-header-cell>
-						<mat-cell *matCellDef="let row">{{ row.assignedAt ? (row.assignedAt | date : 'short') : '—' }}</mat-cell>
-					</ng-container>
+                    <ng-container matColumnDef="assignedAt">
+                        <mat-header-cell *matHeaderCellDef class="assigned-at-column">Assigned</mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="assigned-at-column">
+                            {{ row.assignedAt ? (row.assignedAt | date : 'short') : '—' }}
+                        </mat-cell>
+                    </ng-container>
 
-					<ng-container matColumnDef="actions">
-						<mat-header-cell *matHeaderCellDef class="actions">Actions</mat-header-cell>
-						<mat-cell *matCellDef="let row" class="actions">
-							<button mat-flat-button color="primary" (click)="openAssignDialog(row)" [disabled]="isLoading">
-								{{ row.status === 'assigned' ? 'Reassign' : 'Assign' }}
-							</button>
-							<button
-								mat-button
-								type="button"
-								(click)="confirmUnassign(row)"
-								[disabled]="isLoading || row.status !== 'assigned'"
-							>
-								Unassign
-							</button>
-						</mat-cell>
-					</ng-container>
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef class="actions mq-actions-col">Actions</mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="actions mq-actions-col" (click)="$event.stopPropagation()">
+                            <button mat-flat-button color="primary" (click)="openAssignDialog(row)" [disabled]="isLoading">
+                                {{ row.status === 'assigned' ? 'Reassign' : 'Assign' }}
+                            </button>
+                            <button
+                                mat-button
+                                type="button"
+                                (click)="confirmUnassign(row)"
+                                [disabled]="isLoading || row.status !== 'assigned'"
+                            >
+                                Unassign
+                            </button>
+                        </mat-cell>
+                    </ng-container>
 
-					<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-					<mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+                    <!-- Expand control -->
+                    <ng-container matColumnDef="expand">
+                        <mat-header-cell *matHeaderCellDef class="mq-expand-col"></mat-header-cell>
+                        <mat-cell *matCellDef="let row" class="mq-expand-col">
+                            <button
+                                mat-icon-button
+                                class="mq-expand-btn"
+                                (click)="toggleRow(row, $event)"
+                                [attr.aria-label]="expandedRow === row ? 'Collapse details' : 'Expand details'">
+                                <mat-icon class="mq-expand-icon" [class.is-expanded]="expandedRow === row">
+                                    expand_more
+                                </mat-icon>
+                            </button>
+                        </mat-cell>
+                    </ng-container>
 
-					<tr class="mat-row" *matNoDataRow>
-						<td class="mat-cell" [attr.colspan]="displayedColumns.length">
-							<div class="empty">
-								<div class="empty-title">No QR codes found</div>
-								<div class="empty-subtitle">Try changing your filters, or generate codes first.</div>
-							</div>
-						</td>
-					</tr>
-				</mat-table>
-			</div>
+                    <!-- Expanded detail row -->
+                    <ng-container matColumnDef="expandedDetail">
+                        <mat-cell
+                            *matCellDef="let row"
+                            class="mq-expanded-cell"
+                            [attr.colspan]="displayedColumns.length"
+                            [@detailExpand]="row === expandedRow ? 'expanded' : 'collapsed'">
 
-			<div class="loading" *ngIf="isLoading">
-				<mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
-				<span>Loading…</span>
-			</div>
+                            <div class="mq-expanded">
+                                <div class="mq-details">
+                                    <div class="mq-detail mq-detail--truck-show-when-hidden">
+                                        <div class="mq-detail__label">Truck</div>
+                                        <div class="mq-detail__value mono">{{ row.truck ? `${row.truck?.truckId} (${row.truck?.licensePlate})` : '—' }}</div>
+                                    </div>
 
-			<div class="hint" *ngIf="!businessId">
-				Business context not loaded yet.
-			</div>
-		</mat-card-content>
-	</mat-card>
+                                    <div class="mq-detail mq-detail--created-show-when-hidden">
+                                        <div class="mq-detail__label">Created</div>
+                                        <div class="mq-detail__value">
+                                            {{ row.createdAt ? (row.createdAt | date : 'short') : '—' }}
+                                        </div>
+                                    </div>
+
+                                    <div class="mq-detail mq-detail--assigned-show-when-hidden">
+                                        <div class="mq-detail__label">Assigned</div>
+                                        <div class="mq-detail__value">
+                                            {{ row.assignedAt ? (row.assignedAt | date : 'short') : '—' }}
+                                        </div>
+                                    </div>
+
+                                    <!-- keep the always-useful items -->
+                                    <div class="mq-detail">
+                                        <div class="mq-detail__label">Status</div>
+                                        <div class="mq-detail__value">
+                                            <span class="pill" [class.assigned]="row.status === 'assigned'" [class.unassigned]="row.status !== 'assigned'">
+                                                {{ row.status || 'unknown' }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mq-detail">
+                                        <div class="mq-detail__label">Asset ID</div>
+                                        <div class="mq-detail__value mono">{{ row.assetId }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="mq-actions">
+                                    <button mat-flat-button color="primary" (click)="openAssignDialog(row); $event.stopPropagation()" [disabled]="isLoading">
+                                        {{ row.status === 'assigned' ? 'Reassign' : 'Assign' }}
+                                    </button>
+
+                                    <button
+                                        mat-stroked-button
+                                        color="primary"
+                                        type="button"
+                                        (click)="confirmUnassign(row); $event.stopPropagation()"
+                                        [disabled]="isLoading || row.status !== 'assigned'">
+                                        Unassign
+                                    </button>
+                                </div>
+                            </div>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumns" class="mq-header-row"></mat-header-row>
+
+                    <mat-row
+                        *matRowDef="let row; columns: displayedColumns"
+                        class="mq-row"
+                        [class.is-expanded]="expandedRow === row"
+                        (click)="toggleRow(row, $event)">
+                    </mat-row>
+
+                    <mat-row
+                        *matRowDef="let row; columns: ['expandedDetail']"
+                        class="mq-detail-row"
+                        [@detailExpand]="row === expandedRow ? 'expanded' : 'collapsed'">
+                    </mat-row>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                            <div class="empty">
+                                <div class="empty-title">No QR codes found</div>
+                                <div class="empty-subtitle">Try changing your filters, or generate codes first.</div>
+                            </div>
+                        </td>
+                    </tr>
+                </mat-table>
+            </div>
+
+            <div class="loading" *ngIf="isLoading">
+                <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+                <span>Loading…</span>
+            </div>
+
+            <div class="hint" *ngIf="!businessId">
+                Business context not loaded yet.
+            </div>
+        </mat-card-content>
+    </mat-card>
 </div>
