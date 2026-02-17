@@ -169,7 +169,7 @@ export async function sendDailyReportMagicLinksTask(params: {
         `;
 
         await transporter.sendMail({
-          from: "reviewmy.driving1@gmail.com",
+          from: EMAIL_USER,
           to: emailTo,
           subject,
           html,

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, Inject, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -13,6 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, map } from 'rxjs/operators';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { AuthService } from '../../services/auth.service';
 import { MongoService } from '../../services/mongo.service';
@@ -35,7 +36,14 @@ import { AssignQrCodeDialogComponent } from '../../shared/modals/assign-qr-code-
     MatProgressSpinnerModule,
   ],
   templateUrl: './manage-qr-codes.component.html',
-  styleUrl: './manage-qr-codes.component.scss'
+  styleUrl: './manage-qr-codes.component.scss',
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed,void', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class ManageQrCodesComponent {
 
@@ -52,13 +60,14 @@ export class ManageQrCodesComponent {
 
   filtersForm: FormGroup;
 
-  displayedColumns = ['assetId', 'status', 'truck', 'createdAt', 'assignedAt', 'actions'];
+  displayedColumns = ['assetId', 'status', 'truck', 'createdAt', 'assignedAt', 'actions', 'expand'];
   dataSource = new MatTableDataSource<any>([]);
+  expandedRow: any | null = null;
 
   constructor(
     private authService: AuthService,
     private mongoService: MongoService,
-    private dialog: MatDialog,
+    @Inject(MatDialog) private dialog: MatDialog,
     fb: FormBuilder
   ) {
     this.filtersForm = fb.group({
@@ -277,5 +286,10 @@ export class ManageQrCodesComponent {
           this.snackBar.open(err?.error?.message ?? 'Failed to unassign QR code.', 'Ok', { duration: 6000 });
         },
       });
+  }
+
+  toggleRow(row: any, event: Event): void {
+    event.stopPropagation();
+    this.expandedRow = this.expandedRow === row ? null : row;
   }
 }

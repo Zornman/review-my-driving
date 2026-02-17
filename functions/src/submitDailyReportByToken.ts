@@ -64,18 +64,28 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
 
       const now = new Date();
 
+      const toValidDateOrNull = (value: unknown): Date | null => {
+        if (!value) return null;
+        const d = value instanceof Date ? value : new Date(value as any);
+        return Number.isNaN(d.getTime()) ? null : d;
+      };
+
+      const usedAt = toValidDateOrNull(tokenDoc.usedAt);
+      const revokedAt = toValidDateOrNull(tokenDoc.revokedAt);
+      const expiresAt = toValidDateOrNull(tokenDoc.expiresAt);
+
       // Magic link should be single-use (recommended).
-      if (tokenDoc.usedAt) {
+      if (usedAt) {
         res.status(401).json({ message: "Token already used" });
         return;
       }
 
-      if (tokenDoc.revokedAt) {
+      if (revokedAt) {
         res.status(401).json({ message: "Token revoked" });
         return;
       }
 
-      if (tokenDoc.expiresAt && new Date(tokenDoc.expiresAt) < now) {
+      if (expiresAt && expiresAt < now) {
         res.status(401).json({ message: "Token expired" });
         return;
       }
