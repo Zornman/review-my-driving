@@ -2,6 +2,7 @@ import * as functions from "firebase-functions/v2";
 import { MongoClient } from "mongodb";
 import cors from "cors";
 import { parseJsonBody } from "./_shared/http.js";
+import { DateTime } from "luxon";
 
 const corsHandler = cors({ origin: true });
 
@@ -18,12 +19,56 @@ type UpdateBusinessUserInfoBody = {
 			dailyReportStartWindow?: string | null;
 			dailyReportEndWindow?: string | null;
 			timezone?: string;
+			operatingDays?: number[];
+			holidays?: {
+				mode?: "none" | "custom";
+				dates?: string[];
+			};
 		};
 	};
 };
 
 function isNonEmptyString(value: any): value is string {
 	return typeof value === "string" && value.trim() !== "";
+}
+
+function isIsoDate(value: any): value is string {
+	if (typeof value !== "string") return false;
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+	return DateTime.fromISO(value).isValid;
+}
+
+function normalizeOperatingDays(value: any): number[] | null {
+	if (value === undefined) return null;
+	if (!Array.isArray(value)) return null;
+
+	const nums = value
+		.map((v) => Number(v))
+		.filter((n) => Number.isInteger(n) && n >= 1 && n <= 7);
+
+	const unique = Array.from(new Set(nums)).sort((a, b) => a - b);
+	return unique.length ? unique : [1, 2, 3, 4, 5, 6, 7];
+}
+
+function normalizeHolidays(value: any): { mode: "none" | "custom"; dates?: string[] } | null {
+	if (value === undefined) return null;
+	if (value === null) return { mode: "none" };
+	if (typeof value !== "object") return null;
+
+	const mode: any = (value as any).mode;
+	const normalizedMode: "none" | "custom" = mode === "custom" ? "custom" : "none";
+	if (normalizedMode === "none") return { mode: "none" };
+
+	const datesRaw = (value as any).dates;
+	if (datesRaw === undefined) return { mode: "custom", dates: [] };
+	if (!Array.isArray(datesRaw)) return null;
+
+	const dates = datesRaw.map((d) => (typeof d === "string" ? d.trim() : String(d))).filter((d) => d.length > 0);
+	const invalid = dates.find((d) => !isIsoDate(d));
+	if (invalid) return null;
+
+	const unique = Array.from(new Set(dates)).sort();
+	return { mode: "custom", dates: unique };
 }
 
 export const updateBusinessUserInfo = functions.https.onRequest({ secrets: ["MONGO_URI"] }, async (req, res) => {
@@ -62,6 +107,12 @@ export const updateBusinessUserInfo = functions.https.onRequest({ secrets: ["MON
 			if (settings.dailySummaryEmail !== undefined) setOps["settings.dailySummaryEmail"] = settings.dailySummaryEmail;
 			if (settings.timezone !== undefined) setOps["settings.timezone"] = settings.timezone;
 
+			const operatingDays = normalizeOperatingDays(settings.operatingDays);
+			if (operatingDays) setOps["settings.operatingDays"] = operatingDays;
+
+			const holidays = normalizeHolidays(settings.holidays);
+			if (holidays) setOps["settings.holidays"] = holidays;
+
 			if (settings.dailyReportsEnabled !== undefined) {
 				setOps["settings.dailyReportsEnabled"] = settings.dailyReportsEnabled;
 				if (settings.dailyReportsEnabled === true) {
@@ -81,6 +132,16 @@ export const updateBusinessUserInfo = functions.https.onRequest({ secrets: ["MON
 					unsetOps["settings.dailyReportStartWindow"] = "";
 					unsetOps["settings.dailyReportEndWindow"] = "";
 				}
+			}
+
+			// If the client sent schedule fields but they were invalid, fail fast with a clear message.
+			if (settings.operatingDays !== undefined && !operatingDays) {
+				res.status(400).json({ message: "Invalid operatingDays. Use an array of numbers 1-7 (Mon-Sun)." });
+				return;
+			}
+			if (settings.holidays !== undefined && !holidays) {
+				res.status(400).json({ message: "Invalid holidays. Expected { mode: 'none' | 'custom', dates?: ['YYYY-MM-DD'] }." });
+				return;
 			}
 
 			if (Object.keys(setOps).length === 0 && Object.keys(unsetOps).length === 0) {

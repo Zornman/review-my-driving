@@ -74,7 +74,7 @@ body {
         font-family: 'DynaPuff', serif;
     }
 
-    button:not(.mdc-icon-button):not(.quick-review-button):not(.mat-calendar-body-cell):not(.modal-close) {
+    button:not(.mdc-icon-button):not(.quick-review-button):not(.mat-calendar-body-cell):not(.modal-close):not(.bf-day):not(.mat-button-toggle-button) {
         background-color: $color-primary !important;
         color: $color-text-light !important;
         border: none;
@@ -172,11 +172,6 @@ body.light-mode {
     .card-input {
         border: 1px solid black;
     }
-
-    .table-view {
-        border: 1px solid black;
-        background-color: $color-border-light;
-    }
 }
 
 body.dark-mode {
@@ -197,11 +192,6 @@ body.dark-mode {
 
     .card-input {
         border: 1px solid #E0E0E0;
-    }
-
-    .table-view {
-        border: 1px solid white;
-        background-color: $color-border-dark;
     }
 }
 

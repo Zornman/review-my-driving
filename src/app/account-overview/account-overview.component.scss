@@ -1,25 +1,336 @@
-.mat-table {
+:host {
+    --ao-surface: var(--mdc-theme-surface);
+    --ao-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
+    --ao-primary: var(--mdc-theme-primary);
+    --ao-secondary: var(--mdc-theme-secondary);
+
+    /* Tertiary: neutral ink tint derived from on-surface */
+    --ao-tertiary: color-mix(in srgb, var(--ao-on-surface) 12%, transparent);
+
+    /* Derived neutrals */
+    --ao-border: color-mix(in srgb, var(--ao-on-surface) 14%, transparent);
+    --ao-muted: color-mix(in srgb, var(--ao-on-surface) 72%, transparent);
+    --ao-muted-2: color-mix(in srgb, var(--ao-on-surface) 58%, transparent);
+
+    /* Surfaces */
+    --ao-surface-2: color-mix(in srgb, var(--ao-tertiary) 55%, var(--ao-surface));
+    --ao-hover: color-mix(in srgb, var(--ao-secondary) 14%, transparent);
+    --ao-selected: color-mix(in srgb, var(--ao-primary) 10%, transparent);
+
+    /* Explicit panel surface for expanded rows */
+    --ao-panel: var(--ao-surface);
+}
+
+:host-context(body.dark-mode) {
+    --ao-border: color-mix(in srgb, var(--ao-on-surface) 18%, transparent);
+    --ao-hover: color-mix(in srgb, var(--ao-secondary) 18%, transparent);
+    --ao-selected: color-mix(in srgb, var(--ao-primary) 14%, transparent);
+    background: var(--ao-panel) !important;
+    color: var(--ao-on-surface) !important;
+}
+
+:host-context(body.light-mode) {
+    /* Match the TDM “panel” behavior for expanded rows */
+    --ao-panel: #ffffff;
+}
+
+.ao-page {
+    padding: 6px 0 20px;
+}
+
+.ao-header {
+    /* defend against any global sticky/fixed header styles */
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 12px 12px;
+    border-radius: 14px;
+    background: var(--ao-surface-2);
+    border: 1px solid var(--ao-border);
+
+    margin: 6px 12px 14px;
+}
+
+.ao-title {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.ao-subtitle {
+    margin: 6px 0 0;
+    opacity: 0.85;
+}
+
+.ao-tabs {
+    margin: 0 12px;
+}
+
+.ao-mobile-nav {
+    margin: 0 12px;
+    padding: 4px 0 0;
+    display: none;
+}
+
+.ao-mobile-nav__field {
     width: 100%;
-    table-layout: fixed; /* Ensures columns stay aligned */
-  }
-  
-.mat-header-cell, .mat-cell {
-    text-align: left;
-    padding: 8px 16px; /* Adds spacing */
+}
+
+.ao-tab {
+    padding: 10px 0 18px;
+}
+
+.ao-card {
+    border-radius: 14px;
+}
+
+.ao-section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ao-section-title {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.ao-section-subtitle {
+    margin: 6px 0 0;
+    opacity: 0.82;
+}
+
+.ao-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+
+    @media (max-width: 900px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ao-stat {
+    border: 1px solid var(--ao-border);
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--ao-surface);
+}
+
+.ao-stat__value {
+    font-size: 1.6rem;
+    font-weight: 650;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.ao-stat__label {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    opacity: 0.78;
+}
+
+.ao-stat__loading {
+    color: var(--ao-muted);
+}
+
+.ao-separator {
+    margin: 14px 0;
+    border-top: 1px solid var(--ao-border);
+}
+
+.ao-table-wrap {
+    width: 100%;
+    overflow: auto;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+.ao-table {
+    width: 100%;
+    background: transparent;
+    table-layout: fixed;
+}
+
+.ao-cell-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    line-height: 1.2;
+    min-width: 0;
+}
+
+.ao-cell-subtext {
+    font-size: 0.78rem;
+    color: var(--ao-muted-2);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-  
-.mat-tab-body-content {
-    display: flex; /* Ensures tab content takes up full width */
-    flex-direction: column;
+
+/* cells */
+.ao-table .mat-header-cell,
+.ao-table .mat-cell,
+.ao-table .mat-mdc-header-cell,
+.ao-table .mat-mdc-cell {
+    text-align: left;
+    padding: 10px 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.mat-column-expand {
-    max-width: 100px;
+.ao-header-row {
+    background: var(--ao-surface-2);
+    border-bottom: 1px solid var(--ao-border);
 }
 
-.submission-row:hover {
+/* Make sure header + cell text always follows the theme */
+.ao-table .mat-mdc-header-cell,
+.ao-table .mat-header-cell,
+.ao-table .mat-mdc-cell,
+.ao-table .mat-cell {
+    color: var(--ao-on-surface);
+}
+
+.ao-row {
     cursor: pointer;
+    transition: background-color 120ms ease;
+
+    &:hover {
+        background: var(--ao-hover);
+    }
+
+    &.is-expanded {
+        background: var(--ao-selected);
+    }
+}
+
+/* Expanded detail row: span full width (same approach as TDM) */
+.ao-detail-row {
+    background: var(--ao-panel) !important;
+    color: var(--ao-on-surface) !important;
+}
+
+.ao-detail-row .mat-mdc-cell,
+.ao-detail-row .mat-cell {
+    background: var(--ao-panel) !important;
+    color: var(--ao-on-surface) !important;
+
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    display: block !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.ao-expanded-cell {
+    background: var(--ao-panel) !important;
+    color: var(--ao-on-surface) !important;
+
+    padding: 0 !important;
+    border-bottom: none !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+}
+
+.ao-expanded {
+    padding: 14px 16px;
+    border-top: 1px solid var(--ao-border);
+    background: var(--ao-panel) !important;
+    color: var(--ao-on-surface) !important;
+}
+
+.ao-expanded__label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ao-muted-2);
+    margin-bottom: 4px;
+}
+
+.ao-expanded__value {
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
+}
+
+.ao-expand-btn {
+    width: 40px;
+    height: 40px;
+}
+
+.ao-expand-btn mat-icon {
+    color: var(--ao-primary);
+}
+
+/* Expand column: keep it compact and right-aligned */
+.ao-table .mat-column-expand,
+.ao-table .mat-mdc-column-expand {
+    width: 60px;
+    max-width: 60px;
+    min-width: 60px;
+    text-align: right;
+    justify-content: flex-end;
+}
+
+.ao-table .mat-header-cell.mat-column-expand,
+.ao-table .mat-mdc-header-cell.mat-mdc-column-expand {
+    text-align: right;
+    justify-content: flex-end;
+}
+
+/* Responsive: hide less-important columns on small screens */
+@media (max-width: 720px) {
+    .ao-mobile-nav {
+        display: block;
+    }
+
+    /* Tabs get hard to use on mobile; use the dropdown navigator instead */
+    .ao-tabs ::ng-deep .mat-mdc-tab-header {
+        display: none;
+    }
+
+    .ao-table .mat-column-reasonForContacting,
+    .ao-table .mat-mdc-column-reasonForContacting {
+        display: none;
+    }
+}
+
+.ao-paginator {
+    padding-top: 10px;
+}
+
+.ao-form {
+    max-width: 860px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* keep bootstrap's container from fighting spacing inside the card */
+.ao-container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+@media (max-width: 800px) {
+    .ao-header {
+        margin-left: 12px;
+        margin-right: 12px;
+    }
 }

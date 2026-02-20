@@ -12,9 +12,40 @@ export class MongoService {
 
     }
 
-    getUserSubmissions(token: string) {
-        const url = this.getFunctionUrl("getSubmissionsByUser");
-        const params = new HttpParams().set('userID', (token) ? token : '');
+    getUserSubmissions(
+        criteria:
+            | string
+            | {
+                  userId?: string;
+                  uniqueId?: string;
+                  businessId?: string;
+                  assetId?: string;
+              }
+    ) {
+        const url = this.getFunctionUrl('getSubmissionsByUser');
+
+        // Backwards compatible: previous signature was (token: string) => userID query param
+        if (typeof criteria === 'string') {
+            const params = new HttpParams().set('userID', criteria ? criteria : '');
+            return this.http.get(url, { params });
+        }
+
+        let params = new HttpParams();
+
+        if (criteria?.userId) {
+            // keep using userID for backwards compatibility with deployed functions
+            params = params.set('userID', criteria.userId);
+        }
+        if (criteria?.uniqueId) {
+            params = params.set('uniqueId', criteria.uniqueId);
+        }
+        if (criteria?.businessId) {
+            params = params.set('businessId', criteria.businessId);
+        }
+        if (criteria?.assetId) {
+            params = params.set('assetId', criteria.assetId);
+        }
+
         return this.http.get(url, { params });
     }
 

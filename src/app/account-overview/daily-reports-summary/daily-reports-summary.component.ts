@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, DestroyRef, Input, SimpleChanges, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -12,6 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MongoService } from '../../services/mongo.service';
 import { DailyReportsSummaryDay, DailyReportsSummaryResponse, DailyReportsSummaryRow, DailyReportStatus } from '../../models/daily-reports-summary';
 import { firstValueFrom } from 'rxjs';
@@ -33,6 +35,7 @@ type DriverGroup = {
     MatInputModule,
     MatDatepickerModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatIconModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
@@ -57,6 +60,7 @@ export class DailyReportsSummaryComponent {
   expandedDay: string | null = null;
 
   constructor(private db: MongoService, private fb: FormBuilder) {
+    const destroyRef = inject(DestroyRef);
     const today = new Date();
     const start = new Date(today);
     start.setDate(start.getDate() - 6);
@@ -64,7 +68,16 @@ export class DailyReportsSummaryComponent {
     this.form = this.fb.group({
       startDate: [start, [Validators.required]],
       endDate: [today, [Validators.required]],
+      sortOrder: ['desc', [Validators.required]],
     });
+
+    this.form
+      .get('sortOrder')
+      ?.valueChanges.pipe(takeUntilDestroyed(destroyRef))
+      .subscribe(() => {
+        if (!this.days.length) return;
+        this.applySort();
+      });
   }
 
   ngOnInit(): void {
@@ -145,13 +158,25 @@ export class DailyReportsSummaryComponent {
 
       const result = (responseAny as DailyReportsSummaryResponse | any)?.result;
       this.days = Array.isArray(result?.days) ? result.days : [];
-
-      // Expand the most recent day by default
-      this.expandedDay = this.days.length ? this.days[this.days.length - 1].reportDateLocal : null;
+      this.applySort(true);
     } catch (e: any) {
       this.loadError = e?.message ?? 'Failed to load daily report summaries.';
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  private applySort(ensureExpanded: boolean = false): void {
+    const sortOrder = (this.form.get('sortOrder')?.value ?? 'desc') as 'asc' | 'desc';
+
+    this.days = [...this.days].sort((a, b) => {
+      // reportDateLocal format: YYYY-MM-DD so lexicographic compare works
+      const cmp = a.reportDateLocal.localeCompare(b.reportDateLocal);
+      return sortOrder === 'desc' ? -cmp : cmp;
+    });
+
+    if (ensureExpanded || !this.expandedDay || !this.days.some(d => d.reportDateLocal === this.expandedDay)) {
+      this.expandedDay = this.days.length ? this.days[0].reportDateLocal : null;
     }
   }
 
@@ -196,7 +221,6 @@ export class DailyReportsSummaryComponent {
 
   groupByDriver(rows: DailyReportsSummaryRow[]): DriverGroup[] {
     const map = new Map<string, { driverKey: string; driverName: string; driverEmail: string | null; rows: DailyReportsSummaryRow[] }>();
-
     for (const row of rows) {
       const key = row.driverObjectId ? String(row.driverObjectId) : 'unknown';
       const driverName = row.driverName?.trim() ? row.driverName : 'Unassigned';

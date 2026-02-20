@@ -140,7 +140,9 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
 
       // Mark token used (conditional helps with races).
       const usedRes = await db.collection("daily_report_tokens").updateOne(
-        { _id: tokenDoc._id, usedAt: { $exists: false } },
+        // Note: many tokens are created with usedAt: null.
+        // In MongoDB, { usedAt: null } matches both null and missing fields.
+        { _id: tokenDoc._id, usedAt: null },
         { $set: { usedAt: now } }
       );
       if (usedRes.matchedCount === 0) {

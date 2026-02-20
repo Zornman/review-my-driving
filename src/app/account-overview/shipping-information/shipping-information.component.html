@@ -1,0 +1,181 @@
+<div class="si-page">
+	<header class="si-header">
+		<div class="si-header__text">
+			<h3 class="si-title">Shipping Information</h3>
+			<p class="si-subtitle">Used for product delivery and order updates.</p>
+		</div>
+	</header>
+
+	<div class="container si-container">
+		<div class="row">
+			<div class="col-12">
+				<form [formGroup]="shippingInfoForm" (submit)="saveShippingInfo()" class="si-form">
+					<section class="si-section">
+						<div class="si-section__header">
+							<h3 class="si-section__title">Contact</h3>
+							<p class="si-section__subtitle">Where we send order updates.</p>
+						</div>
+						<div class="si-section__body">
+							<div class="row g-3">
+								<div class="col-12 col-md-6">
+									<mat-form-field appearance="outline">
+										<mat-label>E-Mail</mat-label>
+										<input matInput type="email" formControlName="email" name="email" autocomplete="email" />
+										<mat-error *ngIf="shippingInfoForm.get('email')?.hasError('required') && shippingInfoForm.get('email')?.touched">
+											Email is required.
+										</mat-error>
+										<mat-error *ngIf="shippingInfoForm.get('email')?.hasError('email') && shippingInfoForm.get('email')?.touched">
+											Enter a valid email address.
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div class="col-12 col-md-6">
+									<mat-form-field appearance="outline">
+										<mat-label>Phone Number</mat-label>
+										<input matInput type="tel" name="phone" formatPhone formControlName="phone" autocomplete="tel" />
+										<mat-error *ngIf="shippingInfoForm.get('phone')?.hasError('required') && shippingInfoForm.get('phone')?.touched">
+											Phone number is required.
+										</mat-error>
+									</mat-form-field>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<section class="si-section">
+						<div class="si-section__header">
+							<h3 class="si-section__title">Recipient</h3>
+							<p class="si-section__subtitle">Name used for delivery labels.</p>
+						</div>
+						<div class="si-section__body">
+							<div class="row g-3">
+								<div class="col-12 col-md-6">
+									<mat-form-field appearance="outline">
+										<mat-label>First Name</mat-label>
+										<input matInput type="text" name="firstName" formControlName="firstName" autocomplete="given-name" />
+										<mat-error *ngIf="shippingInfoForm.get('firstName')?.hasError('required') && shippingInfoForm.get('firstName')?.touched">
+											First Name is required.
+										</mat-error>
+										<mat-error *ngIf="shippingInfoForm.get('firstName')?.hasError('pattern') && shippingInfoForm.get('firstName')?.touched">
+											Enter a valid first name.
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div class="col-12 col-md-6">
+									<mat-form-field appearance="outline">
+										<mat-label>Last Name</mat-label>
+										<input matInput type="text" name="lastName" formControlName="lastName" autocomplete="family-name" />
+										<mat-error *ngIf="shippingInfoForm.get('lastName')?.hasError('required') && shippingInfoForm.get('lastName')?.touched">
+											Last Name is required.
+										</mat-error>
+										<mat-error *ngIf="shippingInfoForm.get('lastName')?.hasError('pattern') && shippingInfoForm.get('lastName')?.touched">
+											Enter a valid last name.
+										</mat-error>
+									</mat-form-field>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<section class="si-section">
+						<div class="si-section__header">
+							<h3 class="si-section__title">Address</h3>
+							<p class="si-section__subtitle">Delivery address for physical products.</p>
+						</div>
+						<div class="si-section__body">
+							<div class="row g-3">
+								<div class="col-12">
+									<mat-form-field appearance="outline">
+										<mat-label>Address line 1</mat-label>
+										<input matInput type="text" name="address1" formControlName="address1" autocomplete="address-line1" />
+										<mat-error *ngIf="shippingInfoForm.get('address1')?.hasError('required') && shippingInfoForm.get('address1')?.touched">
+											Address is required.
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div class="col-12">
+									<mat-form-field appearance="outline">
+										<mat-label>Address line 2</mat-label>
+										<input matInput type="text" name="address2" formControlName="address2" autocomplete="address-line2" />
+									</mat-form-field>
+								</div>
+
+								<div class="col-12">
+									<mat-form-field appearance="outline">
+										<mat-label>Country</mat-label>
+										<mat-select formControlName="country" name="country">
+											<mat-option *ngFor="let country of countries" [value]="country.value">{{ country.name }}</mat-option>
+										</mat-select>
+										<mat-error *ngIf="shippingInfoForm.get('country')?.hasError('required') && shippingInfoForm.get('country')?.touched">
+											Country is required.
+										</mat-error>
+									</mat-form-field>
+								</div>
+
+								<div class="col-12 col-md-4">
+									<mat-form-field appearance="outline">
+										<mat-label>City</mat-label>
+										<input matInput type="text" name="city" formControlName="city" autocomplete="address-level2" />
+										<mat-error *ngIf="shippingInfoForm.get('city')?.hasError('required') && shippingInfoForm.get('city')?.touched">
+											City is required.
+										</mat-error>
+										<mat-error *ngIf="shippingInfoForm.get('city')?.hasError('pattern') && shippingInfoForm.get('city')?.touched">
+											Enter a valid city.
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div class="col-12 col-md-4">
+									<mat-form-field appearance="outline">
+										<mat-label>{{ (shippingInfoForm.get('country')?.value === 'US') ? 'State' : 'Region' }}</mat-label>
+										<mat-select formControlName="region" name="region" *ngIf="shippingInfoForm.get('country')?.value === 'US'">
+											<mat-option *ngFor="let state of states" [value]="state.value">{{ state.name }}</mat-option>
+										</mat-select>
+										<input matInput type="text" formControlName="region" name="region" *ngIf="shippingInfoForm.get('country')?.value !== 'US'" autocomplete="address-level1" />
+										<mat-error *ngIf="shippingInfoForm.get('region')?.hasError('required') && shippingInfoForm.get('region')?.touched">
+											{{ (shippingInfoForm.get('country')?.value !== 'US') ? 'Region' : 'State' }} is required.
+										</mat-error>
+										<mat-error *ngIf="shippingInfoForm.get('region')?.hasError('pattern') && shippingInfoForm.get('region')?.touched">
+											Enter a valid {{ (shippingInfoForm.get('country')?.value !== 'US') ? 'region' : 'state' }}.
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div class="col-12 col-md-4">
+									<mat-form-field appearance="outline">
+										<mat-label>Zip Code</mat-label>
+										<input matInput type="text" name="zip" formControlName="zip" autocomplete="postal-code" />
+										<mat-error *ngIf="shippingInfoForm.get('zip')?.hasError('required') && shippingInfoForm.get('zip')?.touched">
+											Zip Code is required.
+										</mat-error>
+										<mat-error *ngIf="shippingInfoForm.get('zip')?.hasError('pattern') && shippingInfoForm.get('zip')?.touched">
+											Enter a valid zip code.
+										</mat-error>
+									</mat-form-field>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<section class="si-section" style="display: none;">
+						<div class="si-section__header">
+							<h3 class="si-section__title">Notifications</h3>
+							<p class="si-section__subtitle">Optional SMS updates for orders.</p>
+						</div>
+						<div class="si-section__body">
+							<mat-checkbox formControlName="smsOptIn">I consent to receive SMS notifications.</mat-checkbox>
+						</div>
+					</section>
+
+					<div class="si-errors" *ngIf="shippingInfoForm.errors as formErrors">
+						<ng-container *ngFor="let error of formErrors | keyvalue">
+							<span>{{ error.key }}: {{ error.value }}</span>
+						</ng-container>
+					</div>
+
+					<div class="si-actions">
+						<button mat-raised-button color="primary" type="submit" [disabled]="shippingInfoForm.invalid">Save Shipping Info</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
