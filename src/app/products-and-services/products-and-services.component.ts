@@ -172,7 +172,7 @@ export class ProductsAndServicesComponent implements OnInit {
       {
         icon: 'security',
         title: 'Secure & Reliable',
-        description: 'Enterprise-grade security with token-based authentication and encrypted data storage.'
+        description: 'Secure authentication and access controls, with time-limited tokens for daily-report links.'
       },
       {
         icon: 'speed',
@@ -182,7 +182,7 @@ export class ProductsAndServicesComponent implements OnInit {
       {
         icon: 'trending_up',
         title: 'Data-Driven Insights',
-        description: 'Make informed decisions with comprehensive analytics and detailed reporting capabilities.'
+        description: 'Make informed decisions with reporting views for feedback and daily-report completion.'
       },
       {
         icon: 'people',
@@ -205,56 +205,35 @@ export class ProductsAndServicesComponent implements OnInit {
   private initializePricingTiers(): void {
     this.pricingTiers = [
       {
-        name: 'Starter',
-        description: 'Perfect for small operations',
-        price: '$99',
-        period: '/month',
+        name: 'Core Platform',
+        description: 'For small fleets that want daily reports + truck/driver management (no custom design required)',
+        price: 'Quote-based',
+        period: '',
         features: [
-          'Up to 5 trucks',
-          'Up to 10 drivers',
-          'Daily reports (basic)',
-          'Basic QR code generation',
-          'Email support',
-          'Monthly analytics'
-        ],
-        highlighted: false,
-        cta: 'Get Started'
-      },
-      {
-        name: 'Professional',
-        description: 'Best for growing fleets',
-        price: '$299',
-        period: '/month',
-        features: [
-          'Up to 50 trucks',
-          'Up to 100 drivers',
-          'Advanced daily reports',
-          'Custom QR codes with branding',
-          'Priority email support',
-          'Real-time analytics',
-          'Driver performance insights',
-          'Automated scheduling'
+          'Truck & driver management',
+          'Vehicle QR codes (standard)',
+          'Feedback collection + routing',
+          'Automated daily reports (magic links)',
+          'Photo uploads for verification',
+          'Business settings (timezone + report windows)'
         ],
         highlighted: true,
-        cta: 'Start Free Trial'
+        cta: 'Talk to Us'
       },
       {
-        name: 'Enterprise',
-        description: 'For large-scale operations',
-        price: 'Custom',
-        period: 'pricing',
+        name: 'Optional Add-Ons',
+        description: 'For teams that want a more tailored rollout and branded assets',
+        price: 'As needed',
+        period: '',
         features: [
-          'Unlimited trucks & drivers',
-          'Full customization',
-          'Dedicated account manager',
-          'Phone & email support',
-          'Advanced analytics & reporting',
-          'Custom integrations',
-          'SLA guarantee',
-          'Training & onboarding'
+          'One-time setup & onboarding assistance',
+          'Initial data import / configuration help',
+          'Custom QR design / branded assets',
+          'Workflow customization and rollout planning',
+          'Integration planning (if needed)'
         ],
         highlighted: false,
-        cta: 'Contact Sales'
+        cta: 'Ask About Add-Ons'
       }
     ];
   }

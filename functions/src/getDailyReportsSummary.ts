@@ -177,7 +177,7 @@ export const getDailyReportsSummary = functions.https.onRequest({ secrets: ["MON
         ? await db
             .collection("drivers")
             .find({ businessId, "audit.deletedAt": null, _id: { $in: driverIds } })
-            .project({ firstName: 1, lastName: 1, email: 1 })
+            .project({ name: 1, email: 1, phone: 1 })
             .toArray()
         : [];
 
@@ -242,8 +242,9 @@ export const getDailyReportsSummary = functions.https.onRequest({ secrets: ["MON
           const driverObjectId = t?.assignment?.assignedDriverId ?? null;
 
           const driver = driverObjectId instanceof ObjectId ? driversById.get(String(driverObjectId)) : null;
-          const driverName = driver ? `${driver.firstName ?? ""} ${driver.lastName ?? ""}`.trim() : null;
+          const driverName = driver?.name ?? null;
           const driverEmail = driver?.email ?? null;
+          const driverPhone = driver?.phone ?? null;
 
           const truckLabel = truckId
             ? `${truckId}${t.licensePlate ? ` (${t.licensePlate})` : ""}`
@@ -270,6 +271,7 @@ export const getDailyReportsSummary = functions.https.onRequest({ secrets: ["MON
             driverObjectId,
             driverName,
             driverEmail,
+            driverPhone,
             truckLabel,
             status,
             token: token

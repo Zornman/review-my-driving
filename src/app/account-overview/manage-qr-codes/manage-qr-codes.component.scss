@@ -8,16 +8,37 @@
 :host {
 	--mq-surface: var(--mdc-theme-surface);
 	--mq-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
+	--mq-primary: var(--mdc-theme-primary);
+	--mq-secondary: var(--mdc-theme-secondary);
+
+	/* Tertiary: neutral ink tint derived from on-surface */
+	--mq-tertiary: color-mix(in srgb, var(--mq-on-surface) 12%, transparent);
+
+	/* Derived neutrals */
 	--mq-border: color-mix(in srgb, var(--mq-on-surface) 14%, transparent);
-	--mq-surface-2: color-mix(in srgb, var(--mq-on-surface) 6%, var(--mq-surface));
-	--mq-hover: color-mix(in srgb, var(--mdc-theme-secondary) 14%, transparent);
-	--mq-selected: color-mix(in srgb, var(--mdc-theme-primary) 10%, transparent);
+	--mq-muted: color-mix(in srgb, var(--mq-on-surface) 72%, transparent);
+	--mq-muted-2: color-mix(in srgb, var(--mq-on-surface) 58%, transparent);
+
+	/* Surfaces */
+	--mq-surface-2: color-mix(in srgb, var(--mq-tertiary) 55%, var(--mq-surface));
+	--mq-hover: color-mix(in srgb, var(--mq-secondary) 14%, transparent);
+	--mq-selected: color-mix(in srgb, var(--mq-primary) 10%, transparent);
+
+	/* Explicit panel surface for expanded rows */
+	--mq-panel: var(--mq-surface);
 }
 
 :host-context(body.dark-mode) {
 	--mq-border: color-mix(in srgb, var(--mq-on-surface) 18%, transparent);
-	--mq-hover: color-mix(in srgb, var(--mdc-theme-secondary) 18%, transparent);
-	--mq-selected: color-mix(in srgb, var(--mdc-theme-primary) 14%, transparent);
+	--mq-hover: color-mix(in srgb, var(--mq-secondary) 18%, transparent);
+	--mq-selected: color-mix(in srgb, var(--mq-primary) 14%, transparent);
+	background: var(--mq-panel) !important;
+	color: var(--mq-on-surface) !important;
+}
+
+:host-context(body.light-mode) {
+	/* Match the TDM “panel” behavior for expanded rows */
+	--mq-panel: #ffffff;
 }
 
 .header {
@@ -56,12 +77,8 @@
 
 .table-wrap {
 	overflow: auto;
-	border-radius: 10px;
-}
-
-.mat-header-cell,
-.mat-cell {
-	padding: 10px 14px;
+	background: transparent;
+	border-radius: 0;
 }
 
 .mono {
@@ -74,18 +91,20 @@
 	padding: 2px 10px;
 	border-radius: 999px;
 	font-size: 12px;
-	border: 1px solid rgba(0, 0, 0, 0.12);
+	border: 1px solid var(--mq-border);
+	background: var(--mq-tertiary);
+	color: var(--mq-on-surface);
 	text-transform: capitalize;
 }
 
 .pill.assigned {
-	background: rgba(46, 125, 50, 0.1);
-	border-color: rgba(46, 125, 50, 0.35);
+	background: color-mix(in srgb, var(--mq-secondary) 18%, transparent);
+	border-color: color-mix(in srgb, var(--mq-secondary) 32%, transparent);
 }
 
 .pill.unassigned {
-	background: rgba(251, 140, 0, 0.1);
-	border-color: rgba(251, 140, 0, 0.35);
+	background: var(--mq-tertiary);
+	border-color: var(--mq-border);
 }
 
 .actions {
@@ -113,12 +132,12 @@
 }
 
 .empty-subtitle {
-	opacity: 0.8;
+	color: var(--mq-muted);
 }
 
 .hint {
 	padding-top: 10px;
-	opacity: 0.7;
+	color: var(--mq-muted);
 }
 
 /* =========================
@@ -127,6 +146,15 @@
 .mq-table {
 	width: 100%;
 	background: transparent;
+}
+
+/* Keep header + cell text aligned with theme */
+.mq-table .mat-mdc-header-cell,
+.mq-table .mat-header-cell,
+.mq-table .mat-mdc-cell,
+.mq-table .mat-cell {
+	color: var(--mq-on-surface);
+	padding: 10px 14px;
 }
 
 .mq-header-row {
@@ -160,6 +188,7 @@
 .mq-expand-icon {
 	transition: transform 140ms ease;
 	transform: rotate(0deg);
+	color: var(--mq-primary);
 
 	&.is-expanded {
 		transform: rotate(180deg);
@@ -174,21 +203,21 @@
 	display: block !important;
 	padding-left: 0 !important;
 	padding-right: 0 !important;
-	background: var(--mq-surface) !important;
+	background: var(--mq-panel) !important;
 	color: var(--mq-on-surface) !important;
 }
 
 .mq-expanded-cell {
 	padding: 0 !important;
 	border-bottom: none !important;
-	background: var(--mq-surface) !important;
+	background: var(--mq-panel) !important;
 	color: var(--mq-on-surface) !important;
 }
 
 .mq-expanded {
 	padding: 14px 16px;
 	border-top: 1px solid var(--mq-border);
-	background: var(--mq-surface) !important;
+	background: var(--mq-panel) !important;
 	color: var(--mq-on-surface) !important;
 
 	@media (max-width: 576px) {
@@ -215,7 +244,7 @@
 	font-size: 0.78rem;
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
-	opacity: 0.72;
+	color: var(--mq-muted-2);
 	margin-bottom: 4px;
 }
 

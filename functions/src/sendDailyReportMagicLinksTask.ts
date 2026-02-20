@@ -17,6 +17,26 @@ function normalizeBusinessIdForRefs(raw: any): any {
   return raw;
 }
 
+function isOperatingDay(settings: any, nowLocal: any): boolean {
+  const days = settings?.operatingDays;
+  if (!Array.isArray(days) || days.length === 0) return true;
+
+  const normalized = days
+    .map((d: any) => Number(d))
+    .filter((d: number) => Number.isInteger(d) && d >= 1 && d <= 7);
+
+  if (normalized.length === 0) return true;
+  return normalized.includes(nowLocal.weekday);
+}
+
+function isHolidayExcluded(settings: any, isoDateLocal: string): boolean {
+  const holidays = settings?.holidays;
+  if (!holidays || typeof holidays !== 'object') return false;
+  if (holidays.mode !== 'custom') return false;
+  if (!Array.isArray(holidays.dates) || holidays.dates.length === 0) return false;
+  return holidays.dates.includes(isoDateLocal);
+}
+
 export async function sendDailyReportMagicLinksTask(params: {
   MONGO_URI: string;
   EMAIL_USER: string;
@@ -67,6 +87,16 @@ export async function sendDailyReportMagicLinksTask(params: {
       const nowLocal = DateTime.now().setZone(timezone);
       const reportDateLocal = nowLocal.toISODate();
       if (!reportDateLocal) {
+        skipped += 1;
+        continue;
+      }
+
+      if (!isOperatingDay(settings, nowLocal)) {
+        skipped += 1;
+        continue;
+      }
+
+      if (isHolidayExcluded(settings, reportDateLocal)) {
         skipped += 1;
         continue;
       }
@@ -169,7 +199,7 @@ export async function sendDailyReportMagicLinksTask(params: {
         `;
 
         await transporter.sendMail({
-          from: EMAIL_USER,
+          from: 'no-reply@reviewmydriving.co',
           to: emailTo,
           subject,
           html,

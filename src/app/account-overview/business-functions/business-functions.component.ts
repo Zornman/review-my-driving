@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -34,12 +34,23 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
   @Input() businessUserInfo: any | null = null;
   isLoading: boolean = false;
 
+  readonly operatingDayOptions: { key: string; label: string; aria: string }[] = [
+    { key: 'mon', label: 'Mon', aria: 'Monday' },
+    { key: 'tue', label: 'Tue', aria: 'Tuesday' },
+    { key: 'wed', label: 'Wed', aria: 'Wednesday' },
+    { key: 'thu', label: 'Thu', aria: 'Thursday' },
+    { key: 'fri', label: 'Fri', aria: 'Friday' },
+    { key: 'sat', label: 'Sat', aria: 'Saturday' },
+    { key: 'sun', label: 'Sun', aria: 'Sunday' },
+  ];
+
   private _snackBar = inject(MatSnackBar);
 
   readonly timezones: TimezoneOption[] = TIMEZONES;
 
   businessUserForm!: FormGroup;
   private dailyReportsEnabledSub?: Subscription;
+  private holidayModeSub?: Subscription;
 
   private initialSnapshot: string = '';
 
@@ -58,6 +69,10 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
     const info = this.businessUserInfo ?? {};
     const settings = info.settings ?? {};
 
+    const operatingDays = this.normalizeOperatingDays(settings.operatingDays);
+    const holidayMode = this.normalizeHolidayMode(settings?.holidays?.mode);
+    const holidayDatesText = this.formatHolidayDates(settings?.holidays?.dates);
+
     const createdAt = this.toDate(info.createdAt);
     const updatedAt = this.toDate(info.updatedAt);
 
@@ -72,6 +87,19 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
       dailyReportsStartTime: [{ value: settings.dailyReportStartWindow ?? null, disabled: false }],
       dailyReportsEndTime: [{ value: settings.dailyReportEndWindow ?? null, disabled: false }],
       timezone: [{ value: settings?.timezone ?? info.timezone ?? 'UTC', disabled: false }],
+
+      operatingDays: this.fb.group({
+        mon: [operatingDays.includes(1)],
+        tue: [operatingDays.includes(2)],
+        wed: [operatingDays.includes(3)],
+        thu: [operatingDays.includes(4)],
+        fri: [operatingDays.includes(5)],
+        sat: [operatingDays.includes(6)],
+        sun: [operatingDays.includes(7)],
+      }),
+      holidayMode: [{ value: holidayMode, disabled: false }],
+      holidayDates: [{ value: holidayDatesText, disabled: false }, [this.holidayDatesValidator(() => this.businessUserForm?.get('holidayMode')?.value)]],
+
       updatedAt: [{ value: this.formatDateTime(updatedAt), disabled: true }],
       createdAt: [{ value: this.formatDateTime(createdAt), disabled: true }]
     });
@@ -81,6 +109,14 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
       .get('dailyReportsEnabled')
       ?.valueChanges.subscribe((enabled: boolean) => {
         this.syncDailyReportsControls(enabled === true);
+      });
+
+    this.syncHolidayControls(this.businessUserForm.get('holidayMode')?.value);
+    this.holidayModeSub = this.businessUserForm
+      .get('holidayMode')
+      ?.valueChanges.subscribe((mode: string) => {
+        this.syncHolidayControls(mode);
+        this.businessUserForm.get('holidayDates')?.updateValueAndValidity();
       });
 
     // Establish a baseline so the Save button stays disabled until the user actually changes something.
@@ -93,6 +129,29 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
 
   ngOnDestroy(): void {
     this.dailyReportsEnabledSub?.unsubscribe();
+    this.holidayModeSub?.unsubscribe();
+  }
+
+  toggleOperatingDay(key: string): void {
+    const group = this.businessUserForm?.get('operatingDays') as FormGroup | null;
+    const ctrl = group?.get(key);
+    if (!ctrl) return;
+
+    ctrl.setValue(!ctrl.value);
+    ctrl.markAsDirty();
+    ctrl.markAsTouched();
+  }
+
+  private syncHolidayControls(mode: string): void {
+    const datesCtrl = this.businessUserForm.get('holidayDates');
+    if (!datesCtrl) return;
+
+    if (mode === 'custom') {
+      datesCtrl.enable({ emitEvent: false });
+      return;
+    }
+
+    datesCtrl.disable({ emitEvent: false });
   }
 
   private syncDailyReportsControls(enabled: boolean): void {
@@ -139,6 +198,15 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
     this.isLoading = true;
     const raw = this.businessUserForm.getRawValue();
 
+    const holidays = this.buildHolidaySettings(raw.holidayMode, raw.holidayDates);
+    if (!holidays.ok) {
+      this.isLoading = false;
+      this._snackBar.open(holidays.message, 'Ok', { duration: 6000 });
+      return;
+    }
+
+    const operatingDays = this.buildOperatingDays(raw.operatingDays);
+
     const payload = {
       userId: raw.userId,
       update: {
@@ -152,6 +220,8 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
           dailyReportStartWindow: raw.dailyReportsEnabled ? raw.dailyReportsStartTime : null,
           dailyReportEndWindow: raw.dailyReportsEnabled ? raw.dailyReportsEndTime : null,
           timezone: raw.timezone,
+          operatingDays,
+          holidays: holidays.value,
         },
       },
     };
@@ -198,6 +268,10 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
 
   private computeSnapshot(): string {
     const raw = this.businessUserForm.getRawValue();
+
+    const holidays = this.buildHolidaySettings(raw.holidayMode, raw.holidayDates);
+    const operatingDays = this.buildOperatingDays(raw.operatingDays);
+
     const snapshot = {
       businessName: raw.businessName ?? null,
       contactEmail: raw.contactEmail ?? null,
@@ -208,8 +282,81 @@ export class BusinessFunctionsComponent implements OnInit, OnChanges, OnDestroy 
       dailyReportsStartTime: raw.dailyReportsStartTime ?? null,
       dailyReportsEndTime: raw.dailyReportsEndTime ?? null,
       timezone: raw.timezone ?? null,
+      operatingDays,
+      holidays: holidays.ok ? holidays.value : null,
     };
     return this.stableStringify(snapshot);
+  }
+
+  private normalizeOperatingDays(value: any): number[] {
+    const allDays = [1, 2, 3, 4, 5, 6, 7];
+    if (!Array.isArray(value)) return allDays;
+
+    const nums = value
+      .map((v: any) => Number(v))
+      .filter((n: number) => Number.isInteger(n) && n >= 1 && n <= 7);
+
+    const unique = Array.from(new Set(nums)).sort((a, b) => a - b);
+    return unique.length ? unique : allDays;
+  }
+
+  private normalizeHolidayMode(value: any): 'none' | 'custom' {
+    return value === 'custom' ? 'custom' : 'none';
+  }
+
+  private formatHolidayDates(dates: any): string {
+    if (!Array.isArray(dates)) return '';
+    const cleaned = dates
+      .map((d: any) => String(d).trim())
+      .filter((d: string) => /^\d{4}-\d{2}-\d{2}$/.test(d));
+    return cleaned.join('\n');
+  }
+
+  private buildOperatingDays(raw: any): number[] {
+    const days: number[] = [];
+    if (raw?.mon) days.push(1);
+    if (raw?.tue) days.push(2);
+    if (raw?.wed) days.push(3);
+    if (raw?.thu) days.push(4);
+    if (raw?.fri) days.push(5);
+    if (raw?.sat) days.push(6);
+    if (raw?.sun) days.push(7);
+
+    // If the user unchecks everything, treat as "all days" to avoid accidental blackout.
+    return days.length ? days : [1, 2, 3, 4, 5, 6, 7];
+  }
+
+  private buildHolidaySettings(mode: any, datesText: any): { ok: true; value: { mode: 'none' | 'custom'; dates?: string[] } } | { ok: false; message: string } {
+    const normalizedMode: 'none' | 'custom' = mode === 'custom' ? 'custom' : 'none';
+    if (normalizedMode === 'none') return { ok: true, value: { mode: 'none' } };
+
+    const text = typeof datesText === 'string' ? datesText : '';
+    const dates = text
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    const invalid = dates.find((d) => !/^\d{4}-\d{2}-\d{2}$/.test(d));
+    if (invalid) return { ok: false, message: `Invalid holiday date: ${invalid}. Use YYYY-MM-DD.` };
+
+    const unique = Array.from(new Set(dates)).sort();
+    return { ok: true, value: { mode: 'custom', dates: unique } };
+  }
+
+  private holidayDatesValidator(getMode: () => any): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const mode = getMode();
+      if (mode !== 'custom') return null;
+
+      const value = typeof control.value === 'string' ? control.value : '';
+      const lines = value
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+
+      const invalid = lines.some((d) => !/^\d{4}-\d{2}-\d{2}$/.test(d));
+      return invalid ? { holidayDates: true } : null;
+    };
   }
 
   private stableStringify(value: any): string {

@@ -30,7 +30,7 @@
           {icon: 'qr_code_2', label: 'Custom QR Codes', value: 'Unlimited'},
           {icon: 'assignment', label: 'Daily Reports', value: 'Automated'},
           {icon: 'directions_car', label: 'Fleet Size', value: 'Any Size'},
-          {icon: 'security', label: 'Security', value: 'Enterprise'}
+          {icon: 'security', label: 'Security', value: 'Secure'}
         ]">
           <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
           <h3>{{ stat.value }}</h3>
@@ -63,7 +63,7 @@
           [class.active]="activeTab === 'pricing'"
           (click)="activeTab = 'pricing'; scrollToSection('pricing')">
           <mat-icon>attach_money</mat-icon>
-          Pricing
+          Plans
         </button>
       </div>
     </div>
@@ -254,8 +254,8 @@
   <section id="pricing" class="pricing-section">
     <div class="container">
       <div class="section-header" @fadeIn>
-        <h2>Simple, Transparent Pricing</h2>
-        <p>Choose the plan that fits your fleet size and needs</p>
+        <h2>Plans & Onboarding</h2>
+        <p>Start with the core platform, then add onboarding or custom QR design if you need it</p>
       </div>
 
       <div class="pricing-grid">
@@ -299,51 +299,7 @@
       </div>
 
       <div class="pricing-note">
-        <p>All plans include a 14-day free trial. No credit card required.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Comparison Section -->
-  <section class="comparison-section">
-    <div class="container">
-      <div class="section-header" @fadeIn>
-        <h2>Complete Feature Comparison</h2>
-        <p>See what's included in each plan</p>
-      </div>
-
-      <div class="comparison-table-wrapper">
-        <table class="comparison-table">
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th>Starter</th>
-              <th>Professional</th>
-              <th>Enterprise</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let feature of [
-              {name: 'Fleet Management', starter: true, pro: true, enterprise: true},
-              {name: 'QR Code Generation', starter: true, pro: true, enterprise: true},
-              {name: 'Custom QR Branding', starter: false, pro: true, enterprise: true},
-              {name: 'Daily Reports', starter: true, pro: true, enterprise: true},
-              {name: 'Driver Analytics', starter: false, pro: true, enterprise: true},
-              {name: 'Real-time Analytics', starter: false, pro: true, enterprise: true},
-              {name: 'Multi-user Support', starter: true, pro: true, enterprise: true},
-              {name: 'Priority Support', starter: false, pro: true, enterprise: true},
-              {name: 'Dedicated Account Manager', starter: false, pro: false, enterprise: true},
-              {name: 'Custom Integrations', starter: false, pro: false, enterprise: true},
-              {name: 'SLA Guarantee', starter: false, pro: false, enterprise: true},
-              {name: 'Training & Onboarding', starter: false, pro: false, enterprise: true}
-            ]">
-              <td class="feature-name">{{ feature.name }}</td>
-              <td><mat-icon *ngIf="feature.starter" class="check">check_circle</mat-icon></td>
-              <td><mat-icon *ngIf="feature.pro" class="check">check_circle</mat-icon></td>
-              <td><mat-icon *ngIf="feature.enterprise" class="check">check_circle</mat-icon></td>
-            </tr>
-          </tbody>
-        </table>
+        <p>Pricing is offered by quote. One-time setup/onboarding and custom QR design are available as add-ons.</p>
       </div>
     </div>
   </section>
@@ -379,11 +335,11 @@
       <div class="faq-grid">
         <div class="faq-item" *ngFor="let faq of [
           {q: 'What if my fleet grows?', a: 'Our plans scale with your business. Upgrade anytime to add more trucks and drivers.'},
-          {q: 'Is there a setup fee?', a: 'No setup fees! We handle the configuration for you during onboarding.'},
-          {q: 'How secure is the data?', a: 'We use enterprise-grade security with encrypted data storage and token-based authentication.'},
+          {q: 'Is there a setup fee?', a: 'Most customers have a one-time setup fee for onboarding, initial data/config, and optional custom QR design.'},
+          {q: 'How secure is the data?', a: 'We use secure authentication and access controls, plus time-limited tokens for daily-report links.'},
           {q: 'Can drivers access reports from mobile?', a: 'Yes! Our platform is fully mobile-optimized for phones, tablets, and desktops.'},
-          {q: 'What kind of support do you offer?', a: 'All plans include email support. Professional and Enterprise tiers include priority support and training.'},
-          {q: 'Do you offer custom integrations?', a: 'Yes! Enterprise customers can request custom integrations with their existing systems.'}
+          {q: 'What kind of support do you offer?', a: 'We provide onboarding and ongoing support. Support options depend on your plan and rollout needs.'},
+          {q: 'Do you offer custom integrations?', a: 'We can discuss integrations during onboarding and evaluate what’s feasible for your workflow.'}
         ]">
           <div class="faq-item-content">
             <h4>

@@ -16,15 +16,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MongoService } from '../services/mongo.service';
 import { Router } from '@angular/router';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { COUNTRIES } from '../shared/classes/countries';
-import { US_STATES } from '../shared/classes/states';
 import { BusinessFunctionsComponent } from './business-functions/business-functions.component';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { FormatPhoneDirective } from '../shared/directives/format-phone.directive';
 import { TruckAndDriverManagementComponent } from './truck-and-driver-management/truck-and-driver-management.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DailyReportsSummaryComponent } from './daily-reports-summary/daily-reports-summary.component';
 import { ManageQrCodesComponent } from './manage-qr-codes/manage-qr-codes.component';
+import { ShippingInformationComponent } from './shipping-information/shipping-information.component';
 
 @Component({
   selector: 'app-account-overview',
@@ -41,12 +38,11 @@ import { ManageQrCodesComponent } from './manage-qr-codes/manage-qr-codes.compon
     MatIconModule,
     MatSelectModule,
     MatPaginatorModule,
-    MatCheckboxModule,
     BusinessFunctionsComponent,
     TruckAndDriverManagementComponent,
-    FormatPhoneDirective,
     DailyReportsSummaryComponent,
-    ManageQrCodesComponent
+    ManageQrCodesComponent,
+    ShippingInformationComponent
    ],
   templateUrl: './account-overview.component.html',
   styleUrl: './account-overview.component.scss',
@@ -64,10 +60,13 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   
   accOverviewForm!: FormGroup;
-  shippingInfoForm!: FormGroup;
   user!: User | null;
   businessUserInfo!: any | null;
   submissions!: any;
+  personalSubmissions: any[] = [];
+  businessSubmissions: any[] = [];
+  submissionScope: 'personal' | 'business' = 'personal';
+  private hasUserPickedSubmissionScope: boolean = false;
   now: Date = new Date();
   month = (this.now.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed, so add 1
   day = this.now.getDate().toString().padStart(2, '0'); // Get day and pad if needed
@@ -78,11 +77,37 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
   lastWeekSubmissions!: number;
   lastMonthSubmissions!: number;
   isBusinessUser: boolean = false;
+  private isBusinessUserKnown: boolean = false;
+  private personalSubmissionsLoadKey: string | null = null;
+  private businessSubmissionsLoadKey: string | null = null;
+  selectedTabIndex = 0;
 
-  countries = COUNTRIES;
-  states = US_STATES;
+  get showSubmissionScopeTabs(): boolean {
+    return (this.personalSubmissions?.length ?? 0) > 0 && (this.businessSubmissions?.length ?? 0) > 0;
+  }
+
+  get noSubmissionsMessage(): string {
+    return this.submissionScope === 'business'
+      ? 'No business submissions yet.'
+      : "No submissions yet, you're driving too well!";
+  }
+
+  get tabLabels(): string[] {
+    return this.isBusinessUser
+      ? [
+          'Overview',
+          'Trucks & Drivers',
+          'QR Codes',
+          'Daily Report Summary',
+          'Business Settings',
+          'Shipping Information',
+        ]
+      : ['Submissions', 'Account Overview', 'Shipping Information', 'Order History'];
+  }
 
   submissionsDataSource = new MatTableDataSource<any>([]);
+  personalSubmissionsDataSource = new MatTableDataSource<any>([]);
+  businessSubmissionsDataSource = new MatTableDataSource<any>([]);
   submissionsColumnsToDisplay = ['name', 'dateSubmitted', 'reasonForContacting', 'expand'];
   submissionsColumnsToDisplayWithExpand = [...this.submissionsColumnsToDisplay, 'expandedDetail'];
   expandedElement: any | null;
@@ -104,29 +129,12 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
       email: [{ value: '', disabled: true }]
     });
 
-    this.shippingInfoForm = this.fb.group({
-      userID: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required]],
-      smsOptIn: [false],
-      firstName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z]+$/)]],
-      lastName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z]+$/)]],
-      address1: ['', Validators.required],
-      address2: [''], // Optional field
-      country: ['', Validators.required],
-      city: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
-      region: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]], // State/Province
-      zip: ['', [Validators.required, Validators.pattern(/^\d+$/)]], // Only numbers
-    });
-
     this.authService.getUser().subscribe((user) => {
       if (user) {
         this.user = user;
         this._snackBar.open('Loading account information...');
         this.initializeAccountOverview();
         this.initializeBusinessUserInfo();
-        this.initializeSubmissions();
-        this.loadShippingInfo();
         this.initializeOrderHistory();
       }
     });
@@ -136,6 +144,9 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    if (this.submissionsDataSource) {
+      this.submissionsDataSource.paginator = this.paginator;
+    }
     this.cdr.detectChanges();
   }
 
@@ -151,7 +162,15 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
     this.authService.isBusinessUser$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isBusiness) => {
+        this.isBusinessUserKnown = isBusiness !== null;
         this.isBusinessUser = !!isBusiness;
+
+        // If the available tabs change, ensure we stay in-range.
+        if (this.selectedTabIndex >= this.tabLabels.length) {
+          this.selectedTabIndex = 0;
+        }
+
+        this.initializeSubmissions();
       });
       
     this.authService.businessUserInfo$
@@ -159,148 +178,166 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
       .subscribe((info) => {
         console.log(info);
         this.businessUserInfo = info;
+
+        this.initializeSubmissions();
       });
   }
 
-  saveShippingInfo() {
-    if (!this.shippingInfoForm.valid) return;
-
-    if (!this.user) {
-      this._snackBar.open('user not found.', 'Ok', { duration: 3000 });
-      return;
-    }
-    this._snackBar.open('Saving shipping information...');
-
-    this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
-
-    const cleanedData = JSON.parse(JSON.stringify(this.shippingInfoForm.value));
-
-    this.dbService.insertUserShippingInfo(cleanedData).subscribe({
-      next: (response: any) => {
-        this._snackBar.open('Saved shipping information!', 'Ok', { duration: 3000 });
-        //console.log(response);
-      },
-      error: (error) => {
-        this._snackBar.open('Error saving shipping information. Please try again.', 'Ok', { duration: 3000 });
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'account-overview.component.ts',
-          method: 'saveShippingInfo()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      },
-    });
-
-    this._snackBar.dismiss();
-  }
-
-  loadShippingInfo() {
-    if (!this.user) return;
-
-    this.shippingInfoForm.get('userID')?.setValue(this.user?.uid);
-
-    this.dbService.getUserShippingInfo(this.user.uid).subscribe({
-      next: (response: any) => {
-        if (response.result) {
-          this.shippingInfoForm.get('firstName')?.setValue(response.result.firstName);
-          this.shippingInfoForm.get('lastName')?.setValue(response.result.lastName);
-          this.shippingInfoForm.get('address1')?.setValue(response.result.address1);
-          this.shippingInfoForm.get('address2')?.setValue(response.result.address2);
-          this.shippingInfoForm.get('city')?.setValue(response.result.city);
-          this.shippingInfoForm.get('zip')?.setValue(response.result.zip);
-          this.shippingInfoForm.get('region')?.setValue(response.result.region);
-          this.shippingInfoForm.get('country')?.setValue(response.result.country);
-          this.shippingInfoForm.get('email')?.setValue(response.result.email);
-          this.shippingInfoForm.get('phone')?.setValue(response.result.phone);
-        } else {
-        }
-      },
-      error: (error) => {
-        this._snackBar.open('Error loading shipping information. Please try again.', 'Ok', { duration: 3000 });
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'account-overview.component.ts',
-          method: 'loadShippingInfo()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      }
-    });
-  }
-
   initializeSubmissions() {
-    if (!this.user) return;
-    this.dbService.getUserSubmissions(this.user?.uid).subscribe({
+    if (!this.user?.uid) return;
+
+    // Personal submissions are always applicable (even for business users)
+    this.loadPersonalSubmissions();
+
+    // Business submissions are only applicable if this account is a business user AND has a businessId
+    if (this.isBusinessUserKnown && this.isBusinessUser) {
+      const businessId = this.businessUserInfo?.businessId ?? this.businessUserInfo?._id ?? null;
+      if (businessId) {
+        this.loadBusinessSubmissions(String(businessId));
+      }
+    }
+
+    // Keep selection stable, but choose a sensible default on first load
+    this.applyDefaultSubmissionScopeIfNeeded();
+    this.updateActiveSubmissionsView();
+  }
+
+  onSubmissionScopeTabChange(event: MatTabChangeEvent): void {
+    this.submissionScope = event.index === 0 ? 'personal' : 'business';
+    this.hasUserPickedSubmissionScope = true;
+    this.updateActiveSubmissionsView();
+  }
+
+  private applyDefaultSubmissionScopeIfNeeded(): void {
+    // If current scope has no data but the other does, switch.
+    const hasPersonal = (this.personalSubmissions?.length ?? 0) > 0;
+    const hasBusiness = (this.businessSubmissions?.length ?? 0) > 0;
+
+    if (this.submissionScope === 'business' && !hasBusiness && hasPersonal) {
+      this.submissionScope = 'personal';
+    } else if (this.submissionScope === 'personal' && !hasPersonal && hasBusiness) {
+      this.submissionScope = 'business';
+    }
+
+    // For business users, default to business once if it exists
+    if (!this.hasUserPickedSubmissionScope && this.isBusinessUser && hasBusiness) {
+      this.submissionScope = 'business';
+    }
+  }
+
+  private updateActiveSubmissionsView(): void {
+    const active = this.submissionScope === 'business' ? this.businessSubmissions : this.personalSubmissions;
+
+    this.submissions = active;
+    this.submissionsDataSource = new MatTableDataSource(active);
+    this.expandedElement = null;
+
+    if (this.paginator) {
+      this.submissionsDataSource.paginator = this.paginator;
+      this.paginator.firstPage();
+    }
+
+    this.applySubmissionStats(active);
+  }
+
+  private applySubmissionStats(list: any[]): void {
+    const now = new Date();
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(now.getDate() - 30);
+    thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+    this.totalSubmissions = (list ?? []).length;
+    this.todaysSubmissions = (list ?? []).filter((x: any) => {
+      const date = this.parseDate(x?.dateSubmitted);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime() === today.getTime();
+    }).length;
+
+    this.lastWeekSubmissions = (list ?? []).filter((x: any) => {
+      const date = this.parseDate(x?.dateSubmitted);
+      date.setHours(0, 0, 0, 0);
+      return date >= sevenDaysAgo && date <= now;
+    }).length;
+
+    this.lastMonthSubmissions = (list ?? []).filter((x: any) => {
+      const date = this.parseDate(x?.dateSubmitted);
+      date.setHours(0, 0, 0, 0);
+      return date >= thirtyDaysAgo && date <= now;
+    }).length;
+  }
+
+  private sortSubmissions(list: any[]): any[] {
+    return (list ?? []).sort((a: any, b: any) => {
+      const dateA = this.parseDate(a?.dateSubmitted);
+      const dateB = this.parseDate(b?.dateSubmitted);
+      const timeA = dateA.getTime();
+      const timeB = dateB.getTime();
+
+      if (Number.isNaN(timeA) || Number.isNaN(timeB)) return 0;
+      return timeB - timeA;
+    });
+  }
+
+  private loadPersonalSubmissions(): void {
+    if (!this.user?.uid) return;
+    const loadKey = `user:${this.user.uid}`;
+    if (this.personalSubmissionsLoadKey === loadKey) return;
+    this.personalSubmissionsLoadKey = loadKey;
+
+    this.dbService.getUserSubmissions({ userId: this.user.uid }).subscribe({
       next: (response: any) => {
-        const now = new Date();
-        const todaysDate = now;
-        todaysDate.setHours(0, 0, 0, 0);
-        const sevenDaysAgo = new Date(now);
-        sevenDaysAgo.setDate(now.getDate() - 7);
-        sevenDaysAgo.setHours(0, 0, 0, 0);
-        const thirtyDaysAgo = new Date(now);
-        thirtyDaysAgo.setDate(now.getDate() - 30);
-        thirtyDaysAgo.setHours(0, 0, 0, 0);
-
-        // Sort submissions by Date descending before setting table data source
-        this.submissions = response.submissions.sort((a: any, b: any) => {
-          const dateA = this.parseDate(a.dateSubmitted);
-          const dateB = this.parseDate(b.dateSubmitted);
-  
-          if (!dateA || !dateB) return 0; // Ignore invalid dates
-  
-          return dateB.getTime() - dateA.getTime(); // Sort in descending order (latest first)
-        });
-        this.submissionsDataSource = new MatTableDataSource(this.submissions);
-        this.submissionsDataSource.paginator = this.paginator;
-        //console.log(this.submissions);
-        this.totalSubmissions = response.submissions.length;
-        this.todaysSubmissions = response.submissions.filter((x: any) => {
-          const date = this.parseDate(x.dateSubmitted);
-          date.setHours(0, 0, 0, 0);
-          return date.getTime() === todaysDate.getTime()
-        }).length;
-        
-        this.lastWeekSubmissions = response.submissions.filter((x: any) => {
-          const date = this.parseDate(x.dateSubmitted);
-          date.setHours(0, 0, 0, 0);
-          return date >= sevenDaysAgo && date <= now;
-        }).length;
-
-        this.lastMonthSubmissions = response.submissions.filter((x: any) => {
-          const date = this.parseDate(x.dateSubmitted);
-          date.setHours(0, 0, 0, 0);
-          return date >= thirtyDaysAgo && date <= now;
-        }).length;
-      
+        this.personalSubmissions = this.sortSubmissions(response?.submissions ?? []);
+        this.personalSubmissionsDataSource = new MatTableDataSource(this.personalSubmissions);
+        this.applyDefaultSubmissionScopeIfNeeded();
+        this.updateActiveSubmissionsView();
         this._snackBar.open('Account Information loaded!', 'Ok', { duration: 3000 });
       },
       error: (error) => {
-        //console.error('Error getting data:', error);
-        this.dbService.insertErrorLog(JSON.stringify({
-          fileName: 'account-overview.component.ts',
-          method: 'initializeSubmissions()',
-          timestamp: new Date().toString(),
-          error: error
-        })).subscribe({
-          next: (response: any) => {
-              console.log(response);
-          },
-          error: (error: any) => {
-          }
-        });
-      }
+        this.dbService
+          .insertErrorLog(
+            JSON.stringify({
+              fileName: 'account-overview.component.ts',
+              method: 'loadPersonalSubmissions()',
+              timestamp: new Date().toString(),
+              error,
+            })
+          )
+          .subscribe();
+      },
+    });
+  }
+
+  private loadBusinessSubmissions(businessId: string): void {
+    const loadKey = `business:${businessId}`;
+    if (this.businessSubmissionsLoadKey === loadKey) return;
+    this.businessSubmissionsLoadKey = loadKey;
+
+    this.dbService.getUserSubmissions({ businessId }).subscribe({
+      next: (response: any) => {
+        this.businessSubmissions = this.sortSubmissions(response?.submissions ?? []);
+        this.businessSubmissionsDataSource = new MatTableDataSource(this.businessSubmissions);
+        this.applyDefaultSubmissionScopeIfNeeded();
+        this.updateActiveSubmissionsView();
+      },
+      error: (error) => {
+        this.dbService
+          .insertErrorLog(
+            JSON.stringify({
+              fileName: 'account-overview.component.ts',
+              method: 'loadBusinessSubmissions()',
+              timestamp: new Date().toString(),
+              error,
+            })
+          )
+          .subscribe();
+      },
     });
   }
 
@@ -332,6 +369,7 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
 
   onTabChange(event: MatTabChangeEvent): void {
     const tabIndex = event.index;
+    this.selectedTabIndex = tabIndex;
   }
 
   toggleRow(row: any, event: Event): void {
@@ -339,9 +377,15 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
     this.expandedElement = this.expandedElement === row ? null : row;
   }
 
-  parseDate(dateString: string): Date {
-    // Assumes the format is MM/DD/YYYY HH:mm:ss
-    const dateTimeParts = dateString.split(' ');
+  parseDate(dateString: string | null | undefined): Date {
+    if (!dateString) return new Date(NaN);
+
+    // 1) ISO 8601 (e.g., 2026-02-11T21:05:33.012Z)
+    const iso = new Date(dateString);
+    if (!Number.isNaN(iso.getTime())) return iso;
+
+    // 2) Legacy format: MM/DD/YYYY HH:mm:ss
+    const dateTimeParts = String(dateString).split(' ');
 
     // If we don't have a time, just parse the date
     if (dateTimeParts.length !== 2) {
@@ -354,5 +398,50 @@ export class AccountOverviewComponent implements OnInit, AfterViewInit {
     const [hour, minute, second] = timePart.split(':').map(Number);
 
     return new Date(year, month - 1, day, hour, minute, second);
+  }
+
+  getBusinessTruckLabel(submission: any): string | null {
+    const truck = submission?.businessContext?.truck ?? null;
+    if (!truck) return null;
+
+    const truckId = truck?.truckId ? String(truck.truckId) : '';
+    const licensePlate = truck?.licensePlate ? String(truck.licensePlate) : '';
+
+    if (truckId && licensePlate) return `${truckId} (${licensePlate})`;
+    if (truckId) return truckId;
+    if (licensePlate) return licensePlate;
+
+    return null;
+  }
+
+  getBusinessTruckDisplay(submission: any): string {
+    const truck = submission?.businessContext?.truck ?? null;
+    if (!truck) return '—';
+
+    const base = this.getBusinessTruckLabel(submission);
+    const make = truck?.make ? String(truck.make) : '';
+    const model = truck?.model ? String(truck.model) : '';
+    const year = truck?.year ? String(truck.year) : '';
+
+    const parts: string[] = [];
+    if (base) parts.push(base);
+
+    const mm = [year, make, model].filter(Boolean).join(' ');
+    if (mm) parts.push(mm);
+
+    return parts.length ? parts.join(' — ') : '—';
+  }
+
+  getBusinessDriverDisplay(submission: any): string {
+    const driver = submission?.businessContext?.driver ?? null;
+    if (!driver) return '—';
+
+    const name = driver?.name ? String(driver.name) : '';
+    const phone = driver?.phone ? String(driver.phone) : '';
+
+    if (name && phone) return `${name} (${phone})`;
+    if (name) return name;
+    if (phone) return phone;
+    return '—';
   }
 }

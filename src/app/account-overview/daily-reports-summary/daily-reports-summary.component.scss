@@ -1,45 +1,102 @@
-.summary-shell {
-	margin: 12px;
+:host {
+	--drs-surface: var(--mdc-theme-surface);
+	--drs-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
+	--drs-primary: var(--mdc-theme-primary);
+	--drs-secondary: var(--mdc-theme-secondary);
+	--drs-error: var(--mdc-theme-error, var(--drs-primary));
+
+	--drs-border: color-mix(in srgb, var(--drs-on-surface) 14%, transparent);
+	--drs-surface-2: color-mix(in srgb, var(--drs-on-surface) 6%, var(--drs-surface));
+	--drs-muted: color-mix(in srgb, var(--drs-on-surface) 72%, transparent);
 }
 
-.controls {
+:host-context(body.dark-mode) {
+	--drs-border: color-mix(in srgb, var(--drs-on-surface) 18%, transparent);
+}
+
+.drs-page {
+	padding: 6px 0 20px;
+}
+
+.drs-header {
 	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+
+	padding: 12px 12px;
+	border-radius: 14px;
+	background: var(--drs-surface-2);
+	border: 1px solid var(--drs-border);
+
+	margin: 6px 12px 14px;
+}
+
+.drs-title {
+	margin: 0;
+	line-height: 1.2;
+}
+
+.drs-subtitle {
+	margin: 6px 0 0;
+	opacity: 0.85;
+}
+
+.drs-card {
+	border-radius: 14px;
+	margin: 0 12px;
+}
+
+.drs-filters {
+	display: flex;
+	flex-wrap: wrap;
 	gap: 12px;
 	align-items: center;
-	flex-wrap: wrap;
-	padding: 12px 0;
+	margin-bottom: 10px;
 }
 
-.control {
+.drs-filter {
 	min-width: 220px;
 }
 
-.status-row {
+.drs-sort {
+	display: grid;
+	gap: 6px;
+	align-content: start;
+}
+
+.drs-sort-label {
+	font-size: 12px;
+	opacity: 0.8;
+	padding-left: 2px;
+}
+
+.drs-status-row {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 	padding: 10px 0;
 }
 
-.error {
-	color: #b00020;
+.drs-error {
+	color: var(--drs-error);
 	padding: 10px 0;
 }
 
-.empty {
-	padding: 14px 0;
-	color: rgba(0, 0, 0, 0.7);
-}
-
-.day-title {
-	font-weight: 600;
-}
-
-.day-stats {
+.drs-empty {
+	padding: 18px 4px;
 	opacity: 0.8;
 }
 
-.day-progress {
+.drs-day-title {
+	font-weight: 600;
+}
+
+.drs-day-stats {
+	opacity: 0.8;
+}
+
+.drs-day-progress {
 	display: grid;
 	grid-template-columns: 1fr auto;
 	gap: 10px;
@@ -47,142 +104,173 @@
 	margin: 10px 0 16px;
 }
 
-.day-progress-label {
+.drs-day-progress-label {
 	font-variant-numeric: tabular-nums;
 	min-width: 42px;
 	text-align: right;
+	opacity: 0.9;
 }
 
-.drivers {
+.drs-drivers {
 	margin-top: 8px;
 }
 
-.driver-name {
+/* Give the driver name/email more room in the panel header */
+.drs-drivers .mat-expansion-panel-header-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+}
+
+.drs-drivers .mat-expansion-panel-header-description {
+	flex: 0 0 auto;
+	white-space: nowrap;
+}
+
+.drs-driver-name {
 	font-weight: 600;
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
-.driver-email {
-	margin-left: 8px;
+.drs-driver-email {
+	opacity: 0.75;
+	flex: 0 0 auto;
+	white-space: nowrap;
+}
+
+.drs-driver-count {
 	opacity: 0.75;
 }
 
-.driver-count {
-	opacity: 0.75;
-}
-
-.truck {
-	border: 1px solid rgba(0, 0, 0, 0.08);
+.drs-truck {
+	border: 1px solid var(--drs-border);
 	border-radius: 12px;
 	padding: 12px;
 	margin: 10px 0;
+	background: var(--drs-surface);
 }
 
-.truck-header {
+.drs-truck-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
 	gap: 12px;
 }
 
-.truck-title {
+.drs-truck-title {
 	font-weight: 600;
 }
 
-.truck-meta {
+.drs-truck-meta {
 	font-size: 12px;
 	opacity: 0.75;
 	margin-top: 2px;
 }
 
-.status-icon {
+.drs-status-chip {
+	border: 1px solid var(--drs-border);
+}
+
+.drs-status-icon {
 	font-size: 18px;
 	height: 18px;
 	width: 18px;
+	margin-right: 6px;
 }
 
-.status-submitted {
-	background: #e8f5e9;
-	color: #1b5e20;
-	border-color: #a5d6a7;
+/* Keep semantic states, but derive colors from theme tokens (no hard-coded palette) */
+.drs-status-chip.status-submitted {
+	background: color-mix(in srgb, var(--drs-primary) 12%, var(--drs-surface));
+	border-color: color-mix(in srgb, var(--drs-primary) 28%, var(--drs-border));
 }
 
-.status-waived {
-	background: #eeeeee;
-	color: #424242;
-	border-color: #e0e0e0;
+.drs-status-chip.status-waived {
+	background: color-mix(in srgb, var(--drs-on-surface) 6%, var(--drs-surface));
 }
 
-.status-pending {
-	background: #fff8e1;
-	color: #e65100;
-	border-color: #ffecb3;
+.drs-status-chip.status-pending {
+	background: color-mix(in srgb, var(--drs-secondary) 12%, var(--drs-surface));
+	border-color: color-mix(in srgb, var(--drs-secondary) 26%, var(--drs-border));
 }
 
-.status-missing {
-	background: #ffebee;
-	color: #b71c1c;
-	border-color: #ef9a9a;
+.drs-status-chip.status-missing {
+	background: color-mix(in srgb, var(--drs-error) 12%, var(--drs-surface));
+	border-color: color-mix(in srgb, var(--drs-error) 26%, var(--drs-border));
 }
 
-.report {
+.drs-report {
 	margin-top: 10px;
 }
 
-.report-grid {
+.drs-report-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 8px 18px;
 }
 
 @media (max-width: 900px) {
-	.report-grid {
+	.drs-report-grid {
 		grid-template-columns: 1fr;
 	}
 }
 
-.photos {
+.drs-photos {
 	margin-top: 12px;
 }
 
-.photos-title {
+.drs-photos-title {
 	font-weight: 600;
 	margin-bottom: 6px;
 }
 
-.photos-grid {
+.drs-photos-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 	gap: 10px;
 }
 
-.photo {
-	border: 1px solid rgba(0, 0, 0, 0.08);
+.drs-photo {
+	border: 1px solid var(--drs-border);
 	border-radius: 10px;
 	overflow: hidden;
-	background: #fafafa;
+	background: var(--drs-surface-2);
 }
 
-.photo-slot {
+.drs-photo-slot {
 	font-size: 12px;
 	padding: 6px 10px;
-	background: rgba(0, 0, 0, 0.04);
+	background: color-mix(in srgb, var(--drs-on-surface) 4%, transparent);
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 }
 
-.photo img {
+.drs-photo img {
 	width: 100%;
 	height: 140px;
 	object-fit: cover;
 	display: block;
 }
 
-.photo-missing {
+.drs-photo-missing {
 	padding: 10px;
 	font-size: 12px;
-	opacity: 0.8;
+	opacity: 0.82;
 }
 
-.report-empty {
-	opacity: 0.75;
+.drs-report-empty {
+	opacity: 0.78;
+}
+
+@media (max-width: 800px) {
+	.drs-header {
+		margin-left: 12px;
+		margin-right: 12px;
+	}
+
+	.drs-filter {
+		min-width: 180px;
+	}
 }

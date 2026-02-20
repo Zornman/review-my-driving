@@ -6,9 +6,9 @@
       <h1 class="hero-title">Streamline Your Fleet Operations</h1>
       <p class="hero-subtitle">Collect valuable driver feedback instantly with QR codes, automate daily reports, and gain actionable insights to improve your fleet performance.</p>
       <div class="hero-cta">
-        <button mat-raised-button color="primary" class="cta-button primary-cta" (click)="navigateTo('/register')">
-          <mat-icon>person_add</mat-icon>
-          Get Started Free
+        <button mat-raised-button color="primary" class="cta-button primary-cta" (click)="navigateTo('/contact')">
+          <mat-icon>message</mat-icon>
+          Talk to Us
         </button>
         <button mat-raised-button class="cta-button secondary-cta" (click)="navigateTo('/services')">
           <mat-icon>info</mat-icon>
@@ -31,8 +31,8 @@
         <div class="stat-card" @scaleIn *ngFor="let stat of [
           {icon: 'qr_code_2', value: 'Unlimited', label: 'QR Codes'},
           {icon: 'assignment', value: 'Automated', label: 'Daily Reports'},
-          {icon: 'trending_up', value: 'Real-Time', label: 'Analytics'},
-          {icon: 'security', value: 'Enterprise', label: 'Security'}
+          {icon: 'trending_up', value: 'Reporting', label: 'Insights'},
+          {icon: 'security', value: 'Secure', label: 'Access'}
         ]">
           <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
           <h3>{{ stat.value }}</h3>
@@ -66,9 +66,9 @@
           },
           {
             icon: 'analytics',
-            title: 'Driver Analytics',
-            description: 'Aggregate and analyze feedback to identify trends and improve fleet performance with actionable insights.',
-            points: ['Real-time tracking', 'Performance insights', 'Historical analysis']
+            title: 'Feedback Insights',
+            description: 'Review submissions and reporting views to spot trends and follow up with the right driver or vehicle.',
+            points: ['Submission history', 'Context on trucks/drivers', 'Reporting views']
           },
           {
             icon: 'directions_car',
@@ -115,9 +115,9 @@
 
       <div class="benefits-grid">
         <div class="benefit-card" @scaleIn *ngFor="let benefit of [
-          {icon: 'security', title: 'Enterprise Security', description: 'Token-based authentication and encrypted data storage'},
+          {icon: 'security', title: 'Secure by Design', description: 'Secure authentication and access controls, plus time-limited tokens for daily-report links'},
           {icon: 'speed', title: 'Lightning Fast', description: 'Cloud-powered infrastructure with instant delivery'},
-          {icon: 'trending_up', title: 'Data-Driven', description: 'Comprehensive analytics and detailed reporting'},
+          {icon: 'trending_up', title: 'Data-Driven', description: 'Reporting views and summaries to keep teams accountable'},
           {icon: 'people', title: 'Easy Collaboration', description: 'Multi-user support for your entire team'},
           {icon: 'devices', title: 'Mobile Optimized', description: 'Works perfectly on phones, tablets, and desktops'},
           {icon: 'auto_awesome', title: 'Automated Workflows', description: 'Save time with scheduled reports and email delivery'}
@@ -134,30 +134,24 @@
   <section class="pricing-section">
     <div class="container">
       <div class="section-header" @fadeIn>
-        <h2>Simple, Transparent Pricing</h2>
-        <p>Choose the plan that fits your fleet size</p>
+        <h2>Plans & Onboarding</h2>
+        <p>Start with the core platform, then add onboarding or custom QR design if you need it</p>
       </div>
 
       <div class="pricing-grid">
         <div class="pricing-card" @fadeIn *ngFor="let tier of [
           {
-            name: 'Starter',
-            price: '$99',
-            description: 'For small fleets',
-            features: ['Up to 5 trucks', 'Up to 10 drivers', 'Daily reports', 'Basic QR codes', 'Email support']
-          },
-          {
-            name: 'Professional',
-            price: '$299',
-            description: 'For growing fleets',
-            features: ['Up to 50 trucks', 'Up to 100 drivers', 'Advanced reports', 'Custom QR branding', 'Priority support', 'Real-time analytics'],
+            name: 'Core Platform',
+            price: 'Quote-based',
+            description: 'For small fleets that want daily reports + truck/driver management',
+            features: ['Truck & driver management', 'Vehicle QR codes (standard)', 'Feedback collection + routing', 'Automated daily reports (magic links)', 'Photo uploads for verification', 'Business settings (timezone + report windows)'],
             highlighted: true
           },
           {
-            name: 'Enterprise',
-            price: 'Custom',
-            description: 'For large operations',
-            features: ['Unlimited trucks & drivers', 'Full customization', 'Dedicated manager', 'Phone & email support', 'Advanced analytics', 'Custom integrations']
+            name: 'Optional Add-Ons',
+            price: 'As needed',
+            description: 'For teams that want a more tailored rollout and branded assets',
+            features: ['One-time setup & onboarding assistance', 'Initial data import / configuration help', 'Custom QR design / branded assets', 'Workflow customization and rollout planning', 'Integration planning (if needed)']
           }
         ]; let i = index" [class.featured]="tier.highlighted" [style.animation-delay]="(i * 150) + 'ms'">
           <div class="pricing-header">
@@ -166,10 +160,9 @@
           </div>
           <div class="pricing-amount">
             <span class="price">{{ tier.price }}</span>
-            <span class="period" *ngIf="tier.name !== 'Enterprise'">/month</span>
           </div>
-          <button mat-raised-button [color]="tier.highlighted ? 'primary' : ''" class="pricing-cta" routerLink="/register">
-            Get Started
+          <button mat-raised-button [color]="tier.highlighted ? 'primary' : ''" class="pricing-cta" routerLink="/contact">
+            Contact Us
           </button>
           <mat-divider></mat-divider>
           <ul class="pricing-features">
@@ -182,7 +175,7 @@
       </div>
 
       <div class="pricing-note">
-        <p>All plans include a 14-day free trial. No credit card required.</p>
+        <p>Pricing is offered by quote. One-time setup/onboarding and custom QR design are available as add-ons.</p>
       </div>
     </div>
   </section>
@@ -198,11 +191,11 @@
       <div class="faq-grid">
         <mat-expansion-panel class="faq-item" *ngFor="let faq of [
           {q: 'What if my fleet grows?', a: 'Our plans scale with your business. Upgrade anytime to add more trucks and drivers.'},
-          {q: 'Is there a setup fee?', a: 'No setup fees! We handle all configuration during onboarding.'},
-          {q: 'How secure is the data?', a: 'We use enterprise-grade security with encrypted storage and token-based authentication.'},
+          {q: 'Is there a setup fee?', a: 'Most customers have a one-time setup fee for onboarding, initial data/config, and optional custom QR design.'},
+          {q: 'How secure is the data?', a: 'We use secure authentication and access controls, plus time-limited tokens for daily-report links.'},
           {q: 'Can drivers use mobile devices?', a: 'Yes! Our platform is fully mobile-optimized for phones, tablets, and desktops.'},
-          {q: 'What support is included?', a: 'All plans include email support. Professional and Enterprise include priority support and training.'},
-          {q: 'Do you offer custom integrations?', a: 'Yes! Enterprise customers can request custom integrations with existing systems.'}
+          {q: 'What support is included?', a: 'We provide onboarding and ongoing support. Support options depend on your plan and rollout needs.'},
+          {q: 'Do you offer custom integrations?', a: 'We can discuss integrations during onboarding and evaluate what’s feasible for your workflow.'}
         ]">
           <mat-expansion-panel-header>
             <mat-panel-title>
@@ -221,15 +214,15 @@
     <div class="container">
       <div class="final-cta-content" @fadeIn>
         <h2>Ready to Transform Your Fleet Operations?</h2>
-        <p>Start your free 14-day trial today. No credit card required.</p>
+        <p>Contact us and we’ll walk through your fleet setup.</p>
         <div class="final-cta-buttons">
-          <button mat-raised-button color="primary" class="cta-button large" routerLink="/register">
-            <mat-icon>person_add</mat-icon>
-            Create Free Account
-          </button>
-          <button mat-raised-button class="cta-button large outlined" routerLink="/contact">
+          <button mat-raised-button color="primary" class="cta-button large" routerLink="/contact">
             <mat-icon>message</mat-icon>
-            Contact Sales
+            Contact Us
+          </button>
+          <button mat-raised-button class="cta-button large outlined" routerLink="/services">
+            <mat-icon>info</mat-icon>
+            View Services
           </button>
         </div>
       </div>
@@ -319,24 +312,44 @@
 
       <mat-card appearance="outlined" *ngIf="totalSubmissions > 0; else noSubmissions" @fadeIn>
         <div class="submissions-table-wrapper">
+          <mat-tab-group
+            *ngIf="showSubmissionScopeTabs"
+            mat-stretch-tabs="false"
+            mat-align-tabs="center"
+            [selectedIndex]="submissionScope === 'personal' ? 0 : 1"
+            (selectedTabChange)="onSubmissionScopeTabChange($event)"
+          >
+            <mat-tab label="Personal"></mat-tab>
+            <mat-tab label="Business"></mat-tab>
+          </mat-tab-group>
+
           <mat-table [dataSource]="submissionsDataSource" multiTemplateDataRows class="submissions-table">
             <!-- Name Column -->
             <ng-container matColumnDef="name">
               <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-              <mat-cell *matCellDef="let element">{{ element.firstName }} {{ element.lastName }}</mat-cell>
+              <mat-cell *matCellDef="let element">
+                <div class="submission-name">
+                  <div>{{ element.firstName }} {{ element.lastName }}</div>
+                  <div
+                    *ngIf="submissionScope === 'business' && getBusinessTruckLabel(element) as truckLabel"
+                    class="submission-subtext">
+                    Truck: {{ truckLabel }}
+                  </div>
+                </div>
+              </mat-cell>
             </ng-container>
             
             <!-- Date Column -->
             <ng-container matColumnDef="dateSubmitted">
               <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
-              <mat-cell *matCellDef="let element">{{ element.dateSubmitted | date:'short' }}</mat-cell>
+              <mat-cell *matCellDef="let element">{{ parseDate(element.dateSubmitted) | date:'short' }}</mat-cell>
             </ng-container>
             
             <!-- Reason Column -->
             <ng-container matColumnDef="reasonForContacting">
               <mat-header-cell *matHeaderCellDef>Reason</mat-header-cell>
               <mat-cell *matCellDef="let element">
-                <span class="reason-badge">{{ element.reasonForContacting.replaceAll('_', ' ') }}</span>
+                <span class="reason-badge">{{ element.reasonForContacting ? element.reasonForContacting.replaceAll('_', ' ') : '—' }}</span>
               </mat-cell>
             </ng-container>
             
@@ -362,6 +375,17 @@
                   [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'"
                 >
                   <div class="detail-content">
+                    <ng-container *ngIf="submissionScope === 'business'">
+                      <div class="detail-kv">
+                        <div class="detail-label">Truck</div>
+                        <div class="detail-value">{{ getBusinessTruckDisplay(element) }}</div>
+                      </div>
+
+                      <div class="detail-kv">
+                        <div class="detail-label">Assigned Driver</div>
+                        <div class="detail-value">{{ getBusinessDriverDisplay(element) }}</div>
+                      </div>
+                    </ng-container>
                     <h4>Comment</h4>
                     <p>{{ element.description }}</p>
                   </div>

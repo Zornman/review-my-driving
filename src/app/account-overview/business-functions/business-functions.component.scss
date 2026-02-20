@@ -1,28 +1,196 @@
-.business-form {
+:host {
+	--bf-surface: var(--mdc-theme-surface);
+	--bf-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
+	--bf-primary: var(--mdc-theme-primary);
+	--bf-secondary: var(--mdc-theme-secondary);
+
+	--bf-tertiary: color-mix(in srgb, var(--bf-on-surface) 12%, transparent);
+
+	--bf-border: color-mix(in srgb, var(--bf-on-surface) 14%, transparent);
+	--bf-muted: color-mix(in srgb, var(--bf-on-surface) 72%, transparent);
+	--bf-muted-2: color-mix(in srgb, var(--bf-on-surface) 58%, transparent);
+
+	--bf-surface-2: color-mix(in srgb, var(--bf-tertiary) 55%, var(--bf-surface));
+	--bf-hover: color-mix(in srgb, var(--bf-secondary) 14%, transparent);
+	--bf-selected: color-mix(in srgb, var(--bf-primary) 10%, transparent);
+
+	--bf-panel: var(--bf-surface);
+}
+
+:host-context(body.dark-mode) {
+	--bf-border: color-mix(in srgb, var(--bf-on-surface) 18%, transparent);
+	--bf-hover: color-mix(in srgb, var(--bf-secondary) 18%, transparent);
+	--bf-selected: color-mix(in srgb, var(--bf-primary) 14%, transparent);
+	background: var(--bf-panel) !important;
+	color: var(--bf-on-surface) !important;
+}
+
+:host-context(body.light-mode) {
+	--bf-panel: #ffffff;
+}
+
+.bf-page {
+	padding: 6px 0 20px;
+	color: var(--bf-on-surface);
+}
+
+.bf-header {
+	position: static !important;
+	top: auto !important;
+	left: auto !important;
+	right: auto !important;
+	z-index: auto !important;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+
+	padding: 12px 12px;
+	border-radius: 14px;
+	background: var(--bf-surface-2);
+	border: 1px solid var(--bf-border);
+
+	margin: 6px 12px 14px;
+}
+
+.bf-title {
+	margin: 0;
+	line-height: 1.2;
+}
+
+.bf-subtitle {
+	margin: 6px 0 0;
+	opacity: 0.82;
+}
+
+.bf-container {
+	padding-left: 12px;
+	padding-right: 12px;
+}
+
+.bf-form {
 	max-width: 1100px;
 	margin: 0 auto;
 	text-align: left;
-
-	/* Undo global mat-form-field padding for a tighter grid layout on this screen */
-	mat-form-field {
-		padding-left: 0;
-		padding-right: 0;
-	}
 }
 
-.section-card {
+/* Keep form fields crisp and aligned in the Bootstrap grid */
+.bf-form mat-form-field {
+	width: 100%;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.bf-section {
 	margin: 12px 0;
-	border-radius: 12px;
+	border-radius: 14px;
+	border: 1px solid var(--bf-border);
+	background: var(--bf-panel);
+	overflow: hidden;
 }
 
-.section-title {
+.bf-section__header {
+	padding: 12px 14px;
+	background: var(--bf-surface-2);
+	border-bottom: 1px solid var(--bf-border);
+}
+
+.bf-section__title {
+	margin: 0;
+	line-height: 1.2;
+	font-size: 1.05rem;
+	font-weight: 650;
+}
+
+.bf-section__subtitle {
+	margin: 6px 0 0;
+	font-size: 0.92rem;
+	opacity: 0.82;
+}
+
+.bf-section__body {
+	padding: 14px;
+}
+
+.bf-separator {
+	margin: 6px 0 14px;
+	border-top: 1px solid var(--bf-border);
+}
+
+.bf-schedule {
+	margin-bottom: 6px;
+}
+
+.bf-schedule__title {
+	font-size: 0.95rem;
+	font-weight: 650;
+	letter-spacing: 0.01em;
+	margin: 0 0 6px 0;
+}
+
+.bf-schedule__hint {
 	margin: 0 0 10px 0;
-	font-size: 1.1rem;
-	font-weight: 600;
+	font-size: 0.9rem;
+	color: var(--bf-muted-2);
 }
 
-.actions-row {
+.bf-days {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 14px;
+	padding: 10px;
+	border: 1px solid var(--bf-border);
+	border-radius: 12px;
+	background: color-mix(in srgb, var(--bf-surface-2) 60%, transparent);
+}
+
+.bf-day {
+	-webkit-appearance: none;
+	appearance: none;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 46px;
+	height: 46px;
+	border-radius: 999px;
+
+	border: 1px solid var(--bf-border);
+	background-color: color-mix(in srgb, var(--bf-on-surface) 6%, transparent);
+	color: var(--bf-on-surface);
+
+	font-weight: 650;
+	font-size: 0.85rem;
+	letter-spacing: 0.01em;
+	user-select: none;
+
+	transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+	cursor: pointer;
+}
+
+.bf-day:hover {
+	background-color: color-mix(in srgb, var(--bf-on-surface) 9%, transparent);
+}
+
+.bf-day.is-selected {
+	background-color: color-mix(in srgb, var(--bf-primary) 22%, transparent);
+	border-color: color-mix(in srgb, var(--bf-primary) 70%, var(--bf-border));
+	color: var(--bf-primary);
+}
+
+.bf-day:focus-visible {
+	outline: 2px solid color-mix(in srgb, var(--bf-primary) 70%, transparent);
+	outline-offset: 2px;
+}
+
+.bf-actions {
 	display: flex;
 	justify-content: center;
 	margin: 18px 0 8px 0;
+}
+
+.bf-actions__spinner {
+	margin-left: 10px;
 }
