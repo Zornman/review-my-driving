@@ -1,5 +1,11 @@
 :host {
-    --ao-surface: var(--mdc-theme-surface);
+        /*
+            Use a surface token that actually changes with your manual
+            body.light-mode/body.dark-mode classes. In this app those classes
+            override container background colors (e.g. expansion/table/select),
+            while --mdc-theme-surface is currently driven by prefers-color-scheme.
+        */
+        --ao-surface: var(--mat-expansion-container-background-color, var(--mdc-theme-surface));
     --ao-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
     --ao-primary: var(--mdc-theme-primary);
     --ao-secondary: var(--mdc-theme-secondary);

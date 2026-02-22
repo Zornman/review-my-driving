@@ -59,6 +59,10 @@
   .hero-content {
     padding-left: 2rem;
 
+    @media screen and (max-width: 767px) {
+      padding-left: 0px !important;
+    }
+
     .hero-title {
       font-size: 3.5rem;
       font-weight: 700;
