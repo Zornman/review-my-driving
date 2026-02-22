@@ -226,6 +226,7 @@ input, textarea, select, label {
 .content {
     flex: 1; /* Allows the content area to expand and scroll */
     overflow-y: auto; /* Enables vertical scrolling for the content */
+    overflow-x: hidden; /* Prevent accidental horizontal scroll from wide children */
 }
 
 mat-form-field {

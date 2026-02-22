@@ -2,24 +2,26 @@
 <div *ngIf="!user" class="home-container">
   <!-- Hero Section -->
   <section class="hero-section" @fadeIn>
-    <div class="hero-content">
-      <h1 class="hero-title">Streamline Your Fleet Operations</h1>
-      <p class="hero-subtitle">Collect valuable driver feedback instantly with QR codes, automate daily reports, and gain actionable insights to improve your fleet performance.</p>
-      <div class="hero-cta">
-        <button mat-raised-button color="primary" class="cta-button primary-cta" (click)="navigateTo('/contact')">
-          <mat-icon>message</mat-icon>
-          Talk to Us
-        </button>
-        <button mat-raised-button class="cta-button secondary-cta" (click)="navigateTo('/services')">
-          <mat-icon>info</mat-icon>
-          Learn More
-        </button>
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Streamline Your Fleet Operations</h1>
+        <p class="hero-subtitle">Collect valuable driver feedback instantly with QR codes, automate daily reports, and gain actionable insights to improve your fleet performance.</p>
+        <div class="hero-cta">
+          <button mat-raised-button color="primary" class="cta-button primary-cta" (click)="navigateTo('/contact')">
+            <mat-icon>message</mat-icon>
+            Talk to Us
+          </button>
+          <button mat-raised-button class="cta-button secondary-cta" (click)="navigateTo('/services')">
+            <mat-icon>info</mat-icon>
+            Learn More
+          </button>
+        </div>
+        <p class="hero-trust-text">Join leading fleet managers who trust Review My Driving</p>
       </div>
-      <p class="hero-trust-text">Join leading fleet managers who trust Review My Driving</p>
-    </div>
-    <div class="hero-visual">
-      <div class="hero-graphic">
-        <mat-icon class="hero-icon">directions_car</mat-icon>
+      <div class="hero-visual">
+        <div class="hero-graphic">
+          <mat-icon class="hero-icon">directions_car</mat-icon>
+        </div>
       </div>
     </div>
   </section>

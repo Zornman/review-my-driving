@@ -197,6 +197,10 @@
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 24px;
 
+    @media (max-width: 600px) {
+      grid-template-columns: repeat(1, 1fr) !important;
+    }
+
     .stat-card {
       background: var(--mat-expansion-container-background-color);
       padding: 30px 20px;
@@ -470,11 +474,18 @@
 
       &.featured {
         border-color: $color-primary;
-        transform: scale(1.05);
+        /* Keep the "featured" emphasis without causing horizontal overflow on smaller devices.
+           Transforms can expand the scrollable width of the `.content` container. */
+        transform: none;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 
+        @media (min-width: 1024px) {
+          transform: scale(1.03);
+          transform-origin: center;
+        }
+
         @media (max-width: 768px) {
-          transform: scale(1);
+          transform: none;
         }
 
         .pricing-cta {
@@ -617,6 +628,8 @@
             align-items: center;
             gap: 12px;
             font-weight: 600;
+            min-width: 0;
+            white-space: normal;
 
             mat-icon {
               color: $color-primary;
@@ -1067,7 +1080,7 @@
   }
 
   .dashboard-stats .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
 
     .stat-card {
       flex-direction: column;

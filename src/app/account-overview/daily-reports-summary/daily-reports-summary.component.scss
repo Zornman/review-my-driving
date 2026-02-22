@@ -1,5 +1,10 @@
 :host {
-	--drs-surface: var(--mdc-theme-surface);
+	/*
+	  Use a surface token that changes with your manual body.light-mode/body.dark-mode.
+	  In this app those classes override container/table background vars, while
+	  --mdc-theme-surface is currently driven by prefers-color-scheme.
+	*/
+	--drs-surface: var(--mat-expansion-container-background-color, var(--mat-table-background-color, var(--mdc-theme-surface)));
 	--drs-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
 	--drs-primary: var(--mdc-theme-primary);
 	--drs-secondary: var(--mdc-theme-secondary);

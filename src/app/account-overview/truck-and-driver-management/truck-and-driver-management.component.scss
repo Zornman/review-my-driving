@@ -5,7 +5,12 @@
    ========================= */
 :host {
   /* Core theme (comes from styles.scss, light/dark mode aware) */
-  --tdm-surface: var(--mdc-theme-surface);
+  /*
+    Use a surface token that changes with your manual body.light-mode/body.dark-mode.
+    In this app, those classes override --mat-table-background-color (and similar),
+    while --mdc-theme-surface is currently driven by prefers-color-scheme.
+  */
+  --tdm-surface: var(--mat-table-background-color, var(--mat-expansion-container-background-color, var(--mdc-theme-surface)));
   --tdm-on-surface: var(--mat-table-row-item-label-text-color, var(--mdc-theme-on-surface));
 
   /* Optional: make subtitle consistently readable */
@@ -100,10 +105,7 @@ tr.tdm-detail-row,
   color: var(--tdm-on-surface) !important;
 }
 
-:host-context(body.light-mode) {
-  /* Ensure light mode always uses a light surface, even if globals set odd values */
-  --tdm-panel: #ffffff;
-}
+/* Keep panel mode-aware by default; avoid hard-coded colors */
 
 /* =========================
    Layout
