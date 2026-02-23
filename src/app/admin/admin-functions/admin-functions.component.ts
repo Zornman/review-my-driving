@@ -79,13 +79,12 @@ export class AdminFunctionsComponent implements OnInit {
     let cachedProducts = null;
 
     if (!cachedProducts) {
-      this.printifyService.getProducts().subscribe({
+      this.printifyService.getAdminProducts().subscribe({
         next: (response: any) => {
           this.products = response.map((item: any) => {
               return new Product(item);
           });
-  
-          this.products = this.products.filter(x => x.visible);
+
           if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('products', JSON.stringify(this.products));
           }

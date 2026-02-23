@@ -71,6 +71,11 @@ export class QRCodeService {
             const options: QRCodeToDataURLOptions = {
                 width: 3000, // Set the desired width in pixels
                 errorCorrectionLevel: 'H', // High error correction level
+                color: {
+                    dark: '#000000', // QR modules
+                    // qrcode expects hex; use 4-digit #RGBA for transparency
+                    light: '#0000', // transparent background
+                },
             };
             return await this.QRCode.toDataURL(url, options); // Returns a Base64 data URL
         } catch (err) {
