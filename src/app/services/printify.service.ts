@@ -17,6 +17,11 @@ export class PrintifyService {
         return this.http.get<Product[]>(url);
     }
 
+    getAdminProducts(): Observable<Product[]> {
+        const url = this.getFunctionUrl("fetchAdminProducts");
+        return this.http.get<Product[]>(url);
+    }
+
     getProduct(productId: string): Observable<Product> {
         const url = this.getFunctionUrl("getProduct");
         const params = new HttpParams().set('id', productId);
