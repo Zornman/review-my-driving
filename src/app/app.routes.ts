@@ -17,7 +17,10 @@ import { ProductsAndServicesComponent } from './products-and-services/products-a
 
 export const routes: Routes = [
     { path: '', component: IndexComponent },
-    { path: 'index', component: IndexComponent },
+
+    // Redirect legacy /index to /
+    { path: 'index', redirectTo: '', pathMatch: 'full' },
+
     { path: 'home', component: HomeComponent },
     { path: 'shop', component: ShopComponent },
     { path: 'services', component: ProductsAndServicesComponent },
@@ -35,5 +38,7 @@ export const routes: Routes = [
     { path: 'contact', component: ContactComponent },
     { path: 'admin-functions', component: AdminFunctionsComponent },
     { path: 'daily-report', component: DailyReportComponent },
-    { path: '**', redirectTo: '/index' }
+
+    // Fallback to /
+    { path: '**', redirectTo: '' }
 ];

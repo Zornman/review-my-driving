@@ -18,7 +18,9 @@
   },
   "hosting": {
     "site": "review-my-driving",
-    "public": "dist/review-my-driving/browser",
+    
+    "public": "hosting-public",
+
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -48,6 +50,24 @@
           {
             "key": "Access-Control-Allow-Headers",
             "value": "Content-Type, Authorization"
+          }
+        ]
+      },
+      {
+        "source": "/",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
           }
         ]
       }
