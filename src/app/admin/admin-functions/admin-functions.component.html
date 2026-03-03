@@ -36,6 +36,39 @@
         </div>
     </div>
 
+    <!-- Truck Registration Summary Section -->
+    <div class="row" style="margin-top: 15px;">
+        <div class="col-12">
+            <h2>Truck Registration - Admin Tools</h2>
+            <p style="margin: 0 0 10px; color: #666;">
+                Run once to test the registration renewal summary email.
+            </p>
+        </div>
+
+        <div class="col-12 col-md-6" style="margin-bottom: 10px;">
+            <button
+                mat-stroked-button
+                color="primary"
+                type="button"
+                (click)="runTruckRegistrationRenewalSummaryOnce()"
+                [disabled]="isRunTruckRegSummaryLoading">
+                Run Registration Summary Once
+                <mat-progress-spinner
+                    *ngIf="isRunTruckRegSummaryLoading"
+                    mode="indeterminate"
+                    diameter="18"
+                    style="margin-left: 10px;">
+                </mat-progress-spinner>
+            </button>
+        </div>
+
+        <div class="col-12" *ngIf="lastTruckRegSummaryResult">
+            <pre style="white-space: pre-wrap; background:#f6f6f6; padding:10px; border-radius:8px;">
+{{ lastTruckRegSummaryResult | json }}
+            </pre>
+        </div>
+    </div>
+
     <!-- Bulk Create Sample QR Codes Form -->
     <div class="row" *ngIf="showBulkCreateForm">
         <div class="col-12">

@@ -18,6 +18,9 @@ const EMAIL_USER = defineSecret("EMAIL_USER");
 const EMAIL_PASS = defineSecret("EMAIL_PASS");
 const APP_BASE_URL = defineSecret("APP_BASE_URL");
 
+// (Optional) if you want a fallback recipient when a business has no contactEmail
+const DEFAULT_TO_EMAIL = defineSecret("DEFAULT_TO_EMAIL");
+
 export { createCustomProduct } from "./createCustomProduct.js";
 export { createCustomBusinessProduct } from "./createCustomBusinessProduct.js";
 export { createPrintifyOrder } from "./createPrintifyOrder.js";
@@ -80,60 +83,88 @@ export { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 
 export { updateSampleMapper } from "./updateSampleMapper.js";
 export { updateOrderStatus } from "./updateOrderStatus.js";
+
 import { updateOrderStatusTask } from "./updateOrderStatusTask.js";
 import { sendDailyReportMagicLinksTask } from "./sendDailyReportMagicLinksTask.js";
+import { sendTruckRegistrationRenewalSummaryTask } from "./sendTruckRegistrationRenewalSummaryTask.js";
 
 export { insertBusinessQRCodes } from "./insertBusinessQRCodes.js";
 export { getBusinessQrContext } from "./getBusinessQrContext.js";
 export { getBusinessQRCodesByBusiness } from "./getBusinessQRCodesByBusiness.js";
 export { assignBusinessQrToTruck } from "./assignBusinessQrToTruck.js";
 export { getAllBusinessUsers } from "./getAllBusinessUsers.js";
+export { runTruckRegistrationRenewalSummaryOnce } from "./runTruckRegistrationRenewalSummaryOnce.js";
 
-export const updateOrderStatusTaskSchedule = onSchedule({schedule: "every hour", secrets: [
-    PRINTIFY_STORE_ID,
-    PRINTIFY_URL,
-    PRINTIFY_API_KEY,
-    MONGO_URI,
-    EMAIL_USER,
-    EMAIL_PASS
-]}, async (event: any) => {
+export const updateOrderStatusTaskSchedule = onSchedule(
+  {
+    schedule: "every hour",
+    secrets: [PRINTIFY_STORE_ID, PRINTIFY_URL, PRINTIFY_API_KEY, MONGO_URI, EMAIL_USER, EMAIL_PASS],
+  },
+  async () => {
     console.log("Running UpdateOrderStatus task...");
 
     try {
-        // Call your existing logic here
-        await updateOrderStatusTask({
-            PRINTIFY_STORE_ID: PRINTIFY_STORE_ID.value(),
-            PRINTIFY_URL: PRINTIFY_URL.value(),
-            PRINTIFY_API_KEY: PRINTIFY_API_KEY.value(),
-            MONGO_URI: MONGO_URI.value(),
-            EMAIL_USER: EMAIL_USER.value(),
-            EMAIL_PASS: EMAIL_PASS.value(),
-          }); // ✅ Replace this with your function logic
-        console.log("Running UpdateOrderStatus task - completed successfully.");
+      await updateOrderStatusTask({
+        PRINTIFY_STORE_ID: PRINTIFY_STORE_ID.value(),
+        PRINTIFY_URL: PRINTIFY_URL.value(),
+        PRINTIFY_API_KEY: PRINTIFY_API_KEY.value(),
+        MONGO_URI: MONGO_URI.value(),
+        EMAIL_USER: EMAIL_USER.value(),
+        EMAIL_PASS: EMAIL_PASS.value(),
+      });
+
+      console.log("Running UpdateOrderStatus task - completed successfully.");
     } catch (error) {
-    console.error("Error running scheduled function:", error);
+      console.error("Error running scheduled function:", error);
     }
-});
+  }
+);
 
 export const sendDailyReportMagicLinksSchedule = onSchedule(
-    {
-        schedule: "every 15 minutes",
-        secrets: [MONGO_URI, EMAIL_USER, EMAIL_PASS, APP_BASE_URL],
-    },
-    async () => {
-        console.log("Running Daily Report magic-link scheduler...");
+  {
+    schedule: "every 15 minutes",
+    secrets: [MONGO_URI, EMAIL_USER, EMAIL_PASS, APP_BASE_URL],
+  },
+  async () => {
+    console.log("Running Daily Report magic-link scheduler...");
 
-        try {
-            const result = await sendDailyReportMagicLinksTask({
-                MONGO_URI: MONGO_URI.value(),
-                EMAIL_USER: EMAIL_USER.value(),
-                EMAIL_PASS: EMAIL_PASS.value(),
-                APP_BASE_URL: APP_BASE_URL.value(),
-            });
+    try {
+      const result = await sendDailyReportMagicLinksTask({
+        MONGO_URI: MONGO_URI.value(),
+        EMAIL_USER: EMAIL_USER.value(),
+        EMAIL_PASS: EMAIL_PASS.value(),
+        APP_BASE_URL: APP_BASE_URL.value(),
+      });
 
-            console.log("Daily Report scheduler completed:", result);
-        } catch (error) {
-            console.error("Error running Daily Report scheduler:", error);
-        }
+      console.log("Daily Report scheduler completed:", result);
+    } catch (error) {
+      console.error("Error running Daily Report scheduler:", error);
     }
+  }
+);
+
+export const sendTruckRegistrationRenewalSummarySchedule = onSchedule(
+  {
+    schedule: "every day 07:00",
+    // If you want a specific timezone for the *trigger*, uncomment and set it:
+    timeZone: "America/Phoenix",
+    secrets: [MONGO_URI, EMAIL_USER, EMAIL_PASS, DEFAULT_TO_EMAIL],
+  },
+  async () => {
+    console.log("Running Truck Registration Renewal Summary scheduler...");
+
+    try {
+      const result = await sendTruckRegistrationRenewalSummaryTask({
+        MONGO_URI: MONGO_URI.value(),
+        EMAIL_USER: EMAIL_USER.value(),
+        EMAIL_PASS: EMAIL_PASS.value(),
+        DEFAULT_TO_EMAIL: DEFAULT_TO_EMAIL.value(),
+        DUE_WITHIN_DAYS: 45, // tweak as desired (still month-based bucketing in the task)
+      });
+
+      console.log("Truck Registration Renewal Summary completed:", result);
+    } catch (error) {
+      console.error("Error running Truck Registration Renewal Summary scheduler:", error);
+    }
+  }
 );

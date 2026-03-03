@@ -46,6 +46,9 @@ export class AdminFunctionsComponent implements OnInit {
   isRunDailyReportSchedulerLoading = false;
   lastDailyReportSchedulerResult: any | null = null;
 
+  isRunTruckRegSummaryLoading = false;
+  lastTruckRegSummaryResult: any | null = null;
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: any, 
     private fb: FormBuilder, 
@@ -161,6 +164,25 @@ export class AdminFunctionsComponent implements OnInit {
         this.isRunDailyReportSchedulerLoading = false;
         this._snackBar.open(err?.error?.message ?? 'Error running scheduler.', 'Ok', { duration: 5000 });
       }
+    });
+  }
+
+  runTruckRegistrationRenewalSummaryOnce(): void {
+    this.isRunTruckRegSummaryLoading = true;
+    this.lastTruckRegSummaryResult = null;
+    this._snackBar.open("Running truck registration renewal summary...", "Close");
+
+    this.mongoService.runTruckRegistrationRenewalSummaryOnce(45).subscribe({
+      next: (result: any) => {
+        this.isRunTruckRegSummaryLoading = false;
+        this.lastTruckRegSummaryResult = result?.result ?? result;
+        const sent = this.lastTruckRegSummaryResult?.emailsSent ?? 0;
+        this._snackBar.open(`Completed. Emails sent: ${sent}`, "Ok", { duration: 5000 });
+      },
+      error: (err: any) => {
+        this.isRunTruckRegSummaryLoading = false;
+        this._snackBar.open(err?.error?.message ?? "Error running summary.", "Ok", { duration: 5000 });
+      },
     });
   }
 
