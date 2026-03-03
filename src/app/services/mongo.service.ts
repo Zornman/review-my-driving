@@ -154,6 +154,11 @@ export class MongoService {
         return this.http.post(url, {});
     }
 
+    runTruckRegistrationRenewalSummaryOnce(dueWithinDays: number = 45) {
+        const url = this.getFunctionUrl("runTruckRegistrationRenewalSummaryOnce");
+        return this.http.post(url, { dueWithinDays });
+      }
+
     getDailyReportsSummary(params: {
         businessId: string;
         startDateLocal: string;

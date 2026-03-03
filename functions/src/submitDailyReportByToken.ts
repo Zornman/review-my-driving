@@ -3,6 +3,7 @@ import { MongoClient } from "mongodb";
 import cors from "cors";
 import { parseJsonBody } from "./_shared/http.js";
 import { DAILY_REPORT_PHOTO_SLOTS, sha256Hex } from "./_shared/dailyReports.js";
+import { writeAuditEvent } from "./_shared/audit.js";
 
 const corsHandler = cors({ origin: true });
 
@@ -138,10 +139,60 @@ export const submitDailyReportByToken = functions.https.onRequest({ secrets: ["M
 
       await db.collection("daily_reports").updateOne(reportKey, { $set: reportDoc }, { upsert: true });
 
+      // --- Truck odometer monotonic update + audit event ---
+      const truckFilter = { businessId: reportKey.businessId, truckId: reportKey.truckId };
+
+      // Fetch current odometer for audit "from" value (keep it small with projection)
+      const truckBefore: any = await db.collection("trucks").findOne(truckFilter, {
+        projection: { _id: 1, truckId: 1, businessId: 1, "odometer.value": 1, "odometer.unit": 1 },
+      });
+
+      // If truck doesn't exist, you can choose to ignore or treat as an error.
+      // Here we just skip updating/auditing.
+      if (truckBefore?._id) {
+        const prevOdometerValue =
+          typeof truckBefore?.odometer?.value === "number" ? truckBefore.odometer.value : null;
+
+        const truckUpdateRes = await db.collection("trucks").updateOne(
+          {
+            ...truckFilter,
+            $or: [
+              { "odometer.value": { $lte: odometer } },
+              { odometer: { $exists: false } },
+              { "odometer.value": { $exists: false } },
+            ],
+          },
+          {
+            $set: {
+              "odometer.value": odometer,
+              "odometer.unit": "mi",
+              "audit.updatedAt": now,
+              "audit.updatedBy": { userId: tokenDoc.driverUserId ?? null, name: tokenDoc.driverName ?? null },
+            },
+          }
+        );
+
+        // Only audit if the odometer was actually updated
+        if (truckUpdateRes.modifiedCount === 1) {
+          await writeAuditEvent({
+            db,
+            businessId: reportKey.businessId,
+            entityType: "truck",
+            entityId: truckBefore._id,
+            entityKey: reportKey.truckId,
+            action: "update",
+            actor: { userId: tokenDoc.driverUserId ?? null, name: tokenDoc.driverName ?? null },
+            changes: [
+              { path: "odometer.value", from: prevOdometerValue, to: odometer },
+              { path: "odometer.unit", from: truckBefore?.odometer?.unit ?? null, to: "mi" },
+            ],
+            requestId: req.header("X-Request-Id") ?? undefined,
+          });
+        }
+      }
+
       // Mark token used (conditional helps with races).
       const usedRes = await db.collection("daily_report_tokens").updateOne(
-        // Note: many tokens are created with usedAt: null.
-        // In MongoDB, { usedAt: null } matches both null and missing fields.
         { _id: tokenDoc._id, usedAt: null },
         { $set: { usedAt: now } }
       );
