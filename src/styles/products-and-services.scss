@@ -1,4 +1,5 @@
 @use '../styles/variables' as *;
+@use 'sass:color';
 
 * {
   margin: 0;
@@ -26,7 +27,7 @@
 
 .hero-section {
   padding: 80px 0;
-  background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 15%) 100%);
+  background: linear-gradient(135deg, $color-primary 0%, color.adjust($color-primary, $lightness: -15%) 100%);
   color: $color-text-light;
   display: flex;
   align-items: center;
@@ -542,7 +543,7 @@
       transition: all 0.3s ease;
 
       &:hover {
-        background-color: lighten($color-primary, 10%) !important;
+        background-color: color.adjust($color-primary, $lightness: 10%) !important;
       }
 
       mat-icon {
@@ -573,11 +574,11 @@
     }
 
     .qr-code-demo {
-      background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 15%) 100%);
+      background: linear-gradient(135deg, $color-primary 0%, color.adjust($color-primary, $lightness: -15%) 100%);
     }
 
     .reports-demo {
-      background: linear-gradient(135deg, $color-secondary 0%, darken($color-secondary, 15%) 100%);
+      background: linear-gradient(135deg, $color-secondary 0%, color.adjust($color-secondary, $lightness: -15%) 100%);
     }
 
     mat-icon {
@@ -1028,7 +1029,7 @@
 
 .final-cta-section {
   padding: 80px 0;
-  background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 15%) 100%);
+  background: linear-gradient(135deg, $color-primary 0%, color.adjust($color-primary, $lightness: -15%) 100%);
   color: $color-text-light;
   position: relative;
   overflow: hidden;

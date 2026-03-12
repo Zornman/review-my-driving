@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSnackBar, MatSnackBarModule, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { ConfirmDialogComponent } from '../../shared/modals/confirm-dialog/confirm-dialog.component';
 import { AssignDriverDialogComponent } from '../../shared/modals/assign-driver-dialog/assign-driver-dialog.component';
@@ -16,6 +17,7 @@ import { AddEditTruckComponent } from '../../shared/modals/add-edit-truck/add-ed
 import { AddNewDriverComponent } from '../../shared/modals/add-new-driver/add-new-driver.component';
 import { EditAddressInfoComponent } from '../../shared/modals/edit-address-info/edit-address-info.component';
 import { EditLicenseInfoComponent } from '../../shared/modals/edit-license-info/edit-license-info.component';
+import { EditPersonalInfoComponent } from '../../shared/modals/edit-personal-info/edit-personal-info.component';
 import { MongoService } from '../../services/mongo.service';
 import { AuthService } from '../../services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -32,6 +34,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatTableModule,
     MatIconModule,
     MatPaginatorModule,
+    MatSnackBarModule,
   ],
   templateUrl: './truck-and-driver-management.component.html',
   styleUrl: './truck-and-driver-management.component.scss',
@@ -45,6 +48,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit {
   private destroyRef = inject(DestroyRef);
+
+  private savingSnackRef: MatSnackBarRef<TextOnlySnackBar> | null = null;
 
   trucksColumnsToDisplay = ['truckId', 'licensePlate', 'assignedDriver', 'odometer', 'status', 'expand'];
   trucksDataSource = new MatTableDataSource<any>([]);
@@ -67,7 +72,25 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
     private dialog: MatDialog,
     private dbService: MongoService,
     private authService: AuthService,
+    private snackBar: MatSnackBar,
   ) { }
+
+  private showSaving(message: string = 'Saving...'): void {
+    this.savingSnackRef?.dismiss();
+    this.savingSnackRef = this.snackBar.open(message);
+  }
+
+  private showSaved(message: string = 'Saved'): void {
+    this.savingSnackRef?.dismiss();
+    this.savingSnackRef = null;
+    this.snackBar.open(message, undefined, { duration: 2500 });
+  }
+
+  private showSaveError(message: string = 'Save failed'): void {
+    this.savingSnackRef?.dismiss();
+    this.savingSnackRef = null;
+    this.snackBar.open(message, 'Dismiss', { duration: 6000 });
+  }
 
   ngOnInit(): void {
     this.authService.user$
@@ -207,6 +230,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
     }).afterClosed().subscribe((result: any) => {
       if (!result || !result.truckId || !this.businessId) return;
 
+      this.showSaving('Saving truck...');
+
       const assignedDriverId = result.assignedDriverId ?? null;
 
       const payload: any = {
@@ -240,18 +265,24 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
               driverObjectId: assignedDriverId,
               unassign: false
             }).subscribe({
-              next: () => void this.refreshAll(),
+              next: () => {
+                void this.refreshAll();
+                this.showSaved('Truck saved');
+              },
               error: (error: any) => {
                 console.error('Error assigning driver after insert:', error);
                 void this.refreshAll();
+                this.showSaveError('Truck saved, but assignment failed');
               }
             });
           } else {
             void this.refreshAll();
+            this.showSaved('Truck saved');
           }
         },
         error: (error: any) => {
           console.error('Error inserting truck:', error);
+          this.showSaveError('Failed to save truck');
         }
       });
     });
@@ -264,6 +295,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
     }).afterClosed().subscribe((result: any) => {
       if (!result || !result.driverId || !this.businessId) return;
 
+      this.showSaving('Saving driver...');
+
       const payload: any = {
         businessId: this.businessId,
         businessIdAsObjectId: this.businessIdAsObjectId,
@@ -274,9 +307,11 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
       this.dbService.insertDriver(payload).subscribe({
         next: () => {
           void this.refreshAll();
+          this.showSaved('Driver saved');
         },
         error: (error: any) => {
           console.error('Error inserting driver:', error);
+          this.showSaveError('Failed to save driver');
         }
       });
     });
@@ -317,6 +352,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
       const existingAssigned = this.assignedDriverIdFromTruck(truck);
       const nextAssigned = result.assignedDriverId ?? null;
 
+      this.showSaving('Saving truck...');
+
       this.dbService.updateTruck(updatePayload).subscribe({
         next: () => {
           if (existingAssigned !== nextAssigned) {
@@ -332,20 +369,24 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
               next: () => {
                 void this.refreshAll();
                 this.expandedTruck = null;
+                this.showSaved('Truck saved');
               },
               error: (error: any) => {
                 console.error('Error assigning driver:', error);
                 void this.refreshAll();
                 this.expandedTruck = null;
+                this.showSaveError('Truck saved, but assignment failed');
               }
             });
           } else {
             void this.refreshAll();
             this.expandedTruck = null;
+            this.showSaved('Truck saved');
           }
         },
         error: (error: any) => {
           console.error('Error updating truck:', error);
+          this.showSaveError('Failed to save truck');
         }
       });
     });
@@ -374,6 +415,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
     }).afterClosed().subscribe((result: boolean) => {
       if (result !== true) return;
 
+      this.showSaving('Saving truck status...');
+
       this.dbService.updateTruck({
         businessId: this.businessId,
         businessIdAsObjectId: this.businessIdAsObjectId,
@@ -384,8 +427,12 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
         next: () => {
           void this.refreshAll();
           this.expandedTruck = null;
+          this.showSaved('Truck status updated');
         },
-        error: (error: any) => console.error('Error updating truck status:', error)
+        error: (error: any) => {
+          console.error('Error updating truck status:', error);
+          this.showSaveError('Failed to update truck status');
+        }
       });
     });
   }
@@ -413,6 +460,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
     }).afterClosed().subscribe((result: boolean) => {
       if (result !== true) return;
 
+      this.showSaving('Saving driver status...');
+
       this.dbService.updateDriver({
         businessId: this.businessId,
         businessIdAsObjectId: this.businessIdAsObjectId,
@@ -423,8 +472,12 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
         next: () => {
           void this.refreshAll();
           this.expandedDriver = null;
+          this.showSaved('Driver status updated');
         },
-        error: (error: any) => console.error('Error updating driver status:', error)
+        error: (error: any) => {
+          console.error('Error updating driver status:', error);
+          this.showSaveError('Failed to update driver status');
+        }
       });
     });
   }
@@ -445,6 +498,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
         const truckObjectId = this.oidToString(this.expandedTruck?._id);
         if (!truckObjectId) return;
 
+        this.showSaving('Deleting truck...');
+
         this.dbService.deleteTruck({
           businessId: this.businessId,
           businessIdAsObjectId: this.businessIdAsObjectId,
@@ -454,8 +509,12 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
           next: () => {
             void this.refreshAll();
             this.expandedTruck = null;
+            this.showSaved('Truck deleted');
           },
-          error: (error: any) => console.error('Error deleting truck:', error)
+          error: (error: any) => {
+            console.error('Error deleting truck:', error);
+            this.showSaveError('Failed to delete truck');
+          }
         });
       }
     });
@@ -477,6 +536,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
         const driverObjectId = this.oidToString(this.expandedDriver?._id);
         if (!driverObjectId) return;
 
+        this.showSaving('Deleting driver...');
+
         this.dbService.deleteDriver({
           businessId: this.businessId,
           businessIdAsObjectId: this.businessIdAsObjectId,
@@ -486,8 +547,12 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
           next: () => {
             void this.refreshAll();
             this.expandedDriver = null;
+            this.showSaved('Driver deleted');
           },
-          error: (error: any) => console.error('Error deleting driver:', error)
+          error: (error: any) => {
+            console.error('Error deleting driver:', error);
+            this.showSaveError('Failed to delete driver');
+          }
         });
       }
     });
@@ -515,6 +580,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
 
       const nextDriverObjectId = selectedDriver ? this.oidToString(selectedDriver?._id) : null;
 
+      this.showSaving('Saving assignment...');
+
       this.dbService.assignDriverToTruck({
         businessId: this.businessId,
         businessIdAsObjectId: this.businessIdAsObjectId,
@@ -526,8 +593,12 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
         next: () => {
           void this.refreshAll();
           this.expandedTruck = null;
+          this.showSaved('Assignment updated');
         },
-        error: (error: any) => console.error('Error reassigning driver:', error)
+        error: (error: any) => {
+          console.error('Error reassigning driver:', error);
+          this.showSaveError('Failed to update assignment');
+        }
       });
     });
   }
@@ -542,6 +613,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
       const driverObjectId = this.oidToString(driver?._id);
       if (!driverObjectId) return;
 
+      this.showSaving('Saving license info...');
+
       const existingLicense = driver?.license?.[0] ?? {};
 
       this.dbService.updateDriver({
@@ -554,8 +627,50 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
         next: () => {
           void this.refreshAll();
           this.expandedDriver = null;
+          this.showSaved('License info saved');
         },
-        error: (error: any) => console.error('Error updating license info:', error)
+        error: (error: any) => {
+          console.error('Error updating license info:', error);
+          this.showSaveError('Failed to save license info');
+        }
+      });
+    });
+  }
+
+  editPersonalInfo(driver: any): void {
+    this.dialog.open(EditPersonalInfoComponent, {
+      width: '400px',
+      disableClose: false,
+      data: { driver }
+    }).afterClosed().subscribe((result: any) => {
+      if (!result) return;
+
+      if (!this.businessId) return;
+      const driverObjectId = this.oidToString(driver?._id);
+      if (!driverObjectId) return;
+
+      this.showSaving('Saving personal info...');
+
+      this.dbService.updateDriver({
+        businessId: this.businessId,
+        businessIdAsObjectId: this.businessIdAsObjectId,
+        actor: this.actor(),
+        driverObjectId,
+        update: {
+          name: result?.name,
+          phone: result?.phone,
+          email: result?.email
+        }
+      }).subscribe({
+        next: () => {
+          void this.refreshAll();
+          this.expandedDriver = null;
+          this.showSaved('Personal info saved');
+        },
+        error: (error: any) => {
+          console.error('Error updating personal info:', error);
+          this.showSaveError('Failed to save personal info');
+        }
       });
     });
   }
@@ -570,6 +685,8 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
       const driverObjectId = this.oidToString(driver?._id);
       if (!driverObjectId) return;
 
+      this.showSaving('Saving address info...');
+
       const existingAddress = driver?.address?.[0] ?? {};
 
       this.dbService.updateDriver({
@@ -582,8 +699,12 @@ export class TruckAndDriverManagementComponent implements OnInit, AfterViewInit 
         next: () => {
           void this.refreshAll();
           this.expandedDriver = null;
+          this.showSaved('Address info saved');
         },
-        error: (error: any) => console.error('Error updating address info:', error)
+        error: (error: any) => {
+          console.error('Error updating address info:', error);
+          this.showSaveError('Failed to save address info');
+        }
       });
     });
   }

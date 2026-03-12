@@ -60,6 +60,21 @@ export class AddEditTruckComponent implements OnInit {
         ? this.truck.odometer
         : this.truck?.odometer?.value ?? '';
 
+    const normalizedStatus = (() => {
+      const rawStatus = this.truck?.status;
+
+      if (typeof rawStatus === 'string') {
+        const s = rawStatus.trim().toLowerCase();
+        if (s === 'active') return 'Active';
+        if (s === 'inactive') return 'Inactive';
+        return '';
+      }
+
+      if (rawStatus === true) return 'Active';
+      if (rawStatus === false) return 'Inactive';
+      return '';
+    })();
+
     this.truckForm = this.fb.group({
       truckId: [{ value: this.truck ? this.truck.truckId : null, disabled: true }],
       licensePlate: [this.truck ? this.truck.licensePlate : '', Validators.required],
@@ -71,7 +86,7 @@ export class AddEditTruckComponent implements OnInit {
       vin: [this.truck ? this.truck.vin : '', Validators.required],
       odometer: [this.truck ? currentOdometer : '', Validators.required],
       registrationExpiration: [this.truck ? this.truck.registrationExpiration : '', Validators.required],
-      status: [this.truck ? this.truck.status : '', Validators.required],
+      status: [this.truck ? normalizedStatus : '', Validators.required],
     });
   }
 
