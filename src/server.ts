@@ -7,6 +7,36 @@ const app = express();
 const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
 const siteUrl = 'https://www.reviewmydriving.co';
 
+// Cloud Run / Firebase App Hosting sit behind a proxy/CDN.
+// This makes req.protocol and req.hostname honor X-Forwarded-* headers.
+app.enable('trust proxy');
+
+// Normalize host + protocol to avoid duplicate URL variants in search engines.
+app.use((req, res, next) => {
+  const forwardedProto = req.header('x-forwarded-proto');
+  const proto = (forwardedProto || req.protocol || 'https').toLowerCase();
+
+  const forwardedHost = req.header('x-forwarded-host');
+  const hostHeader = (forwardedHost || req.header('host') || '').toLowerCase();
+  const host = hostHeader.split(',')[0]?.trim();
+
+  const shouldForceHttps = proto !== 'https';
+  const shouldForceWww = host === 'reviewmydriving.co';
+
+  if (shouldForceHttps || shouldForceWww) {
+    const targetHost = shouldForceWww ? 'www.reviewmydriving.co' : host;
+    return res.redirect(301, `https://${targetHost}${req.originalUrl}`);
+  }
+
+  // Strip trailing slash (except for root) to avoid duplicate paths.
+  if (req.path.length > 1 && req.path.endsWith('/')) {
+    const withoutTrailingSlash = req.originalUrl.replace(/\/+$/, '');
+    return res.redirect(301, withoutTrailingSlash);
+  }
+
+  next();
+});
+
 const indexableRoutes = [
   '/',
   '/home',
