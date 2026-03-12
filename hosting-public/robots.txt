@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /account
+Disallow: /settings
+Disallow: /admin-functions
+Disallow: /checkout
+Disallow: /cart
+Disallow: /orderConfirmation
+Disallow: /daily-report
+
+Sitemap: https://www.reviewmydriving.co/sitemap.xml

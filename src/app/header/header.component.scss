@@ -63,7 +63,7 @@
 
 .brand {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center; // change baseline -> center for image alignment
   gap: 0.35rem;
 
   text-decoration: none;
@@ -78,18 +78,12 @@
   }
 }
 
-.brand__primary,
-.brand__secondary {
-  font-size: 1.05rem;
-}
-
-.brand__primary {
-  font-weight: 700;
-}
-
-.brand__secondary {
-  font-weight: 850;
-  color: var(--hdr-brand);
+.brand__logo {
+  display: block;
+  height: 2.2rem; // ~matches the previous text visual height; tweak if needed
+  width: auto;
+  max-width: 180px; // prevents it from getting too wide on narrow headers
+  object-fit: contain;
 }
 
 .nav {

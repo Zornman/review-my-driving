@@ -5,15 +5,55 @@ import { render } from './main.server'; // Import named export, not "default"
 
 const app = express();
 const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
+const siteUrl = 'https://www.reviewmydriving.co';
+
+const indexableRoutes = [
+  '/',
+  '/home',
+  '/shop',
+  '/services',
+  '/about',
+  '/contact'
+];
+
+const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${indexableRoutes
+  .map(
+    (route) => `  <url>
+    <loc>${siteUrl}${route === '/' ? '' : route}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>${route === '/' ? '1.0' : '0.7'}</priority>
+  </url>`
+  )
+  .join('\n')}
+</urlset>`;
+
+const robotsTxt = `User-agent: *
+Allow: /
+
+Disallow: /account
+Disallow: /settings
+Disallow: /admin-functions
+Disallow: /checkout
+Disallow: /cart
+Disallow: /orderConfirmation
+Disallow: /daily-report
+
+Sitemap: ${siteUrl}/sitemap.xml`;
+
+app.get('/sitemap.xml', (_req, res) => {
+  res.type('application/xml');
+  res.send(sitemapXml);
+});
+
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain');
+  res.send(robotsTxt);
+});
 
 // Serve static files (JS, CSS, images)
 app.use(express.static(distFolder, { maxAge: '1y' }));
-
-// ✅ Ensure MIME types are correctly set for JavaScript files
-app.get('*', (req, res, next) => {
-  res.setHeader('Content-Type', 'application/javascript');
-  next();
-});
 
 // Handle all routes using Angular SSR
 app.get('*', async (req, res) => {
