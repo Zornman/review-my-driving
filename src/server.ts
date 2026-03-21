@@ -14,11 +14,15 @@ app.enable('trust proxy');
 // Normalize host + protocol to avoid duplicate URL variants in search engines.
 app.use((req, res, next) => {
   const forwardedProto = req.header('x-forwarded-proto');
-  const proto = (forwardedProto || req.protocol || 'https').toLowerCase();
+  const proto = (forwardedProto || req.protocol || 'https')
+    .split(',')[0]
+    ?.trim()
+    .toLowerCase();
 
   const forwardedHost = req.header('x-forwarded-host');
   const hostHeader = (forwardedHost || req.header('host') || '').toLowerCase();
-  const host = hostHeader.split(',')[0]?.trim();
+  const hostWithMaybePort = hostHeader.split(',')[0]?.trim();
+  const host = (hostWithMaybePort || '').split(':')[0]?.trim();
 
   const shouldForceHttps = proto !== 'https';
   const shouldForceWww = host === 'reviewmydriving.co';
@@ -32,6 +36,32 @@ app.use((req, res, next) => {
   if (req.path.length > 1 && req.path.endsWith('/')) {
     const withoutTrailingSlash = req.originalUrl.replace(/\/+$/, '');
     return res.redirect(301, withoutTrailingSlash);
+  }
+
+  next();
+});
+
+// Ensure non-public routes are not indexed even if HTML meta tags are missed.
+// (Robots.txt should allow crawling so search engines can see this.)
+app.use((req, res, next) => {
+  const pathLower = (req.path || '').toLowerCase();
+
+  const noindexPrefixes = [
+    '/register',
+    '/cart',
+    '/checkout',
+    '/orderconfirmation',
+    '/login',
+    '/resetpassword',
+    '/account',
+    '/settings',
+    '/admin-functions',
+    '/daily-report',
+  ];
+
+  const shouldNoindex = noindexPrefixes.some((prefix) => pathLower === prefix || pathLower.startsWith(`${prefix}/`));
+  if (shouldNoindex) {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   }
 
   next();
@@ -61,15 +91,6 @@ ${indexableRoutes
 
 const robotsTxt = `User-agent: *
 Allow: /
-
-Disallow: /account
-Disallow: /settings
-Disallow: /admin-functions
-Disallow: /checkout
-Disallow: /cart
-Disallow: /orderConfirmation
-Disallow: /daily-report
-
 Sitemap: ${siteUrl}/sitemap.xml`;
 
 app.get('/sitemap.xml', (_req, res) => {
