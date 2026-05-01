@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node dist/review-my-driving/server/server.mjs",
+    "start:dev": "ng serve",
     "build": "ng build --configuration=production",
     "watch": "ng build --configuration development",
     "test": "ng test",
