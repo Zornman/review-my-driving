@@ -9,8 +9,8 @@
     "test": "ng test",
     "deploy": "firebase deploy --only functions",
     "lint": "eslint \"src/**/*.ts\" --fix",
-    "build:ssr": "ng run review-my-driving:server",
-    "serve:ssr": "node dist/review-my-driving/server/main.js",
+    "build:ssr": "ng build --configuration=production",
+    "serve:ssr": "node dist/review-my-driving/server/server.mjs",
     "serve:ssr:review-my-driving": "node dist/review-my-driving/server/server.mjs"
   },
   "private": true,

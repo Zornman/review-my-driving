@@ -1,11 +1,12 @@
 import 'zone.js/node';
 import express from 'express';
 import { join } from 'path';
-import { render } from './main.server'; // Import named export, not "default"
+import { AngularNodeAppEngine, createNodeRequestHandler, writeResponseToNodeResponse } from '@angular/ssr/node';
 
 const app = express();
 const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
 const siteUrl = 'https://www.reviewmydriving.co';
+const angularApp = new AngularNodeAppEngine();
 
 // Cloud Run / Firebase App Hosting sit behind a proxy/CDN.
 // This makes req.protocol and req.hostname honor X-Forwarded-* headers.
@@ -23,13 +24,12 @@ app.use((req, res, next) => {
   const hostHeader = (forwardedHost || req.header('host') || '').toLowerCase();
   const hostWithMaybePort = hostHeader.split(',')[0]?.trim();
   const host = (hostWithMaybePort || '').split(':')[0]?.trim();
+  const isLocalHost = host === 'localhost' || host === '127.0.0.1';
 
-  const shouldForceHttps = proto !== 'https';
-  const shouldForceWww = host === 'reviewmydriving.co';
+  const shouldForceHttps = proto !== 'https' && !isLocalHost;
 
-  if (shouldForceHttps || shouldForceWww) {
-    const targetHost = shouldForceWww ? 'www.reviewmydriving.co' : host;
-    return res.redirect(301, `https://${targetHost}${req.originalUrl}`);
+  if (shouldForceHttps) {
+    return res.redirect(301, `https://${hostWithMaybePort}${req.originalUrl}`);
   }
 
   // Strip trailing slash (except for root) to avoid duplicate paths.
@@ -104,16 +104,22 @@ app.get('/robots.txt', (_req, res) => {
 });
 
 // Serve static files (JS, CSS, images)
-app.use(express.static(distFolder, { maxAge: '1y' }));
+app.use(express.static(distFolder, { maxAge: '1y', index: false, redirect: false }));
 
 // Handle all routes using Angular SSR
-app.get('*', async (req, res) => {
+app.get('*', async (req, res): Promise<void> => {
   try {
-    const html = await render(req.originalUrl); // Pass the request URL to the render function
-    res.send(html);
+    const response = await angularApp.handle(req);
+    if (!response) {
+      res.status(404).send('<h1>Not Found</h1>');
+      return;
+    }
+
+    await writeResponseToNodeResponse(response, res);
   } catch (error) {
     console.error('❌ SSR Error:', error);
     res.status(500).send('<h1>Internal Server Error</h1>');
+    return;
   }
 });
 
@@ -122,3 +128,5 @@ const PORT = process.env['PORT'] || 8080;
 app.listen(PORT, () => {
   console.log(`🚀 Angular 19 SSR running at http://localhost:${PORT}`);
 });
+
+export const reqHandler = createNodeRequestHandler(app);
