@@ -1,7 +1,12 @@
 import 'zone.js/node';
 import express from 'express';
 import { join } from 'path';
+import { ɵsetAngularAppEngineManifest } from '@angular/ssr';
 import { AngularNodeAppEngine, createNodeRequestHandler, writeResponseToNodeResponse } from '@angular/ssr/node';
+// @ts-expect-error Generated during the SSR build and emitted next to server.mjs.
+import angularAppEngineManifest from './angular-app-engine-manifest.mjs';
+
+ɵsetAngularAppEngineManifest(angularAppEngineManifest);
 
 const app = express();
 const distFolder = join(process.cwd(), 'dist/review-my-driving/browser');
