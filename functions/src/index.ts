@@ -145,7 +145,7 @@ export const sendDailyReportMagicLinksSchedule = onSchedule(
 
 export const sendTruckRegistrationRenewalSummarySchedule = onSchedule(
   {
-    schedule: "every day 07:00",
+    schedule: "0 7 * * 1",
     // If you want a specific timezone for the *trigger*, uncomment and set it:
     timeZone: "America/Phoenix",
     secrets: [MONGO_URI, EMAIL_USER, EMAIL_PASS, DEFAULT_TO_EMAIL],
