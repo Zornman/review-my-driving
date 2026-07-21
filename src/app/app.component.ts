@@ -1,5 +1,5 @@
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, Inject } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { filter } from 'rxjs';
@@ -24,8 +24,7 @@ export class AppComponent {
     private readonly activatedRoute: ActivatedRoute,
     private readonly meta: Meta,
     private readonly titleService: Title,
-    @Inject(DOCUMENT) private readonly document: Document,
-    @Inject(PLATFORM_ID) private readonly platformId: Object
+    @Inject(DOCUMENT) private readonly document: Document
   ) {
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
@@ -64,15 +63,13 @@ export class AppComponent {
 
   private getCanonicalUrl(): string {
     const currentPath = this.router.url.split('?')[0].split('#')[0];
-    const normalizedPath = currentPath === '/' ? '' : currentPath;
-    return `${this.siteUrl}${normalizedPath}`;
+    if (currentPath === '/') {
+      return `${this.siteUrl}/`;
+    }
+    return `${this.siteUrl}${currentPath}`;
   }
 
   private updateCanonicalLink(url: string): void {
-    if (!isPlatformBrowser(this.platformId)) {
-      return;
-    }
-
     let canonicalLink = this.document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonicalLink) {
       canonicalLink = this.document.createElement('link');

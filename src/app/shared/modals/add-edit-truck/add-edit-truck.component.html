@@ -63,7 +63,10 @@
         </mat-form-field>
         <mat-form-field appearance="fill" class="full-width">
             <mat-label>Status</mat-label>
-            <input matInput formControlName="status" name="status" />
+            <mat-select formControlName="status" name="status">
+                <mat-option value="Active">Active</mat-option>
+                <mat-option value="Inactive">Inactive</mat-option>
+            </mat-select>
         </mat-form-field>
     </form>
 </mat-dialog-content>

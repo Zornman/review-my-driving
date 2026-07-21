@@ -1,6 +1,6 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,13 +37,11 @@ export class ContactComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private emailService: EmailService
+    private emailService: EmailService,
+    @Inject(PLATFORM_ID) private readonly platformId: Object
   ) {}
 
   ngOnInit(): void {
-    // Scroll to top when component initializes
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     this.contactForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -51,6 +49,11 @@ export class ContactComponent implements OnInit {
       reasonForContacting: ['', Validators.required],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]]
     });
+
+    // Scroll to top when component initializes (browser only)
+    if (isPlatformBrowser(this.platformId)) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   sendFeedback(): void {

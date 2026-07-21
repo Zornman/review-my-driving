@@ -301,6 +301,9 @@
                 </div>
 
                 <div class="tdm-actions">
+                  <button mat-stroked-button color="primary" (click)="editPersonalInfo(element); $event.stopPropagation()">
+                    Edit Personal
+                  </button>
                   <button mat-flat-button color="primary" (click)="editLicenseInfo(element); $event.stopPropagation()">
                     Edit License
                   </button>
